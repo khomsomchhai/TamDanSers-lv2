@@ -72,11 +72,9 @@ class AppTextStyles {
       isKhmer
           ? GoogleFonts.googleSans(
               fontSize: 16,
-              fontWeight: FontWeight.w500,
             )
           : GoogleFonts.spaceGrotesk(
               fontSize: 16,
-              fontWeight: FontWeight.w500,
             );
 
   static TextStyle get bodyMedium =>
