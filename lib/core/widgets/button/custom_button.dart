@@ -93,8 +93,8 @@ class CustomButton extends StatelessWidget {
       ),
       child: isLoading
           ? SizedBox(
-              height: 22,
-              width: 22,
+              height: 24,
+              width: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 color: getTextColor(),
@@ -110,7 +110,7 @@ class CustomButton extends StatelessWidget {
 
                 Text(
                   text,
-                  style: Get.textTheme.titleSmall!.copyWith(color: getTextColor())
+                  style: Get.textTheme.titleMedium!.copyWith(color: getTextColor())
                 ),
 
                 if (suffixIcon != null) ...[
