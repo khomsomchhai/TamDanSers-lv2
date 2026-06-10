@@ -73,6 +73,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                 LocalizationService().changeLocale(lang);
               },
               position: PopupMenuPosition.under,
+              borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
               itemBuilder: (context) {
                 return [
                   PopupMenuItem(
