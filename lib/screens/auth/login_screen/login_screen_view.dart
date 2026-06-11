@@ -71,7 +71,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           children: [
             PopupMenuButton<String>(
               onSelected: (lang) {
-                LocalizationService().changeLocale(lang);
+                controller.changeLanguage(lang);
               },
               position: PopupMenuPosition.under,
               borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
@@ -104,7 +104,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                         SizedBox(width: 10,),
                         Text(
                           "ភាសាខ្មែរ",
-                          style: GoogleFonts.googleSans(),
+                          style: GoogleFonts.kantumruyPro(),
                         ),
                       ],
                     ),
@@ -123,7 +123,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                   SizedBox(width: 10,),
                   Text(
                     Get.locale?.languageCode == 'km' ? "ភាសាខ្មែរ" : "English",
-                    style: Get.locale?.languageCode == 'km' ? GoogleFonts.googleSans() : GoogleFonts.spaceGrotesk(),
+                    style: GoogleFonts.kantumruyPro(),
                   )
                 ],
               ),
@@ -154,16 +154,16 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
       child: Column(
         children: [
           Text(
-            "Login",
+            "login_title".tr,
             style: Get.textTheme.titleLarge,
           ),
           SizedBox(height: 20,),
           CustomTextField(
-            hintText: "Enter your ID",
+            hintText: "hint_id".tr,
             controller: controller.idCtrl,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return "Required";
+                return "Required".tr;
               }
               return null;
             },
@@ -173,11 +173,11 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             height: 16,
           ),
           Obx(() => CustomTextField(
-                hintText: "Enter your password",
+                hintText: "hint_password".tr,
                 controller: controller.pwdCtrl,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return "Required";
+                    return "Required".tr;
                   }
                   return null;
                 },
@@ -205,7 +205,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               Bounceable(
                 onTap: () {},
                 child: Text(
-                  "Forget Password?",
+                  "forget_password".tr,
                   style:
                       Get.textTheme.bodyLarge!.copyWith(color: AppColors.info),
                 ),
@@ -219,7 +219,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                 height: 50,
                 width: double.infinity,
                 child: CustomButton(
-                  text: "Login",
+                  text: "login_title".tr,
                   onPressed: () {
                     controller.login();
                   },
@@ -239,7 +239,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Don't have an account?",
+              "no_account".tr,
               style: Get.textTheme.bodyLarge,
             ),
             SizedBox(
@@ -247,7 +247,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             ),
             GestureDetector(
               onTap: () {},
-              child: Text("Register",
+              child: Text("register".tr,
                   style: Get.textTheme.bodyLarge!
                       .copyWith(color: AppColors.info)),
             ),
