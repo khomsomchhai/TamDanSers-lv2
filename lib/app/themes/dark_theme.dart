@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 
-final ThemeData darkTheme = ThemeData(
+ThemeData get darkTheme => ThemeData(
   brightness: Brightness.dark,
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.darkBackground,

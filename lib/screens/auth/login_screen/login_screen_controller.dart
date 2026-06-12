@@ -12,6 +12,11 @@ class LoginScreenViewController extends GetxController {
 
   var isKeyboardOpen = false.obs;
 
+  void changeLanguage(String lang){
+  LocalizationService().changeLocale(lang);
+  Get.forceAppUpdate();
+}
+
   void updateKeyboard(BuildContext context) {
     isKeyboardOpen.value = MediaQuery.of(context).viewInsets.bottom > 0;
   }
