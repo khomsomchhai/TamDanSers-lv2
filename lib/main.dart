@@ -7,6 +7,7 @@ import 'package:tamdansers_lv2/app/routes/app_pages.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/dark_theme.dart';
 import 'package:tamdansers_lv2/app/themes/light_theme.dart';
+import 'package:tamdansers_lv2/core/api/controllers/initial_binding.dart';
 import 'package:tamdansers_lv2/core/services/theme_service.dart';
 
 void main() async {
@@ -27,7 +28,8 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.loginScreen,
+      initialRoute: AppRoutes.splashScreen,
+      initialBinding: InitialBinding(),
 
       translations: AppTranslation(),
       locale: LocalizationService().getLocale(),

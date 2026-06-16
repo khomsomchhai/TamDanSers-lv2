@@ -10,4 +10,9 @@ Map<String, String> enUs = {
   'no_account': "Don't have an account?",
   'register': 'Register',
   "requred" : "Required",
+  "good_morning" : "Good morning!",
+  "good_afternoon" : "Good afternoon!",
+  "good_evening" : "Good evening!",
+  "good_night" : "Good night!",
+
 };

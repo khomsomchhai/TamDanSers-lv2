@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
+import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
+import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
+import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
 import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/core/widgets/textfield.dart/custom_textfield.dart';
@@ -71,7 +75,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           children: [
             PopupMenuButton<String>(
               onSelected: (lang) {
-                controller.changeLanguage(lang);
+                LocalizationService().changeLocale(lang);
               },
               position: PopupMenuPosition.under,
               borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
