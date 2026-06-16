@@ -10,4 +10,8 @@ Map<String, String> kmKh = {
   'no_account': 'គ្មានគណនី?',
   'register': 'ចុះឈ្មោះ',
   "Required" : "ចាំបាច់",
+  "good_morning" : "អរុណសួស្តី!",
+  "good_afternoon" : "ទិវាសួស្ដី!",
+  "good_evening" : "សាយណ្ហសួស្ដី!",
+  "good_night" : "រាត្រីសួស្ដី!",
 };
