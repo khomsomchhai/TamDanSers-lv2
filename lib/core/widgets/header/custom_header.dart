@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:tamdansers_lv2/app/constants/app_icons.dart';
-import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
-import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 
 class CustomHeader extends StatelessWidget {
@@ -47,97 +42,23 @@ class CustomHeader extends StatelessWidget {
         const SizedBox(
           width: 10,
         ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                getGreeting(),
-                style: Get.textTheme.bodySmall!
-                    .copyWith(height: 1.2),
-              ),
-              Text(
-                controller.user!.fullName,
-                style: Get.textTheme.titleSmall!
-                    .copyWith(height: 1.2),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          )
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              getGreeting(),
+              style: Get.textTheme.bodySmall!
+                  .copyWith(height: 1.2),
+            ),
+            Text(
+              controller.user!.fullName,
+              style: Get.textTheme.titleSmall!
+                  .copyWith(height: 1.2),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
-        SizedBox(
-          width: 10,
-        ),
-        PopupMenuButton<String>(
-          onSelected: (lang) {
-            LocalizationService().changeLocale(lang);
-          },
-          position: PopupMenuPosition.under,
-          borderRadius:
-              BorderRadius.circular(AppNumbers.radiusMedium),
-          itemBuilder: (context) {
-            return [
-              PopupMenuItem(
-                value: 'en',
-                child: Row(
-                  children: [
-                    Image.asset(
-                      AppIcons.englishIcon,
-                      width: 24,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      "English",
-                      style: Get.textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'km',
-                child: Row(
-                  children: [
-                    Image.asset(
-                      AppIcons.khmerIcon,
-                      width: 24,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      "ភាសាខ្មែរ",
-                      style: GoogleFonts.kantumruyPro(),
-                    ),
-                  ],
-                ),
-              ),
-            ];
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Image.asset(
-                Get.locale?.languageCode == 'km'
-                    ? AppIcons.khmerIcon
-                    : AppIcons.englishIcon,
-                width: 24,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          width: 6,
-        ),
-        Bounceable(
-          onTap: () {},
-          child: Icon(
-            Icons.notifications_rounded,
-            size: 28,
-          )
-        )
       ],
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header.dart';
+import 'package:tamdansers_lv2/core/widgets/header/custom_header_action.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_placeholder.dart';
 
 part 'home_tab_binding.dart';
@@ -19,9 +20,19 @@ class HomeTabView extends GetView<HomeTabViewController> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                Obx(() => controller.userController.isLoading.value
-                ? CustomHeaderPlaceholder()
-                : CustomHeader(controller: controller.userController),)
+                Row(
+                  children: [
+                    Expanded(
+                      child: Obx(() => controller.userController.isLoading.value
+                      ? CustomHeaderPlaceholder()
+                      : CustomHeader(controller: controller.userController),),
+                    ),
+                    const SizedBox(width: 10,),
+                    CustomHeaderAction(onTapNotification: () {
+                      
+                    },)
+                  ],
+                )
               ],
             ),
           ),
