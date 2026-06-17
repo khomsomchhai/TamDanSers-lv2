@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
+import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 
 part 'splash_screen_binding.dart';
@@ -12,6 +14,7 @@ class SplashScreenView extends GetView<SplashScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    controller.navigation();
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: Column(

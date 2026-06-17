@@ -1,3 +1,18 @@
 Map<String, String> enUs = {
-  
+  'language_english': 'English',
+  'language_khmer': 'Khmer',
+  'login_title': 'Login',
+  'hint_id': 'Enter your ID',
+  'hint_password': 'Enter your password',
+  'required': 'Required',
+  'forget_password': 'Forget Password?',
+  'login': 'Login',
+  'no_account': "Don't have an account?",
+  'register': 'Register',
+  "requred" : "Required",
+  "good_morning" : "Good morning!",
+  "good_afternoon" : "Good afternoon!",
+  "good_evening" : "Good evening!",
+  "good_night" : "Good night!",
+
 };

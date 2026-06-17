@@ -12,6 +12,9 @@ class LoginScreenViewController extends GetxController {
 
   var isKeyboardOpen = false.obs;
 
+  var authService = AuthServices();
+  var box = GetStorage();
+
   void updateKeyboard(BuildContext context) {
     isKeyboardOpen.value = MediaQuery.of(context).viewInsets.bottom > 0;
   }
@@ -25,10 +28,42 @@ class LoginScreenViewController extends GetxController {
       CustomSnackbar.error("Invalid form");
       return;
     }
-    isLoading.value = true;
-    await Future.delayed(Duration(seconds: 2));
-    isLoading.value = false;
-    CustomSnackbar.error("Login credentials are incorrect");
+    try{
+      isLoading.value = true;
+      var response = await authService.loginService(
+        loginId: idCtrl.text, 
+        password: pwdCtrl.text
+      );
+      if(response["access_token"] != null){
+        await box.write(
+          "token",
+          response["access_token"],
+        );
+        await box.write(
+          "role",
+          response["role"],
+        );
+        CustomSnackbar.success("Login successful");
+        if(response["role"] == "student"){
+          Get.offAllNamed(
+            AppRoutes.studentDashboard,
+          );
+        }else if(response["role"] == "parent"){
+          Get.offAllNamed(
+            AppRoutes.parentDashboard,
+          );
+        }else{
+          CustomSnackbar.error("Unknown role");
+        }
+      }else{
+        CustomSnackbar.error("Login failed");
+      }
+
+      isLoading.value = false;
+    }catch(error){
+      CustomSnackbar.error("Login credentials are incorrect");
+      isLoading.value = false;
+    }
   }
 
   

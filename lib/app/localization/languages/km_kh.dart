@@ -1,3 +1,17 @@
 Map<String, String> kmKh = {
-  
+  'language_english': 'អង់គ្លេស',
+  'language_khmer': 'ភាសាខ្មែរ',
+  'login_title': 'ចូលគណនី',
+  'hint_id': 'បញ្ចូលលេខសម្គាល់របស់អ្នក',
+  'hint_password': 'បញ្ចូលពាក្យសម្ងាត់របស់អ្នក',
+  'required': 'ចាំបាច់',
+  'forget_password': 'ភ្លេចពាក្យសម្ងាត់?',
+  'login': 'ចូល',
+  'no_account': 'គ្មានគណនី?',
+  'register': 'ចុះឈ្មោះ',
+  "Required" : "ចាំបាច់",
+  "good_morning" : "អរុណសួស្តី!",
+  "good_afternoon" : "ទិវាសួស្ដី!",
+  "good_evening" : "សាយណ្ហសួស្ដី!",
+  "good_night" : "រាត្រីសួស្ដី!",
 };

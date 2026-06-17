@@ -36,12 +36,14 @@ class CustomTextField extends StatelessWidget {
       minLines: isMultiline ? 5 : 1,
       maxLines: isMultiline ? 10 : 1,
       cursorColor: AppColors.dark,
+      style: Get.textTheme.bodyLarge,
       decoration: InputDecoration(
+        labelStyle: Get.textTheme.bodyLarge,
         hintText: hintText,
-        hintStyle: Get.textTheme.bodyMedium!.copyWith(color: AppColors.hintColor),
+        hintStyle: Get.textTheme.bodyLarge!.copyWith(color: AppColors.hintColor),
         prefixIcon: prefixIcon,
         suffixIcon: isPwd ? suffixIcon : null,
-        errorStyle: Get.textTheme.bodyMedium!.copyWith(color: AppColors.error),
+        errorStyle: Get.textTheme.bodyLarge!.copyWith(color: AppColors.error),
         border: OutlineInputBorder(
           borderSide: BorderSide.none,
           borderRadius: BorderRadius.circular(AppNumbers.radiusMedium)

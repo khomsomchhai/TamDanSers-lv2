@@ -13,6 +13,5 @@ class LocalizationService {
   void changeLocale(String lang){
     box.write("lang", lang);
     Get.updateLocale(Locale(lang));
-
   }
 }

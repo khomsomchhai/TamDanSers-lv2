@@ -1,0 +1,38 @@
+import 'package:dio/dio.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+
+class ApiConfig {
+
+  late Dio dio;
+  ApiConfig() {
+    dio = Dio(
+      BaseOptions(
+        baseUrl: "https://tamdanses-lv2.onrender.com",
+        connectTimeout: const Duration(seconds: 100),
+        receiveTimeout: const Duration(seconds: 100),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      ),
+    );
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          var token = GetStorage().read("token");
+          if(token != null){
+            options.headers["Authorization"] = "Bearer $token";
+          }
+          handler.next(options);
+        },
+      ),
+    );
+    dio.interceptors.add(
+      PrettyDioLogger(
+        requestBody: true,
+        requestHeader: true,
+        responseBody: true,
+      ),
+    );
+  }
+}

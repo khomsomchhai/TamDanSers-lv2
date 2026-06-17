@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
+import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
+import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
 import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/core/widgets/textfield.dart/custom_textfield.dart';
@@ -73,6 +77,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                 LocalizationService().changeLocale(lang);
               },
               position: PopupMenuPosition.under,
+              borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
               itemBuilder: (context) {
                 return [
                   PopupMenuItem(
@@ -101,8 +106,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                         ),
                         SizedBox(width: 10,),
                         Text(
-                          "Khmer",
-                          style: Get.textTheme.bodyMedium,
+                          "ភាសាខ្មែរ",
+                          style: GoogleFonts.kantumruyPro(),
                         ),
                       ],
                     ),
@@ -120,8 +125,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                   ),
                   SizedBox(width: 10,),
                   Text(
-                    Get.locale?.languageCode == 'km' ? "Khmer" : "English",
-                    style: Get.textTheme.bodyMedium,
+                    Get.locale?.languageCode == 'km' ? "ភាសាខ្មែរ" : "English",
+                    style: GoogleFonts.kantumruyPro(),
                   )
                 ],
               ),
@@ -130,7 +135,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
         ),
         SizedBox(height: 20,),
         SizedBox(
-          height: 100,
+          height: 140,
           child: ClipRRect(
             borderRadius: BorderRadiusGeometry.circular(AppNumbers.radiusMedium),
             child: SvgPicture.asset(
@@ -152,16 +157,16 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
       child: Column(
         children: [
           Text(
-            "Login",
+            "login_title".tr,
             style: Get.textTheme.titleLarge,
           ),
           SizedBox(height: 20,),
           CustomTextField(
-            hintText: "Enter your ID",
+            hintText: "hint_id".tr,
             controller: controller.idCtrl,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return "Required";
+                return "Required".tr;
               }
               return null;
             },
@@ -171,11 +176,11 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             height: 16,
           ),
           Obx(() => CustomTextField(
-                hintText: "Enter your password",
+                hintText: "hint_password".tr,
                 controller: controller.pwdCtrl,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return "Required";
+                    return "Required".tr;
                   }
                   return null;
                 },
@@ -203,9 +208,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               Bounceable(
                 onTap: () {},
                 child: Text(
-                  "Forget Password?",
+                  "forget_password".tr,
                   style:
-                      Get.textTheme.bodyMedium!.copyWith(color: AppColors.info),
+                      Get.textTheme.bodyLarge!.copyWith(color: AppColors.info),
                 ),
               )
             ],
@@ -217,7 +222,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                 height: 50,
                 width: double.infinity,
                 child: CustomButton(
-                  text: "Login",
+                  text: "login_title".tr,
                   onPressed: () {
                     controller.login();
                   },
@@ -237,16 +242,16 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Don't have an account?",
-              style: Get.textTheme.bodyMedium,
+              "no_account".tr,
+              style: Get.textTheme.bodyLarge,
             ),
             SizedBox(
               width: 10,
             ),
             GestureDetector(
               onTap: () {},
-              child: Text("Register",
-                  style: Get.textTheme.bodyMedium!
+              child: Text("register".tr,
+                  style: Get.textTheme.bodyLarge!
                       .copyWith(color: AppColors.info)),
             ),
           ],
