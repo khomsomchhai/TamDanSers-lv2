@@ -20,7 +20,10 @@ class ApiConfig {
       InterceptorsWrapper(
         onRequest: (options, handler) {
           var token = GetStorage().read("token");
-          if(token != null){
+          if (token is String) {
+            token = token.trim();
+          }
+          if (token != null && token is String && token.isNotEmpty) {
             options.headers["Authorization"] = "Bearer $token";
           }
           handler.next(options);

@@ -4,6 +4,36 @@ class HomeTabViewController extends GetxController {
 
   var userController = Get.find<UserController>();
 
+  String getCurrentDate() {
+    DateTime now = DateTime.now();
+    List<String> khmerWeekDays = [
+      "ថ្ងៃច័ន្ទ",
+      "ថ្ងៃអង្គារ",
+      "ថ្ងៃពុធ",
+      "ថ្ងៃព្រហស្បតិ៍",
+      "ថ្ងៃសុក្រ",
+      "ថ្ងៃសៅរ៍",
+      "ថ្ងៃអាទិត្យ",
+    ];
+    List<String> khmerMonths = [
+      "មករា",
+      "កុម្ភៈ",
+      "មីនា",
+      "មេសា",
+      "ឧសភា",
+      "មិថុនា",
+      "កក្កដា",
+      "សីហា",
+      "កញ្ញា",
+      "តុលា",
+      "វិច្ឆិកា",
+      "ធ្នូ",
+    ];
+    String weekDay = khmerWeekDays[now.weekday - 1];
+    String month = khmerMonths[now.month - 1];
+    return "$weekDay ទី ${now.day} ខែ $month ឆ្នាំ ${now.year}";
+  }
+
   @override
   void onInit() {
     // TODO: implement onInit
