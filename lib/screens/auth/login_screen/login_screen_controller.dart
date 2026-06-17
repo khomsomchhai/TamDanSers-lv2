@@ -35,15 +35,16 @@ class LoginScreenViewController extends GetxController {
         password: pwdCtrl.text
       );
       if(response["access_token"] != null){
+        var token = response["access_token"]?.toString().trim();
         await box.write(
           "token",
-          response["access_token"],
+          token,
         );
         await box.write(
           "role",
           response["role"],
         );
-        CustomSnackbar.success("Login successful");
+        // CustomSnackbar.success("Login successful");
         if(response["role"] == "student"){
           Get.offAllNamed(
             AppRoutes.studentDashboard,
@@ -58,10 +59,9 @@ class LoginScreenViewController extends GetxController {
       }else{
         CustomSnackbar.error("Login failed");
       }
-
-      isLoading.value = false;
     }catch(error){
       CustomSnackbar.error("Login credentials are incorrect");
+    }finally{
       isLoading.value = false;
     }
   }
