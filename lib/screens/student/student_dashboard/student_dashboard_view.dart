@@ -37,11 +37,11 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
               label: "Home",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_outlined),
+              icon: Icon(Icons.menu_book_outlined),
               label: "Homework",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart_outlined),
+              icon: Icon(Icons.check_circle_outline),
               label: "Attendance",
             ),
             BottomNavigationBarItem(
