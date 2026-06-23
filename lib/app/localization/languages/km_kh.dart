@@ -14,4 +14,15 @@ Map<String, String> kmKh = {
   "good_afternoon" : "ទិវាសួស្ដី!",
   "good_evening" : "សាយណ្ហសួស្ដី!",
   "good_night" : "រាត្រីសួស្ដី!",
+
+  "home" : "ទំព័រដើម",
+  "homework" : "កិច្ចការផ្ទះ",
+  "attendance" : "អវត្តមាន",
+  "profile" : "ប្រវត្តិរូប",
+
+  "class" : "ថ្នាក់ទី​ ",
+
+  "ask_permission" : "សុំច្បាប់",
+  "schedule" : "កាលវិភាគ",
+  "result" : "លទ្ធផល់",
 };

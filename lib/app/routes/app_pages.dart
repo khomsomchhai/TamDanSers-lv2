@@ -36,19 +36,19 @@ class AppPages {
       name: AppRoutes.askPermissionScreen, 
       page: () => AskPermissionScreenView(),
       binding: AskPermissionScreenViewBinding(),
-      transition: Transition.leftToRight
+      transition: Transition.rightToLeft
     ),
     GetPage(
       name: AppRoutes.scheduleScreen, 
       page: () => ScheduleScreenView(),
       binding: ScheduleScreenViewBinding(),
-      transition: Transition.leftToRight
+      transition: Transition.rightToLeft
     ),
     GetPage(
       name: AppRoutes.resultScreen, 
       page: () => ResultScreenView(),
       binding: ResultScreenViewBinding(),
-      transition: Transition.leftToRight
+      transition: Transition.rightToLeft
     ),
 
     ////////////////////////////////

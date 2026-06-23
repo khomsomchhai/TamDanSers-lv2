@@ -2,31 +2,49 @@ part of 'splash_screen_view.dart';
 
 class SplashScreenViewController extends GetxController {
   var box = GetStorage();
-  RxnString token = RxnString();
-  RxnString role = RxnString();
 
-  void getToken(){
-    token.value = box.read("token");
-    role.value = box.read("role");
-    debugPrint("My Token : ${token.value}");
-    debugPrint("My Role : ${role.value}");
+  @override
+  void onReady() {
+    // TODO: implement onReady
+    super.onReady();
+    checkAuth();
   }
 
-  void navigation() async{
-    await Future.delayed(Duration(seconds: 2));
-    getToken();
-    if(token.value == null){
-      Get.offNamed(AppRoutes.loginScreen);
+  Future<void> checkAuth() async {
+
+    final token = box.read<String>("token");
+    final role = box.read<String>("role");
+
+    debugPrint("Token: $token");
+    debugPrint("Role: $role");
+
+    if (token == null || token.isEmpty) {
+      Get.offAllNamed(AppRoutes.loginScreen);
       return;
     }
 
-    if(role.value == "student"){
-      Get.offNamed(AppRoutes.studentDashboard);
-    } else if(role.value == "parent"){
-      Get.offNamed(AppRoutes.parentDashboard);
-    } else {
-      Get.offNamed(AppRoutes.loginScreen);
+    try {
+      // validate token
+      await Get.find<UserController>().getProfile();
+
+      if (role == "student") {
+        Get.offAllNamed(AppRoutes.studentDashboard);
+      } else if (role == "parent") {
+        Get.offAllNamed(AppRoutes.parentDashboard);
+      }else {
+        await logout();
+      }
+    } catch(_) {
+      await logout();
     }
   }
 
+  Future<void> logout() async {
+    await box.remove("token");
+    await box.remove("role");
+
+    Get.offAllNamed(AppRoutes.loginScreen);
+  }
+
+  
 }

@@ -5,6 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
+import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 
 part 'splash_screen_binding.dart';
 part 'splash_screen_controller.dart';
@@ -14,7 +15,7 @@ class SplashScreenView extends GetView<SplashScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
-    controller.navigation();
+    debugPrint("Splash view build");
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: Column(

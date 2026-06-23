@@ -15,4 +15,15 @@ Map<String, String> enUs = {
   "good_evening" : "Good evening!",
   "good_night" : "Good night!",
 
+  "home" : "Home",
+  "homework" : "Homework",
+  "attendance" : "Attendance",
+  "profile" : "Profile",
+
+  "class" : "Class ",
+
+  "ask_permission" : "Permission",
+  "schedule" : "Schedule",
+  "result" : "Result",
+
 };
