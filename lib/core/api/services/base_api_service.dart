@@ -1,7 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/core/api/api_config.dart';
 
 class BaseApiService {
@@ -31,14 +28,9 @@ class BaseApiService {
       return response.data;
     }on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        var box = GetStorage();
-        await box.remove("token");
-        await box.remove("role");
-        Get.offAllNamed(
-          AppRoutes.loginScreen,
-        );
+        throw Exception("Unauthorized");
       }
-      rethrow;
+      throw Exception(e.message);
     }
   }
 
