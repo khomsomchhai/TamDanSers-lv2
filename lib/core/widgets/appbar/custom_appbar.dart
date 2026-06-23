@@ -30,11 +30,32 @@ class CustomAppBar extends StatelessWidget
     return AppBar(
       automaticallyImplyLeading: false,
       centerTitle: true,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
 
       leading: showBackButton
-          ? IconButton(
-              onPressed: onBack ?? () => Get.back(),
-              icon: const Icon(Icons.arrow_back_ios_new),
+          ? Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: GestureDetector(
+                onTap: onBack ?? () => Get.back(),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.lightGrey,
+                      width: 1
+                    )
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new,
+                    size: 16,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
             )
           : null,
 
