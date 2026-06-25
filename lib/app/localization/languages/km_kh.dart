@@ -14,6 +14,7 @@ Map<String, String> kmKh = {
   "good_afternoon" : "ទិវាសួស្ដី!",
   "good_evening" : "សាយណ្ហសួស្ដី!",
   "good_night" : "រាត្រីសួស្ដី!",
+<<<<<<< HEAD
 
   "home" : "ទំព័រដើម",
   "homework" : "កិច្ចការផ្ទះ",
@@ -25,4 +26,21 @@ Map<String, String> kmKh = {
   "ask_permission" : "សុំច្បាប់",
   "schedule" : "កាលវិភាគ",
   "result" : "លទ្ធផល់",
+=======
+  'homework': 'កិច្ចការផ្ទះ:',
+  'ongoing': 'កំពុងបន្ត',
+  'completed': 'បានបញ្ចប់',
+  'math': 'គណិតវិទ្យា',
+  'khmer_literature': 'អក្សរសាស្ត្រខ្មែរ',
+  'physics': 'រូបវិទ្យា',
+  'history': 'ប្រវត្តិវិទ្យា',
+  'geography': 'ភូមិវិទ្យា',
+  'teacher_prefix': 'គ្រូបង្រៀន៖ ',
+  'not_done': 'មិនទាន់ធ្វើ',
+  'preparing': 'កំពុងរៀបចំ',
+  'late': 'យឺតយ៉ាវ',
+  'deadline_prefix': 'ឈប់ទទួល៖ ',
+  'submitted_prefix': 'បានផ្ញើ៖ ',
+  'view_details': 'មើលលម្អិត',
+>>>>>>> e0f2ef0 (fix)
 };
