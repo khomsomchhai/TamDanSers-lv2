@@ -6,7 +6,7 @@ ThemeData get darkTheme => ThemeData(
   brightness: Brightness.dark,
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.darkBackground,
-  cardColor: AppColors.primary,
+  cardColor: AppColors.grey,
   dividerColor: Colors.white12,
   hintColor: AppColors.hintColor,
   colorScheme: const ColorScheme.dark(
@@ -58,7 +58,7 @@ ThemeData get darkTheme => ThemeData(
     ),
 
     bodySmall: AppTextStyles.bodySmall.copyWith(
-      color: AppColors.grey,
+      color: AppColors.white,
     ),
   ),
 );

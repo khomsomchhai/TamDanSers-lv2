@@ -30,4 +30,15 @@ Map<String, String> enUs = {
   'submitted_prefix': 'Submitted: ',
   'view_details': 'View details',
 
+  "home" : "Home",
+  "homework" : "Homework",
+  "attendance" : "Attendance",
+  "profile" : "Profile",
+
+  "class" : "Class ",
+
+  "ask_permission" : "Permission",
+  "schedule" : "Schedule",
+  "result" : "Result",
+
 };

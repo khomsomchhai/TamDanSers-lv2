@@ -51,6 +51,25 @@ class AppPages {
         page: () => HomeworkView(),
         binding: HomeworkViewBinding(),
         transition: Transition.leftToRight),
+    GetPage(
+      name: AppRoutes.askPermissionScreen, 
+      page: () => AskPermissionScreenView(),
+      binding: AskPermissionScreenViewBinding(),
+      transition: Transition.rightToLeft
+    ),
+    GetPage(
+      name: AppRoutes.scheduleScreen, 
+      page: () => ScheduleScreenView(),
+      binding: ScheduleScreenViewBinding(),
+      transition: Transition.rightToLeft
+    ),
+    GetPage(
+      name: AppRoutes.resultScreen, 
+      page: () => ResultScreenView(),
+      binding: ResultScreenViewBinding(),
+      transition: Transition.rightToLeft
+    ),
+
     ////////////////////////////////
     //Parent
     GetPage(

@@ -26,10 +26,10 @@ class CustomHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return controller.user == null? SizedBox.shrink(): Row(
+    return Row(
       children: [
         CircleAvatar(
-          backgroundColor: AppColors.neutral500,
+          backgroundColor: AppColors.lightGrey,
           radius: 24,
           onBackgroundImageError: (exception, stackTrace) => Image.asset("assets/images/app_logo.png"),
           backgroundImage: controller.user!.avatarUrl != null
