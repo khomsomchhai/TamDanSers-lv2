@@ -36,9 +36,12 @@ class HomeTabView extends GetView<HomeTabViewController> {
                       : CustomHeader(controller: controller.userController),),
                     ),
                     const SizedBox(width: 10,),
-                    CustomHeaderAction(onTapNotification: () {
+                    CustomHeaderAction(
+                      onTapNotification: () {
                       
-                    },)
+                      },
+                      unreadCount: 2,
+                    )
                   ],
                 ),
                 const SizedBox(height: 20,),
@@ -51,8 +54,22 @@ class HomeTabView extends GetView<HomeTabViewController> {
                 ? _buildAttendanceCardSkeleton()
                 : _buildAttendanceCard()
                 ),
-                SizedBox(height: 20,),
-                _buildFunction()
+                const SizedBox(height: 20,),
+                _buildFunction(),
+                const SizedBox(height: 20,),
+                Row(
+                  children: [
+                    Text(
+                      "attendance".tr,
+                      style: Get.textTheme.titleSmall,
+                    ),
+                    Spacer(),
+                    Text(
+                      "see all".tr,
+                      style: Get.textTheme.bodyMedium!.copyWith(color: AppColors.info),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -61,7 +78,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
     );
   }
 
-  Row _buildFunction() {
+  Widget _buildFunction() {
     return Row(
       children: [
         Expanded(child: Bounceable(

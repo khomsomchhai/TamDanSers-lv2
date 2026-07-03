@@ -9,8 +9,8 @@ class ApiConfig {
     dio = Dio(
       BaseOptions(
         baseUrl: "https://tamdanses-lv2.onrender.com",
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
+        connectTimeout: const Duration(seconds: 20),
+        receiveTimeout: const Duration(seconds: 20),
         headers: {
           "Content-Type": "application/json",
         },

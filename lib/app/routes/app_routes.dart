@@ -2,9 +2,13 @@ class AppRoutes {
   //Auth
   static const String splashScreen = "/splash_screen";
   static const String loginScreen = "/login_screen";
+  static const String forgetPasswordScreen = "/forget_password_screen";
+  static const String resetPasswordScreen = "/reset_password_screen";
+  static const String changePasswordScreen = "/change_password_screen";
 
   //Student
   static const String studentDashboard = "/student_dashboard";
+  
   static const String askPermissionScreen = "/ask_permission_screen";
   static const String scheduleScreen = "/schedule_screen";
   static const String resultScreen = "/result_screen";

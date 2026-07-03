@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/svg.dart';
@@ -22,43 +23,37 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
-    controller.updateKeyboard(context);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return Padding(
+            return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Obx(() => SingleChildScrollView(
-                physics: controller.isKeyboardOpen.value
-                ? BouncingScrollPhysics()
-                : NeverScrollableScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight
-                  ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
                         children: [
-                          Column(
-                            children: [
-                              _buildHeader(),
-                              SizedBox(height: 50,),
-                              _buildForm(),
-                              SizedBox(height: 10,),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              _buildFooter(),
-                              SizedBox(height: 20,),
-                            ],
-                          ),
+                          _buildHeader(),
+                          const SizedBox(height: 40),
+                          _buildForm(),
                         ],
                       ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: _buildFooter(),
+                      ),
+                    ],
+                  ),
                 ),
-              )),
+              ),
             );
           },
         ),
@@ -206,7 +201,11 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Bounceable(
-                onTap: () {},
+                onTap: () {
+                  Get.toNamed(
+                    AppRoutes.forgetPasswordScreen
+                  );
+                },
                 child: Text(
                   "forget_password".tr,
                   style:
@@ -224,6 +223,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                 child: CustomButton(
                   text: "login_title".tr,
                   onPressed: () {
+                    Get.focusScope?.unfocus();
                     controller.login();
                   },
                   isLoading: controller.isLoading.value,
