@@ -32,7 +32,6 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.splashScreen,
       initialBinding: InitialBinding(),
-
       translations: AppTranslation(),
       locale: LocalizationService().getLocale(),
 
@@ -40,7 +39,6 @@ class MainApp extends StatelessWidget {
       darkTheme: darkTheme,
       themeMode: themeService.themeMode,
       getPages: AppPages.getPages,
-      
     );
   }
 }

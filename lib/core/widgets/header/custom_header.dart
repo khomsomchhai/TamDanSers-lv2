@@ -11,25 +11,25 @@ class CustomHeader extends StatelessWidget {
 
   final UserController controller;
 
-  String getGreeting(){
+  String getGreeting() {
     final hour = DateTime.now().hour;
-    if(hour >= 5 && hour < 12){
+    if (hour >= 5 && hour < 12) {
       return "good_morning".tr;
-    }else if(hour >= 12 && hour < 17){
+    } else if (hour >= 12 && hour < 17) {
       return "good_afternoon".tr;
-    }else if(hour >= 17 && hour < 21){
+    } else if (hour >= 17 && hour < 21) {
       return "good_evening".tr;
-    }else{
+    } else {
       return "good_night".tr;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return controller.user == null? SizedBox.shrink(): Row(
       children: [
         CircleAvatar(
-          backgroundColor: AppColors.lightGrey,
+          backgroundColor: AppColors.neutral500,
           radius: 24,
           onBackgroundImageError: (exception, stackTrace) => Image.asset("assets/images/app_logo.png"),
           backgroundImage: controller.user!.avatarUrl != null
