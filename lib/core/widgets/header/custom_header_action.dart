@@ -8,9 +8,12 @@ import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 
 class CustomHeaderAction extends StatelessWidget {
   final VoidCallback onTapNotification;
+  final int unreadCount;
+
   const CustomHeaderAction({
     super.key,
-    required this.onTapNotification
+    required this.onTapNotification,
+    this.unreadCount = 0,
   });
 
   @override
@@ -22,8 +25,9 @@ class CustomHeaderAction extends StatelessWidget {
             LocalizationService().changeLocale(lang);
           },
           position: PopupMenuPosition.under,
-          borderRadius:
-              BorderRadius.circular(AppNumbers.radiusMedium),
+          borderRadius: BorderRadius.circular(
+            AppNumbers.radiusMedium,
+          ),
           itemBuilder: (context) {
             return [
               PopupMenuItem(
@@ -77,17 +81,47 @@ class CustomHeaderAction extends StatelessWidget {
           ),
         ),
         SizedBox(
-          width: 6,
+          width: 8,
         ),
         Bounceable(
-          onTap: () {
-            onTapNotification;
-          },
-          child: Icon(
-            Icons.notifications_rounded,
-            size: 28,
-          )
-        )
+          onTap: onTapNotification,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const Icon(
+                Icons.notifications_rounded,
+                size: 28,
+              ),
+              if (unreadCount > 0)
+                Positioned(
+                  right: -3,
+                  top: -3,
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      minWidth: 18,
+                      minHeight: 18,
+                    ),
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      unreadCount > 99
+                          ? "99+"
+                          : unreadCount.toString(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ],
     );
   }

@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool isMultiline;
   final FocusNode? nameFoucs;
+  final TextInputType? keyboardType;
   const CustomTextField({
     super.key,
     required this.hintText,
@@ -23,7 +24,8 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.isHide = false,
     this.isMultiline = false,
-    this.nameFoucs
+    this.nameFoucs,
+    this.keyboardType,
   });
 
   @override
@@ -32,6 +34,7 @@ class CustomTextField extends StatelessWidget {
       focusNode: nameFoucs,
       controller: controller,
       validator: validator,
+      keyboardType: keyboardType,
       obscureText: isPwd && isHide,
       minLines: isMultiline ? 5 : 1,
       maxLines: isMultiline ? 10 : 1,
@@ -44,7 +47,7 @@ class CustomTextField extends StatelessWidget {
         prefixIcon: prefixIcon,
         suffixIcon: isPwd ? suffixIcon : null,
         errorStyle: Get.textTheme.bodyLarge!.copyWith(color: AppColors.error),
-        border: OutlineInputBorder(
+        border:  OutlineInputBorder(
           borderSide: BorderSide.none,
           borderRadius: BorderRadius.circular(AppNumbers.radiusMedium)
         ),

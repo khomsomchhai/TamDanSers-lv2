@@ -15,6 +15,7 @@ dependencies:
   flutter_svg: ^2.0.0
   flutter_bounceable: ^1.2.0
   dio: ^5.9.2
+  url_launcher: ^6.1.10
   pretty_dio_logger: ^1.4.0
   shimmer: ^3.0.0
   image_picker: ^0.8.7

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 
@@ -30,13 +32,17 @@ class CustomAppBar extends StatelessWidget
     return AppBar(
       automaticallyImplyLeading: false,
       centerTitle: true,
+      surfaceTintColor: Get.theme.scaffoldBackgroundColor,
       elevation: 0,
-      backgroundColor: Colors.transparent,
+      systemOverlayStyle: Get.isDarkMode
+      ? SystemUiOverlayStyle.light
+      : SystemUiOverlayStyle.dark,
 
       leading: showBackButton
           ? Padding(
               padding: const EdgeInsets.only(left: 12),
-              child: GestureDetector(
+              child: Bounceable(
+                scaleFactor: 0.7,
                 onTap: onBack ?? () => Get.back(),
                 child: Container(
                   width: 40,
@@ -68,7 +74,7 @@ class CustomAppBar extends StatelessWidget
         if(showNotification)
       
           Padding(
-            padding: const EdgeInsets.only(right: 20),
+            padding: const EdgeInsets.only(right: 12),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
