@@ -10,14 +10,14 @@ class LoginScreenViewController extends GetxController {
   var isHidePwd = true.obs;
   var isLoading = false.obs;
 
-  var isKeyboardOpen = false.obs;
+  // var isKeyboardOpen = false.obs;
 
   var authService = AuthServices();
   var box = GetStorage();
 
-  void updateKeyboard(BuildContext context) {
-    isKeyboardOpen.value = MediaQuery.of(context).viewInsets.bottom > 0;
-  }
+  // void updateKeyboard(BuildContext context) {
+  //   isKeyboardOpen.value = MediaQuery.of(context).viewInsets.bottom > 0;
+  // }
 
   void togglePwd(){
     isHidePwd.value = !isHidePwd.value;
@@ -59,9 +59,30 @@ class LoginScreenViewController extends GetxController {
       }else{
         CustomSnackbar.error("Login failed");
       }
-    }catch(error){
-      CustomSnackbar.error("Login credentials are incorrect");
-    }finally{
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        CustomSnackbar.error("Connection timed out. Please check your internet connection.");
+      } else if (e.type == DioExceptionType.unknown) {
+        var errorText = e.error?.toString().toLowerCase() ?? "";
+        if (errorText.contains("socketexception") || errorText.contains("connection") || errorText.contains("network")) {
+          CustomSnackbar.error("Unable to connect. Please check your internet connection.");
+        } else {
+          CustomSnackbar.error(e.message ?? "Login failed");
+        }
+      } else if (e.response?.statusCode == 401) {
+        CustomSnackbar.error("Login credentials are incorrect");
+      } else {
+        CustomSnackbar.error(e.message ?? "Login failed");
+      }
+    } catch (error) {
+      var message = error.toString().replaceFirst('Exception: ', '');
+      if (message.isEmpty || message == 'Failed') {
+        message = 'Login failed';
+      }
+      CustomSnackbar.error(message);
+    } finally {
       isLoading.value = false;
     }
   }

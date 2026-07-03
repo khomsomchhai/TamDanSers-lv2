@@ -8,22 +8,22 @@ class StudentDashboardViewController extends GetxController {
     currentIndex.value = index;
   }
 
-  var box = GetStorage();
-  void checkToken(){
-    var token = box.read("token") ;
+  // var box = GetStorage();
+  // void checkToken(){
+  //   var token = box.read("token") ;
 
-    debugPrint("token: $token ");
+  //   debugPrint("token: $token ");
 
 
-    if(token == null){
-      Get.offAllNamed(AppRoutes.loginScreen);
-    }
-  }
+  //   if(token == null){
+  //     Get.offAllNamed(AppRoutes.loginScreen);
+  //   }
+  // }
   @override
   void onInit() {
     // TODO: implement onInit
     super.onInit();
-    checkToken();
+    // checkToken();
   }
 
 }
