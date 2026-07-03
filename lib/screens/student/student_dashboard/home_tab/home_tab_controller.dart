@@ -4,7 +4,7 @@ class HomeTabViewController extends GetxController {
 
   var userController = Get.find<UserController>();
 
-  String getCurrentDate() {
+  String getKhmerDate() {
     DateTime now = DateTime.now();
     List<String> khmerWeekDays = [
       "ថ្ងៃច័ន្ទ",
@@ -31,7 +31,17 @@ class HomeTabViewController extends GetxController {
     ];
     String weekDay = khmerWeekDays[now.weekday - 1];
     String month = khmerMonths[now.month - 1];
-    return "$weekDay ទី ${now.day} ខែ $month ឆ្នាំ ${now.year}";
+    return "$weekDay ទី${now.day} ខែ$month ឆ្នាំ${now.year}";
+  }
+  String getCurrentDate() {
+    if (Get.locale?.languageCode == 'km') {
+      return getKhmerDate();
+    }
+
+    return DateFormat(
+      'EEEE, d MMMM yyyy',
+      'en',
+    ).format(DateTime.now());
   }
 
   @override

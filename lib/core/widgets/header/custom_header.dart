@@ -26,46 +26,40 @@ class CustomHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return controller.user == null
-        ? SizedBox.shrink()
-        : Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: AppColors.neutral500,
-                radius: 24,
-                onBackgroundImageError: (exception, stackTrace) =>
-                    Image.asset("assets/images/app_logo.png"),
-                backgroundImage: controller.user!.avatarUrl != null
-                    ? NetworkImage(
-                        controller.user!.avatarUrl!,
-                      )
-                    : null,
-                child: controller.user!.avatarUrl == null
-                    ? const Icon(
-                        Icons.person,
-                        size: 38,
-                      )
-                    : null,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    getGreeting(),
-                    style: Get.textTheme.bodySmall!.copyWith(height: 1.2),
-                  ),
-                  Text(
-                    controller.user!.fullName,
-                    style: Get.textTheme.titleSmall!.copyWith(height: 1.2),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ],
-          );
+    return controller.user == null? SizedBox.shrink(): Row(
+      children: [
+        CircleAvatar(
+          backgroundColor: AppColors.neutral500,
+          radius: 24,
+          onBackgroundImageError: (exception, stackTrace) => Image.asset("assets/images/app_logo.png"),
+          backgroundImage: controller.user!.avatarUrl != null
+              ? NetworkImage(controller.user!.avatarUrl!, )
+              : null,
+          child: controller.user!.avatarUrl == null
+              ? const Icon(Icons.person, size: 38,)
+              : null,
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              getGreeting(),
+              style: Get.textTheme.bodySmall!
+                  .copyWith(height: 1.2),
+            ),
+            Text(
+              controller.user!.fullName,
+              style: Get.textTheme.titleSmall!
+                  .copyWith(height: 1.2),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
