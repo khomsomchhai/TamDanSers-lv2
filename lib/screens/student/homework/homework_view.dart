@@ -1,8 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide MultipartFile;
+import 'package:get_storage/get_storage.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/student_dashboard_view.dart';
+import 'package:tamdansers_lv2/core/api/services/homework_services.dart';
+import 'package:tamdansers_lv2/data/model/homework_model.dart';
+import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
+import 'package:tamdansers_lv2/data/model/submission_model.dart';
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:tamdansers_lv2/screens/student/homework/homework_detail_view.dart';
 
 part 'homework_binding.dart';
 part 'homework_controller.dart';
@@ -56,7 +65,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                       ),
                     ),
                   ),
-                  
+
                   // Screen Title
                   Text(
                     'homework'.tr,
@@ -78,9 +87,10 @@ class HomeworkView extends GetView<HomeworkViewController> {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.light
-                                ? AppColors.white
-                                : Colors.grey[900],
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? AppColors.white
+                                    : Colors.grey[900],
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
@@ -93,9 +103,10 @@ class HomeworkView extends GetView<HomeworkViewController> {
                           child: Icon(
                             Icons.notifications_rounded,
                             size: 22,
-                            color: Theme.of(context).brightness == Brightness.light
-                                ? AppColors.dark
-                                : AppColors.white,
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? AppColors.dark
+                                    : AppColors.white,
                           ),
                         ),
                         // Red Notification Badge Dot
@@ -141,7 +152,8 @@ class HomeworkView extends GetView<HomeworkViewController> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: controller.selectedTabIndex.value == 0
-                                  ? (Theme.of(context).brightness == Brightness.light
+                                  ? (Theme.of(context).brightness ==
+                                          Brightness.light
                                       ? AppColors.white
                                       : Colors.grey[850])
                                   : Colors.transparent,
@@ -157,7 +169,9 @@ class HomeworkView extends GetView<HomeworkViewController> {
                                   : [],
                             ),
                             child: Text(
-                              'ongoing'.tr,
+                              Get.locale?.languageCode == 'km'
+                                  ? 'រង់ចាំពិនិត្យ'
+                                  : 'Pending',
                               style: Get.textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: controller.selectedTabIndex.value == 0
@@ -177,7 +191,8 @@ class HomeworkView extends GetView<HomeworkViewController> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: controller.selectedTabIndex.value == 1
-                                  ? (Theme.of(context).brightness == Brightness.light
+                                  ? (Theme.of(context).brightness ==
+                                          Brightness.light
                                       ? AppColors.white
                                       : Colors.grey[850])
                                   : Colors.transparent,
@@ -193,7 +208,9 @@ class HomeworkView extends GetView<HomeworkViewController> {
                                   : [],
                             ),
                             child: Text(
-                              'completed'.tr,
+                              Get.locale?.languageCode == 'km'
+                                  ? 'ពិនិត្យ'
+                                  : 'Check',
                               style: Get.textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: controller.selectedTabIndex.value == 1
@@ -215,21 +232,36 @@ class HomeworkView extends GetView<HomeworkViewController> {
             // 3. Main Homework List Views
             Expanded(
               child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
                 final list = controller.selectedTabIndex.value == 0
                     ? controller.ongoingList
                     : controller.completedList;
 
                 if (list.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: Text(
+                      'No homework',
+                      style: Get.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  );
                 }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  itemCount: list.length,
-                  itemBuilder: (context, index) {
-                    final item = list[index];
-                    return _buildHomeworkCard(context, item);
-                  },
+                return RefreshIndicator(
+                  onRefresh: controller.fetchHomework,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    itemCount: list.length,
+                    itemBuilder: (context, index) {
+                      final item = list[index];
+                      return _buildHomeworkCard(context, item);
+                    },
+                  ),
                 );
               }),
             ),
@@ -240,36 +272,32 @@ class HomeworkView extends GetView<HomeworkViewController> {
   }
 
   Widget _buildHomeworkCard(BuildContext context, HomeworkItem item) {
-    // Styling attributes based on homework status
+    final isKm = Get.locale?.languageCode == 'km';
+
     String badgeText = '';
     Color badgeTextColor = Colors.black;
     Color badgeBgColor = Colors.grey;
+    bool showBadge = false;
 
-    switch (item.status) {
-      case HomeworkStatus.notDone:
-        badgeText = 'not_done'.tr;
-        badgeTextColor = const Color(0xffD97706);
-        badgeBgColor = const Color(0xffFEF3C7);
-        break;
-      case HomeworkStatus.preparing:
-        badgeText = 'preparing'.tr;
-        badgeTextColor = AppColors.primary;
-        badgeBgColor = AppColors.primary.withOpacity(0.12);
-        break;
-      case HomeworkStatus.late:
-        badgeText = 'late'.tr;
-        badgeTextColor = AppColors.error;
-        badgeBgColor = AppColors.error.withOpacity(0.12);
-        break;
-      case HomeworkStatus.completed:
-        badgeText = 'completed'.tr;
-        badgeTextColor = AppColors.success;
-        badgeBgColor = AppColors.success.withOpacity(0.12);
-        break;
+    if (item.status == HomeworkStatus.none) {
+      badgeText = isKm ? 'រង់ចាំពិនិត្យ' : 'Pending';
+      badgeTextColor = const Color(0xffD97706);
+      badgeBgColor = const Color(0xffFEF3C7);
+      showBadge = true;
+    } else if (item.status == HomeworkStatus.submitted) {
+      badgeText = isKm ? 'បានប្រគល់' : 'Submitted';
+      badgeTextColor = const Color(0xff2563EB);
+      badgeBgColor = const Color(0xffDBEAFE);
+      showBadge = true;
+    } else if (item.status == HomeworkStatus.checked) {
+      badgeText = isKm ? 'ពិនិត្យ' : 'Check';
+      badgeTextColor = AppColors.success;
+      badgeBgColor = AppColors.success.withOpacity(0.12);
+      showBadge = true;
     }
 
-    final isLate = item.status == HomeworkStatus.late;
-    final isCompleted = item.status == HomeworkStatus.completed;
+    final isCompleted = item.status == HomeworkStatus.submitted ||
+        item.status == HomeworkStatus.checked;
 
     Widget cardContent = Container(
       margin: const EdgeInsets.only(bottom: 18),
@@ -317,7 +345,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      item.subjectKey.tr,
+                      item.subjectName,
                       style: Get.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -330,7 +358,9 @@ class HomeworkView extends GetView<HomeworkViewController> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'teacher_prefix'.tr + item.teacherName,
+                      isKm
+                          ? 'គ្រូ៖ ${item.teacherName}'
+                          : 'Teacher: ${item.teacherName}',
                       style: Get.textTheme.bodySmall?.copyWith(
                         color: AppColors.grey,
                         fontSize: 12,
@@ -343,21 +373,23 @@ class HomeworkView extends GetView<HomeworkViewController> {
               ),
 
               // Status Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: badgeBgColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  badgeText,
-                  style: Get.textTheme.bodySmall?.copyWith(
-                    color: badgeTextColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11,
+              if (showBadge)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: badgeBgColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    badgeText,
+                    style: Get.textTheme.bodySmall?.copyWith(
+                      color: badgeTextColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 11,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
 
@@ -381,8 +413,12 @@ class HomeworkView extends GetView<HomeworkViewController> {
                   const SizedBox(width: 8),
                   Text(
                     isCompleted
-                        ? 'submitted_prefix'.tr + item.date
-                        : 'deadline_prefix'.tr + item.date,
+                        ? (isKm
+                            ? 'បានប្រគល់៖ ${item.date}'
+                            : 'Submitted: ${item.date}')
+                        : (isKm
+                            ? 'ថ្ងៃកំណត់៖ ${item.date}'
+                            : 'Deadline: ${item.date}'),
                     style: Get.textTheme.bodySmall?.copyWith(
                       color: AppColors.grey,
                       fontSize: 13,
@@ -390,18 +426,16 @@ class HomeworkView extends GetView<HomeworkViewController> {
                   ),
                 ],
               ),
-              
+
               // Action Button
               Bounceable(
-                onTap: isLate
-                    ? null
-                    : () {
-                        // Open details page
-                      },
+                onTap: () {
+                  controller.showHomeworkDetails(context, item);
+                },
                 child: Text(
-                  'view_details'.tr,
+                  isKm ? 'មើលលម្អិត' : 'View details',
                   style: Get.textTheme.bodyMedium?.copyWith(
-                    color: isLate ? AppColors.grey : AppColors.primary,
+                    color: AppColors.primary,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -412,14 +446,6 @@ class HomeworkView extends GetView<HomeworkViewController> {
         ],
       ),
     );
-
-    // If assignment is late, make the card semi-transparent
-    if (isLate) {
-      return Opacity(
-        opacity: 0.6,
-        child: cardContent,
-      );
-    }
 
     return cardContent;
   }
