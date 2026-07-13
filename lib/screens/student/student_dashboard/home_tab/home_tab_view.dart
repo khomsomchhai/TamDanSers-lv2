@@ -3,6 +3,7 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
@@ -87,12 +88,11 @@ class HomeTabView extends GetView<HomeTabViewController> {
           },
           child: CustomFunctionCard(
             title: "ask_permission".tr,
-            icon: Icon(
-              Icons.fact_check_rounded,
-              size: 24,
-              color: AppColors.primary,
+            icon: Image.asset(
+              AppIcons.permissionIcon,
+              width: 50,
+              height: 50,
             ),
-            iconBackColor: AppColors.secondary,
           ),
         )),
         const SizedBox(width: 20,),
@@ -102,12 +102,11 @@ class HomeTabView extends GetView<HomeTabViewController> {
           },
           child: CustomFunctionCard(
             title: "schedule".tr,
-            icon: Icon(
-              Icons.calendar_month_rounded,
-              size: 24,
-              color: AppColors.purple,
+            icon: Image.asset(
+              AppIcons.scheduleIcon,
+              width: 50,
+              height: 50,
             ),
-            iconBackColor: AppColors.lightPurple,
           ),
         )),
         const SizedBox(width: 20,),
@@ -117,12 +116,11 @@ class HomeTabView extends GetView<HomeTabViewController> {
           },
           child: CustomFunctionCard(
             title: "result".tr,
-            icon: Icon(
-              Icons.assessment_rounded,
-              size: 24,
-              color: AppColors.orange,
+            icon: Image.asset(
+              AppIcons.resultIcon,
+              width: 50,
+              height: 50,
             ),
-            iconBackColor: AppColors.lightOrange,
           ),
         )),
       ],
@@ -157,8 +155,8 @@ class HomeTabView extends GetView<HomeTabViewController> {
   }
   Widget _buildAttendanceCardSkeleton() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppColors.skeletonBaseColor,
+      highlightColor: AppColors.skeletonHighlightColor,
       child: Column(
         children: [
           Row(

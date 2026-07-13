@@ -53,11 +53,7 @@ class ForgetPasswordScreenViewController extends GetxController {
         try {
           final data = resp.data;
           if (data != null) {
-            if (data is Map && data['message'] != null) {
-              msg = data['message'].toString();
-            } else if (data is String && data.isNotEmpty) {
-              msg = data.toString();
-            }
+            msg = _extractErrorMessage(data);
           }
         } catch (_) {}
 
@@ -66,8 +62,10 @@ class ForgetPasswordScreenViewController extends GetxController {
             msg = 'Unauthorized. Please login again.'.tr;
           } else if (resp.statusCode == 404) {
             msg = 'Not found. Please check the phone number.'.tr;
+          } else if (resp.statusCode == 500) {
+            msg = 'Your phone number is not linked to Telegram. Please link it first.'.tr;
           } else if (resp.statusCode != null) {
-            msg = 'Request failed (code: ${resp.statusCode})'.tr;
+            msg = 'Request failed'.tr;
           }
         }
 
@@ -96,6 +94,51 @@ class ForgetPasswordScreenViewController extends GetxController {
       }
       CustomSnackbar.error("Something went wrong");
     }
+  }
+
+  String _extractErrorMessage(dynamic data) {
+    if (data is Map) {
+      for (final key in ['message', 'detail', 'error', 'title']) {
+        final value = data[key];
+        if (value is String && value.trim().isNotEmpty) {
+          final normalized = value.trim().toLowerCase();
+          if (normalized.contains('not linked') || normalized.contains('telegram')) {
+            return 'Your phone number is not linked to Telegram. Please link it first.'.tr;
+          }
+          return value.trim();
+        }
+      }
+
+      if (data['errors'] is Map) {
+        final errors = data['errors'] as Map;
+        for (final value in errors.values) {
+          if (value is List && value.isNotEmpty) {
+            final firstValue = value.first;
+            if (firstValue is String && firstValue.trim().isNotEmpty) {
+              final normalized = firstValue.trim().toLowerCase();
+              if (normalized.contains('not linked') || normalized.contains('telegram')) {
+                return 'Your phone number is not linked to Telegram. Please link it first.'.tr;
+              }
+              return firstValue.trim();
+            }
+          } else if (value is String && value.trim().isNotEmpty) {
+            final normalized = value.trim().toLowerCase();
+            if (normalized.contains('not linked') || normalized.contains('telegram')) {
+              return 'Your phone number is not linked to Telegram. Please link it first.'.tr;
+            }
+            return value.trim();
+          }
+        }
+      }
+    } else if (data is String && data.trim().isNotEmpty) {
+      final normalized = data.trim().toLowerCase();
+      if (normalized.contains('not linked') || normalized.contains('telegram')) {
+        return 'Your phone number is not linked to Telegram. Please link it first.'.tr;
+      }
+      return data.trim();
+    }
+
+    return '';
   }
 
   @override

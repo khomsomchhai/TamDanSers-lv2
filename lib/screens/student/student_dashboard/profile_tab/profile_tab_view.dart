@@ -5,6 +5,7 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
@@ -32,9 +33,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
         child: Obx(
           () {
             if (controller.userController.isLoading.value) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return _buildLoadingSkeleton(context);
             }
 
             final user = controller.userController.user;
@@ -54,6 +53,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 20,),
                   Center(child: Obx(() => _buildAvatar(user, context))),
                   const SizedBox(height: 16),
                   Center(child: _buildUserName(user)),
@@ -138,6 +138,108 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     );
   }
 
+  Widget _buildLoadingSkeleton(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: AppColors.skeletonBaseColor,
+      highlightColor: AppColors.skeletonHighlightColor,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            Center(
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Container(
+                width: 160,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            _buildSkeletonSectionTitle(),
+            const SizedBox(height: 12),
+            _buildSkeletonCard(),
+            const SizedBox(height: 24),
+            _buildSkeletonSectionTitle(),
+            const SizedBox(height: 12),
+            _buildSkeletonCard(),
+            const SizedBox(height: 24),
+            _buildSkeletonSectionTitle(),
+            const SizedBox(height: 12),
+            _buildSkeletonCard(),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonSectionTitle() {
+    return Container(
+      width: 140,
+      height: 16,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 16,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            height: 16,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            height: 16,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAvatar(dynamic user, BuildContext context) {
     final picked = controller.pickedImagePath.value;
     final hasImage = picked != null ||
@@ -157,7 +259,6 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
               colors: [Color(0xFF7F77DD), Color(0xFF5DCAA5), Color(0xFF7F77DD)],
             ),
           ),
-          // ── White gap (3px) ─────────────────────────────────
           child: Padding(
             padding: const EdgeInsets.all(3),
             child: Container(
@@ -182,7 +283,6 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
           ),
         ),
 
-        // ── Camera edit button ───────────────────────────────
         Positioned(
           bottom: 2,
           right: 2,
@@ -211,7 +311,6 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     );
   }
 
-  /// Fallback: initials if name exists, generic icon if not
   Widget _buildFallback(dynamic user) {
     final name = (user.displayName ?? user.name ?? '').trim();
     if (name.isNotEmpty) {
