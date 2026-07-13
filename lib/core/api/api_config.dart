@@ -8,7 +8,8 @@ class ApiConfig {
   ApiConfig() {
     dio = Dio(
       BaseOptions(
-        baseUrl: "https://tamdanses-lv2.onrender.com",
+        // baseUrl: "http://10.0.2.2:8000",
+        baseUrl: "https://tamdansers-56q81mrhl79g8.sabay.com",
         connectTimeout: const Duration(seconds: 20),
         receiveTimeout: const Duration(seconds: 20),
         headers: {

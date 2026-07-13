@@ -5,12 +5,10 @@ import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 class CustomFunctionCard extends StatelessWidget {
   final String title;
   final Widget icon;
-  final Color iconBackColor;
   const CustomFunctionCard({
     super.key, 
     required this.title, 
     required this.icon, 
-    required this.iconBackColor
   });
 
   @override
@@ -21,21 +19,14 @@ class CustomFunctionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppNumbers.radiusMedium)
       ),
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.only(bottom: 10, top: 6),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: iconBackColor,
-                shape: BoxShape.circle
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: icon
-              ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: icon
             ),
-            SizedBox(height: 4,),
             Text(
               title,
               style: Get.textTheme.bodyMedium,

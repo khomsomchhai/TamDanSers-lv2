@@ -5,9 +5,13 @@ class SplashScreenViewController extends GetxController {
 
   @override
   void onReady() {
-    // TODO: implement onReady
     super.onReady();
-    checkAuth();
+    startNavigation();
+  }
+
+  Future<void> startNavigation() async {
+    await Future.delayed(const Duration(milliseconds: 1800));
+    await checkAuth();
   }
 
   Future<void> checkAuth() async {
