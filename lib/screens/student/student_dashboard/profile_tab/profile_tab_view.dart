@@ -78,9 +78,9 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       _buildDivider(),
                       _buildOptionItem(
                         icon: Icons.lock_outline,
-                        title: "Change Password",
-                        subtitle: "Change your password",
-                        onTap: () => Get.toNamed(AppRoutes.changePasswordScreen),
+                        title: "Forget Password",
+                        subtitle: "Reset your password",
+                        onTap: () => Get.toNamed(AppRoutes.forgetPasswordScreen),
                       ),
                     ],
                   ),

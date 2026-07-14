@@ -7,8 +7,8 @@ import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
-import 'package:tamdansers_lv2/core/widgets/card/custom_attendance_card.dart';
 import 'package:tamdansers_lv2/core/widgets/card/custom_function_card.dart';
+import 'package:tamdansers_lv2/core/widgets/card/custom_score_card.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_action.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_placeholder.dart';
@@ -23,55 +23,60 @@ class HomeTabView extends GetView<HomeTabViewController> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Obx(() => controller.userController.isLoading.value
-                      ? CustomHeaderPlaceholder()
-                      : CustomHeader(controller: controller.userController),),
-                    ),
-                    const SizedBox(width: 10,),
-                    CustomHeaderAction(
-                      onTapNotification: () {
-                      
-                      },
-                      unreadCount: 2,
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20,),
-                Text(
-                  controller.getCurrentDate(),
-                  style: Get.textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 10,),
-                Obx(() => controller.userController.isLoading.value
-                ? _buildAttendanceCardSkeleton()
-                : _buildAttendanceCard()
-                ),
-                const SizedBox(height: 20,),
-                _buildFunction(),
-                const SizedBox(height: 20,),
-                Row(
-                  children: [
-                    Text(
-                      "attendance".tr,
-                      style: Get.textTheme.titleSmall,
-                    ),
-                    Spacer(),
-                    Text(
-                      "see all".tr,
-                      style: Get.textTheme.bodyMedium!.copyWith(color: AppColors.info),
-                    ),
-                  ],
-                )
-              ],
+        child: RefreshIndicator(
+          onRefresh: controller.refreshHome,
+          color: AppColors.primary,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Obx(() => controller.userController.isLoading.value
+                        ? CustomHeaderPlaceholder()
+                        : CustomHeader(controller: controller.userController),),
+                      ),
+                      const SizedBox(width: 10,),
+                      CustomHeaderAction(
+                        onTapNotification: () {
+                        
+                        },
+                        unreadCount: 2,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  Text(
+                    controller.getCurrentDate(),
+                    style: Get.textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 10,),
+                  Obx(() => controller.userController.isLoading.value
+                  ? _buildAttendanceCardSkeleton()
+                  : _buildAttendanceCard()
+                  ),
+                  const SizedBox(height: 20,),
+                  _buildFunction(),
+                  const SizedBox(height: 20,),
+                  Row(
+                    children: [
+                      Text(
+                        "attendance".tr,
+                        style: Get.textTheme.titleSmall,
+                      ),
+                      Spacer(),
+                      Text(
+                        "see all".tr,
+                        style: Get.textTheme.bodyMedium!.copyWith(color: AppColors.info),
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -143,11 +148,10 @@ class HomeTabView extends GetView<HomeTabViewController> {
           ],
         ),
         const SizedBox(height: 10,),
-        CustomAttendanceCard(
-          totalDays: 9, 
-          presentDays: 5, 
-          absentDays: 4, 
-          attendanceRate: 87, 
+        CustomScoreCard(
+          averageScore: 8.5, 
+          totalScore: 850, 
+          rank: 5, 
           currentMonth: "មិថុនា"
         )
       ],

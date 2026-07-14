@@ -33,6 +33,26 @@ class HomeTabViewController extends GetxController {
     String month = khmerMonths[now.month - 1];
     return "$weekDay ទី${now.day} ខែ$month ឆ្នាំ${now.year}";
   }
+
+  String getKhmerMonth() {
+    DateTime now = DateTime.now();
+    List<String> khmerMonths = [
+      "មករា",
+      "កុម្ភៈ",
+      "មីនា",
+      "មេសា",
+      "ឧសភា",
+      "មិថុនា",
+      "កក្កដា",
+      "សីហា",
+      "កញ្ញា",
+      "តុលា",
+      "វិច្ឆិកា",
+      "ធ្នូ",
+    ];
+    return khmerMonths[now.month - 1];
+  }
+
   String getCurrentDate() {
     if (Get.locale?.languageCode == 'km') {
       return getKhmerDate();
@@ -46,11 +66,14 @@ class HomeTabViewController extends GetxController {
 
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
     if(userController.user == null && userController.profile == null){
       userController.getProfile();
     }
+  }
+
+  Future<void> refreshHome() async {
+    await userController.getProfile();
   }
 
 }

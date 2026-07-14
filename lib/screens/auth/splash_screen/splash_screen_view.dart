@@ -88,55 +88,58 @@ class _SplashScreenBodyState extends State<SplashScreenBody>
                       scale: _scaleAnimation.value,
                       child: Opacity(
                         opacity: _fadeAnimation.value,
-                        child: Container(
-                          width: 170,
-                          height: 170,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.white.withValues(alpha: 0.12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.dark.withValues(alpha: 0.12),
-                                blurRadius: 20,
-                                spreadRadius: 3,
+                        child: Hero(
+                          tag: 'app_logo',
+                          child: Container(
+                            width: 170,
+                            height: 170,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.white.withValues(alpha: 0.12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.dark.withValues(alpha: 0.12),
+                                  blurRadius: 20,
+                                  spreadRadius: 3,
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(24.0),
+                              child: SvgPicture.asset(
+                                AppIcons.appIconWhite,
                               ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: SvgPicture.asset(
-                              AppIcons.appIconWhite,
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 28),
-                  Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: const Text(
-                      'TamDanSers',
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Opacity(
-                    opacity: _fadeAnimation.value,
-                    child: const Text(
-                      'Welcome to your learning journey',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
+                  // const SizedBox(height: 28),
+                  // Opacity(
+                  //   opacity: _fadeAnimation.value,
+                  //   child: const Text(
+                  //     'TamDanSers',
+                  //     style: TextStyle(
+                  //       color: AppColors.white,
+                  //       fontSize: 24,
+                  //       fontWeight: FontWeight.w700,
+                  //       letterSpacing: 1.2,
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 10),
+                  // Opacity(
+                  //   opacity: _fadeAnimation.value,
+                  //   child: const Text(
+                  //     'Welcome to your learning journey',
+                  //     textAlign: TextAlign.center,
+                  //     style: TextStyle(
+                  //       color: Colors.white70,
+                  //       fontSize: 14,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

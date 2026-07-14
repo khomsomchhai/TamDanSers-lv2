@@ -64,7 +64,7 @@ class ResetPasswordScreenView
     return Column(
       children: [
         Text(
-          'Enter the 6-digit code sent to your Telegram and choose a new password.'
+          'Enter the 6-digit code sent to your phone by SMS and choose a new password.'
               .tr,
           textAlign: TextAlign.center,
           style: Get.textTheme.bodyMedium,
@@ -213,11 +213,11 @@ class ResetPasswordScreenView
           fillColor: AppColors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-            borderSide: BorderSide(color: AppColors.primary.withOpacity(0.25)),
+            borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.25)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-            borderSide: BorderSide(color: AppColors.primary.withOpacity(0.25)),
+            borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.25)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
