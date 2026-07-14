@@ -1,10 +1,10 @@
 import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 
 class ScheduleApi {
-  BaseApiService baseApi =BaseApiService();
+  BaseApiService baseApiService =BaseApiService();
 
   Future<dynamic> getSchedule() async {
-    var response = await baseApi.get(
+    var response = await baseApiService.get(
       endpoint: "/schedules",
     );
     return response;

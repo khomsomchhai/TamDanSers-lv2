@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/screens/student/schedule_screen/schedule_screen_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/attendance_tab/attendance_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/homework_tab/homework_tab_view.dart';
@@ -27,7 +26,6 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
             ProfileTabView(),
           ],
         ),
-
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: controller.currentIndex.value,
           onTap: controller.changeTab,
@@ -55,5 +53,3 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
     );
   }
 }
-
-
