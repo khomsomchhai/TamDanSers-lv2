@@ -24,7 +24,7 @@ class AuthServices {
     return response;
   }
 
-  Future<bool> checkTelegramService({
+  Future<bool> checkSmsService({
     required String phone,
   }) async {
     try {
@@ -36,7 +36,6 @@ class AuthServices {
       );
       return response['telegram_linked'] == true;
     } on DioException catch (e) {
-      // If the endpoint doesn't exist on the server, skip the telegram check
       if (e.response?.statusCode == 404) {
         return true;
       }
