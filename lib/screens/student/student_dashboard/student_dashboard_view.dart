@@ -22,10 +22,9 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
             HomeTabView(),
             HomeworkTabView(),
             AttendanceTabView(),
-            ProfileTabView()
+            ProfileTabView(),
           ],
         ),
-
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
             splashFactory: NoSplash.splashFactory,
@@ -64,3 +63,5 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
     );
   }
 }
+
+

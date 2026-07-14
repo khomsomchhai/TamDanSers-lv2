@@ -14,7 +14,6 @@ Map<String, String> kmKh = {
   "good_afternoon" : "ទិវាសួស្ដី!",
   "good_evening" : "សាយណ្ហសួស្ដី!",
   "good_night" : "រាត្រីសួស្ដី!",
-<<<<<<< HEAD
 
   "home" : "ទំព័រដើម",
   "homework" : "កិច្ចការផ្ទះ",
@@ -25,9 +24,8 @@ Map<String, String> kmKh = {
 
   "ask_permission" : "សុំច្បាប់",
   "schedule" : "កាលវិភាគ",
-  "result" : "លទ្ធផល់",
-=======
-  'homework': 'កិច្ចការផ្ទះ:',
+  "result" : "លទ្ធផល",
+  //'homework': 'កិច្ចការផ្ទះ:',
   'ongoing': 'កំពុងបន្ត',
   'completed': 'បានបញ្ចប់',
   'math': 'គណិតវិទ្យា',
@@ -42,5 +40,27 @@ Map<String, String> kmKh = {
   'deadline_prefix': 'ឈប់ទទួល៖ ',
   'submitted_prefix': 'បានផ្ញើ៖ ',
   'view_details': 'មើលលម្អិត',
->>>>>>> e0f2ef0 (fix)
+  "semester 1" : "ឆមាស 1",
+  "semester 2" : "ឆមាស 2",
+  'ranking_for_month': 'ចំណាត់ថ្នាក់សម្រាប់ខែ',
+
+  //months
+  'month_1': 'មករា',
+  'month_2': 'កុម្ភៈ',
+  'month_3': 'មីនា',
+  'month_4': 'កក្កដា',
+  'month_5': 'សីហា',
+  'month_6': 'មិថុនា',
+  'month_7': 'កក្កដា',
+  'month_8': 'សីហា',
+  'month_9': 'កញ្ញា',
+  'month_10': 'តុលា',
+  'month_11': 'វិច្ឆិកា',
+  'month_12': 'ធ្នូ',
+
+  //subjects
+  'khmer': 'ភាសាខ្មែរ',
+  //'math': 'គណិតវិទ្យា',
+  'english': 'អង់គ្លេស',
+  'biology': 'ជីវវិទ្យា',
 };
