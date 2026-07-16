@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/svg.dart';
@@ -131,11 +132,14 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
         SizedBox(height: 20,),
         SizedBox(
           height: 140,
-          child: ClipRRect(
-            borderRadius: BorderRadiusGeometry.circular(AppNumbers.radiusMedium),
-            child: SvgPicture.asset(
-              AppIcons.appIconPrimary,
-              fit: BoxFit.contain,
+          child: Hero(
+            tag: 'app_logo',
+            child: ClipRRect(
+              borderRadius: BorderRadiusGeometry.circular(AppNumbers.radiusMedium),
+              child: SvgPicture.asset(
+                AppIcons.appIconPrimary,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
         ),

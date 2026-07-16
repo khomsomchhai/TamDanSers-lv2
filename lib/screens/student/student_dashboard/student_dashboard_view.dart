@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/attendance_tab/attendance_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/homework_tab/homework_tab_view.dart';
@@ -21,31 +22,42 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
             HomeTabView(),
             HomeworkTabView(),
             AttendanceTabView(),
-            ProfileTabView()
+            ProfileTabView(),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: controller.currentIndex.value,
-          onTap: controller.changeTab,
-          type: BottomNavigationBarType.fixed,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: "home".tr,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.menu_book_outlined),
-              label: "homework".tr,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.check_circle_outline),
-              label: "attendance".tr,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              label: "profile".tr,
-            ),
-          ],
+        bottomNavigationBar: Theme(
+          data: Theme.of(context).copyWith(
+            splashFactory: NoSplash.splashFactory,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+          ),
+          child: BottomNavigationBar(
+            currentIndex: controller.currentIndex.value,
+            onTap: controller.changeTab,
+            type: BottomNavigationBarType.fixed,
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(PhosphorIconsRegular.house),
+                activeIcon: Icon(PhosphorIconsFill.house),
+                label: "home".tr,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(PhosphorIconsRegular.clipboardText),
+                activeIcon: Icon(PhosphorIconsFill.clipboardText),
+                label: "homework".tr,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(PhosphorIconsRegular.calendarCheck),
+                activeIcon: Icon(PhosphorIconsFill.calendarCheck),
+                label: "attendance".tr,
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(PhosphorIconsRegular.user),
+                activeIcon: Icon(PhosphorIconsFill.user),
+                label: "profile".tr,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get_storage/get_storage.dart';
@@ -9,7 +11,9 @@ import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/dark_theme.dart';
 import 'package:tamdansers_lv2/app/themes/light_theme.dart';
 import 'package:tamdansers_lv2/core/api/controllers/initial_binding.dart';
+import 'package:tamdansers_lv2/core/services/notification_service.dart';
 import 'package:tamdansers_lv2/core/services/theme_service.dart';
+import 'package:tamdansers_lv2/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,13 +22,30 @@ void main() async {
   await initializeDateFormatting();
 
   final themeService = ThemeService();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-  runApp(MainApp(themeService: themeService,));
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  await setupLocalNotifications();
+  await setupFCM();
+
+  runApp(MainApp(
+    themeService: themeService,
+  ));
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   final ThemeService themeService;
   const MainApp({super.key, required this.themeService});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +55,9 @@ class MainApp extends StatelessWidget {
       initialBinding: InitialBinding(),
       translations: AppTranslation(),
       locale: LocalizationService().getLocale(),
-
       theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: themeService.themeMode,
+      themeMode: widget.themeService.themeMode,
       getPages: AppPages.getPages,
     );
   }

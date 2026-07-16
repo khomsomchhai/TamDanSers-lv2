@@ -3,17 +3,11 @@ import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 
 class AuthServices {
   final baseApi = BaseApiService();
-  Future<Map<String, dynamic>> loginService({
-    required String loginId,
-    required String password
-  }) async {
+  Future<Map<String, dynamic>> loginService(
+      {required String loginId, required String password}) async {
     var response = await baseApi.post(
-      endpoint: "/auth/login", 
-      data: {
-        "login_id" : loginId,
-        "password" : password
-      }
-    );
+        endpoint: "/auth/login",
+        data: {"login_id": loginId, "password": password});
     return response;
   }
 
@@ -24,7 +18,7 @@ class AuthServices {
     return response;
   }
 
-  Future<bool> checkTelegramService({
+  Future<bool> checkSmsService({
     required String phone,
   }) async {
     try {
@@ -36,7 +30,6 @@ class AuthServices {
       );
       return response['telegram_linked'] == true;
     } on DioException catch (e) {
-      // If the endpoint doesn't exist on the server, skip the telegram check
       if (e.response?.statusCode == 404) {
         return true;
       }
@@ -67,6 +60,18 @@ class AuthServices {
         "phone": phone,
         "otp": otp,
         "new_password": newPassword,
+      },
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> saveFcmToken({
+    required String fcmToken,
+  }) async {
+    var response = await baseApi.post(
+      endpoint: "/notifications/fcm-token",
+      data: {
+        "token": fcmToken,
       },
     );
     return response;

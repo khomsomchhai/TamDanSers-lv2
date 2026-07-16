@@ -29,11 +29,42 @@ Map<String, String> enUs = {
   'deadline_prefix': 'Deadline: ',
   'submitted_prefix': 'Submitted: ',
   'view_details': 'View details',
-  "home": "Home",
-  "attendance": "Attendance",
-  "profile": "Profile",
-  "class": "Class ",
-  "ask_permission": "Permission",
-  "schedule": "Schedule",
-  "result": "Result",
+
+  "home" : "Home",
+  "homework" : "Homework",
+  "attendance" : "Attendance",
+  "profile" : "Profile",
+
+  "class" : "Class ",
+
+  "ask_permission" : "Permission",
+  "schedule" : "Schedule",
+  "result" : "Result",
+  "semester 1" : "Semester 1",
+  "semester 2" : "Semester 2",
+  'ranking_for_month': 'Ranking for Month',
+
+  //months
+  'month_1': 'January',
+  'month_2': 'February',
+  'month_3': 'March',
+  'month_4': 'April',
+  'month_5': 'May',
+  'month_6': 'June',
+  'month_7': 'July',  
+  'month_8': 'August',
+  'month_9': 'September',
+  'month_10': 'October',
+  'month_11': 'November',
+  'month_12': 'December',
+
+  //subjects
+  'khmer': 'Khmer',
+  'math': 'Math',
+  'english': 'English',
+  'science': 'Science',
+  'social': 'Social',
+  'biology': 'Biology',
+
+
 };

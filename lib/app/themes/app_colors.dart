@@ -12,6 +12,9 @@ class AppColors {
   static const Color dark = Color(0xff1C1C1E);
   static const Color hintColor = Color(0xFF6E6E73);
 
+  static const Color skeletonBaseColor = Color.fromRGBO(189, 189, 189, 1);
+  static const Color skeletonHighlightColor = Color.fromRGBO(238, 238, 238, 1);
+
   static const Color success = Color(0xff22C55E); 
   static const Color warning = Color(0xffF59E0B); 
   static const Color error = Color(0xffEF4444); 

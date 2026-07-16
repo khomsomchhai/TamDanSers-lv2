@@ -64,7 +64,7 @@ class ResetPasswordScreenView
     return Column(
       children: [
         Text(
-          'Enter the 6-digit code sent to your Telegram and choose a new password.'
+          'Enter the 6-digit code sent to your phone by SMS and choose a new password.'
               .tr,
           textAlign: TextAlign.center,
           style: Get.textTheme.bodyMedium,

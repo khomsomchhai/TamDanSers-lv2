@@ -4,9 +4,7 @@ class ForgetPasswordScreenViewController extends GetxController {
   final formKey = GlobalKey<FormState>();
   final phoneCtrl = TextEditingController();
   final isLoading = false.obs;
-  final isTelegramLoading = false.obs;
   final authService = AuthServices();
-  final telegramService = TelegramService();
 
   Future<void> submitPhone() async {
     if (!formKey.currentState!.validate()) {
@@ -32,19 +30,6 @@ class ForgetPasswordScreenViewController extends GetxController {
     }
   }
 
-  Future<void> connectTelegram() async {
-    var phone = phoneCtrl.text.trim();
-    if (!phone.startsWith("0")) {
-      phone = "0$phone";
-    }
-    try {
-      isTelegramLoading.value = true;
-      await telegramService.connectTelegram(phone);
-    } finally {
-      isTelegramLoading.value = false;
-    }
-  }
-  
   void _handleError(dynamic error) {
     if (error is DioException) {
       final resp = error.response;
@@ -53,11 +38,7 @@ class ForgetPasswordScreenViewController extends GetxController {
         try {
           final data = resp.data;
           if (data != null) {
-            if (data is Map && data['message'] != null) {
-              msg = data['message'].toString();
-            } else if (data is String && data.isNotEmpty) {
-              msg = data.toString();
-            }
+            msg = _extractErrorMessage(data);
           }
         } catch (_) {}
 
@@ -66,8 +47,10 @@ class ForgetPasswordScreenViewController extends GetxController {
             msg = 'Unauthorized. Please login again.'.tr;
           } else if (resp.statusCode == 404) {
             msg = 'Not found. Please check the phone number.'.tr;
+          } else if (resp.statusCode == 500) {
+            msg = 'We could not send the SMS. Please check your phone number and try again.'.tr;
           } else if (resp.statusCode != null) {
-            msg = 'Request failed (code: ${resp.statusCode})'.tr;
+            msg = 'Request failed'.tr;
           }
         }
 
@@ -96,6 +79,51 @@ class ForgetPasswordScreenViewController extends GetxController {
       }
       CustomSnackbar.error("Something went wrong");
     }
+  }
+
+  String _extractErrorMessage(dynamic data) {
+    if (data is Map) {
+      for (final key in ['message', 'detail', 'error', 'title']) {
+        final value = data[key];
+        if (value is String && value.trim().isNotEmpty) {
+          final normalized = value.trim().toLowerCase();
+          if (normalized.contains('not linked') || normalized.contains('telegram') || normalized.contains('sms')) {
+            return 'We could not send the SMS. Please check your phone number and try again.'.tr;
+          }
+          return value.trim();
+        }
+      }
+
+      if (data['errors'] is Map) {
+        final errors = data['errors'] as Map;
+        for (final value in errors.values) {
+          if (value is List && value.isNotEmpty) {
+            final firstValue = value.first;
+            if (firstValue is String && firstValue.trim().isNotEmpty) {
+              final normalized = firstValue.trim().toLowerCase();
+              if (normalized.contains('not linked') || normalized.contains('telegram') || normalized.contains('sms')) {
+                return 'We could not send the SMS. Please check your phone number and try again.'.tr;
+              }
+              return firstValue.trim();
+            }
+          } else if (value is String && value.trim().isNotEmpty) {
+            final normalized = value.trim().toLowerCase();
+            if (normalized.contains('not linked') || normalized.contains('telegram') || normalized.contains('sms')) {
+              return 'We could not send the SMS. Please check your phone number and try again.'.tr;
+            }
+            return value.trim();
+          }
+        }
+      }
+    } else if (data is String && data.trim().isNotEmpty) {
+      final normalized = data.trim().toLowerCase();
+      if (normalized.contains('not linked') || normalized.contains('telegram')) {
+        return 'Your phone number is not linked to Telegram. Please link it first.'.tr;
+      }
+      return data.trim();
+    }
+
+    return '';
   }
 
   @override
