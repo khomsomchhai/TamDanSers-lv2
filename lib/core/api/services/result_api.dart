@@ -12,9 +12,12 @@ class ResultApi {
     return (response as List).map((e) => ScoreModel.fromMap(e)).toList();
   }
 
-  Future<ScoreModel> getRankStudent() async {
+  Future<ScoreModel> getRankStudent({
+    required int month,
+    required int semester,
+  }) async {
     final response = await baseApiService.get(
-      endpoint: '/scores/student/rank',
+      endpoint: '/scores/student/rank?month=$month&semester=$semester',
     );
 
     return ScoreModel.fromMap(response);

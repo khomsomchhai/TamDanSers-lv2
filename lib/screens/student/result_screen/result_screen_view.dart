@@ -5,6 +5,7 @@ import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/api/services/result_api.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
+import 'package:tamdansers_lv2/core/widgets/card/custom_score_card.dart';
 import 'package:tamdansers_lv2/core/widgets/score_bar.dart';
 import 'package:tamdansers_lv2/core/widgets/subject_ui.dart';
 import 'package:tamdansers_lv2/data/model/score_model.dart';
@@ -32,10 +33,11 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                 ),
                 child: TabBar(
                   onTap: (index) {
-                    controller.selectedSemester.value = index + 1;
-                    controller.selectedMonth.value = null;
-                    controller.selectFisrtMonth();
-                  },
+  controller.selectedSemester.value = index + 1;
+  controller.selectedMonth.value = null;
+  controller.selectFisrtMonth();
+  controller.getRank();
+},
                   indicator: BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(10),
@@ -61,7 +63,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                               child: monthList(),
                             ),
                             SizedBox(height: 16),
-                            cartRanking(),
+                            CustomScoreCard(),
                             SizedBox(height: 16),
                             Expanded(
                               child: scoreList(),
@@ -136,6 +138,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                     borderRadius: BorderRadius.circular(10),
                     onTap: () {
                       controller.selectedMonth.value = month;
+                      controller.getRank();
                     },
                     child: Container(
                       width: 120,

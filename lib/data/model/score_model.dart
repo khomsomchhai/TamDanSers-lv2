@@ -16,19 +16,19 @@ class ScoreModel {
     required this.maxScore,
     required this.subjectName,
     required this.teacherName,
-    required this.rank
+    required this.rank,
   });
 
   factory ScoreModel.fromMap(Map<String, dynamic> map) {
     return ScoreModel(
       semester: map['semester'] ?? 0,
       month: map['month'] ?? 0,
-      score: (map['score'] ?? 0).toDouble(),
+      score: (map['score'] ?? map['average'] ?? 0).toDouble(),
       totalScore: (map['total_score'] ?? 0).toDouble(),
-      maxScore: (map['max_score'] ?? 0).toDouble(),
+      maxScore: (map['max_score'] ?? map['total_max'] ?? 0).toDouble(),
       subjectName: map['subject_name'] ?? '',
       teacherName: map['teacher_name'] ?? '',
-      rank:map['rank']?.toString()??''
+      rank: map['rank']?.toString() ?? '',
     );
   }
 }

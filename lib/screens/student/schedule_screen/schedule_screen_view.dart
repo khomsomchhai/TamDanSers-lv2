@@ -87,7 +87,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                         children: [
                           if (morningSchedules.isNotEmpty) ...[
                             Text(
-                              'Morning',
+                              'morning'.tr,
                               style: Get.textTheme.titleMedium,
                             ),
                             SizedBox(height: 8),
@@ -96,7 +96,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                           ],
                           if (afternoonSchedules.isNotEmpty) ...[
                             Text(
-                              'Afternoon',
+                              'afternoon'.tr,
                               style: Get.textTheme.titleMedium,
                             ),
                             SizedBox(height: 8),
@@ -165,7 +165,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item['subject_name'] ?? '',
+                  item['subject_name'] ?? ''.tr,
                   style: AppTextStyles.titleMedium
                       .copyWith(color: AppColors.hintColor),
                 ),
