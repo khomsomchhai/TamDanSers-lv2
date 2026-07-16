@@ -9,25 +9,19 @@ Map<String, String> kmKh = {
   'login': 'ចូល',
   'no_account': 'គ្មានគណនី?',
   'register': 'ចុះឈ្មោះ',
-  "Required" : "ចាំបាច់",
-  "good_morning" : "អរុណសួស្តី!",
-  "good_afternoon" : "ទិវាសួស្ដី!",
-  "good_evening" : "សាយណ្ហសួស្ដី!",
-  "good_night" : "រាត្រីសួស្ដី!",
-<<<<<<< HEAD
-
-  "home" : "ទំព័រដើម",
-  "homework" : "កិច្ចការផ្ទះ",
-  "attendance" : "អវត្តមាន",
-  "profile" : "ប្រវត្តិរូប",
-
-  "class" : "ថ្នាក់ទី​ ",
-
-  "ask_permission" : "សុំច្បាប់",
-  "schedule" : "កាលវិភាគ",
-  "result" : "លទ្ធផល់",
-=======
-  'homework': 'កិច្ចការផ្ទះ:',
+  "Required": "ចាំបាច់",
+  "good_morning": "អរុណសួស្តី!",
+  "good_afternoon": "ទិវាសួស្ដី!",
+  "good_evening": "សាយណ្ហសួស្ដី!",
+  "good_night": "រាត្រីសួស្ដី!",
+  "home": "ទំព័រដើម",
+  "homework": "កិច្ចការផ្ទះ",
+  "attendance": "អវត្តមាន",
+  "profile": "ប្រវត្តិរូប",
+  "class": "ថ្នាក់ទី​ ",
+  "ask_permission": "សុំច្បាប់",
+  "schedule": "កាលវិភាគ",
+  "result": "លទ្ធផល់",
   'ongoing': 'កំពុងបន្ត',
   'completed': 'បានបញ្ចប់',
   'math': 'គណិតវិទ្យា',
@@ -42,5 +36,4 @@ Map<String, String> kmKh = {
   'deadline_prefix': 'ឈប់ទទួល៖ ',
   'submitted_prefix': 'បានផ្ញើ៖ ',
   'view_details': 'មើលលម្អិត',
->>>>>>> e0f2ef0 (fix)
 };

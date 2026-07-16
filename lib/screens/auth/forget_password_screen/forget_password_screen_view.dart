@@ -62,10 +62,10 @@ class ForgetPasswordScreenView extends GetView<ForgetPasswordScreenViewControlle
                       decoration: BoxDecoration(
                         color: AppColors.white,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.15)),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.dark.withOpacity(0.05),
+                            color: AppColors.dark.withValues(alpha: 0.05),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -81,7 +81,7 @@ class ForgetPasswordScreenView extends GetView<ForgetPasswordScreenViewControlle
                                 height: 52,
                                 width: 52,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.12),
+                                  color: AppColors.primary.withValues(alpha: 0.12),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(

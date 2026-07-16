@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/attendance_tab/attendance_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/homework_tab/homework_tab_view.dart';
-import 'package:tamdansers_lv2/screens/student/student_dashboard/profile_tab/profile_tab_view.dart' hide Get;
+import 'package:tamdansers_lv2/screens/student/student_dashboard/profile_tab/profile_tab_view.dart';
 
 part 'student_dashboard_binding.dart';
 part 'student_dashboard_controller.dart';
@@ -24,7 +24,6 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
             ProfileTabView()
           ],
         ),
-
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: controller.currentIndex.value,
           onTap: controller.changeTab,
@@ -52,5 +51,3 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
     );
   }
 }
-
-

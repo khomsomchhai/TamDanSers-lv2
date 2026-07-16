@@ -213,11 +213,11 @@ class ResetPasswordScreenView
           fillColor: AppColors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-            borderSide: BorderSide(color: AppColors.primary.withOpacity(0.25)),
+            borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.25)),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-            borderSide: BorderSide(color: AppColors.primary.withOpacity(0.25)),
+            borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.25)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
