@@ -12,13 +12,14 @@ import 'package:tamdansers_lv2/core/widgets/card/custom_score_card.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_action.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_placeholder.dart';
+import 'package:tamdansers_lv2/screens/student/result_screen/result_screen_view.dart';
 
 part 'home_tab_binding.dart';
 part 'home_tab_controller.dart';
 
 class HomeTabView extends GetView<HomeTabViewController> {
-  const HomeTabView({super.key});
-
+  HomeTabView({super.key});
+  final resultController = Get.put(ResultScreenViewController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,32 +37,42 @@ class HomeTabView extends GetView<HomeTabViewController> {
                   Row(
                     children: [
                       Expanded(
-                        child: Obx(() => controller.userController.isLoading.value
-                        ? CustomHeaderPlaceholder()
-                        : CustomHeader(controller: controller.userController),),
+                        child: Obx(
+                          () => controller.userController.isLoading.value
+                              ? CustomHeaderPlaceholder()
+                              : CustomHeader(
+                                  controller: controller.userController),
+                        ),
                       ),
-                      const SizedBox(width: 10,),
+                      const SizedBox(
+                        width: 10,
+                      ),
                       CustomHeaderAction(
-                        onTapNotification: () {
-                        
-                        },
+                        onTapNotification: () {},
                         unreadCount: 2,
                       )
                     ],
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   Text(
                     controller.getCurrentDate(),
                     style: Get.textTheme.bodyLarge,
                   ),
-                  const SizedBox(height: 10,),
-                  Obx(() => controller.userController.isLoading.value
-                  ? _buildAttendanceCardSkeleton()
-                  : _buildAttendanceCard()
+                  const SizedBox(
+                    height: 10,
                   ),
-                  const SizedBox(height: 20,),
+                  Obx(() => controller.userController.isLoading.value
+                      ? _buildAttendanceCardSkeleton()
+                      : _buildAttendanceCard()),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   _buildFunction(),
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   Row(
                     children: [
                       Text(
@@ -71,7 +82,8 @@ class HomeTabView extends GetView<HomeTabViewController> {
                       Spacer(),
                       Text(
                         "see all".tr,
-                        style: Get.textTheme.bodyMedium!.copyWith(color: AppColors.info),
+                        style: Get.textTheme.bodyMedium!
+                            .copyWith(color: AppColors.info),
                       ),
                     ],
                   )
@@ -87,7 +99,8 @@ class HomeTabView extends GetView<HomeTabViewController> {
   Widget _buildFunction() {
     return Row(
       children: [
-        Expanded(child: Bounceable(
+        Expanded(
+            child: Bounceable(
           onTap: () {
             Get.toNamed(AppRoutes.askPermissionScreen);
           },
@@ -100,8 +113,11 @@ class HomeTabView extends GetView<HomeTabViewController> {
             ),
           ),
         )),
-        const SizedBox(width: 20,),
-        Expanded(child: Bounceable(
+        const SizedBox(
+          width: 20,
+        ),
+        Expanded(
+            child: Bounceable(
           onTap: () {
             Get.toNamed(AppRoutes.scheduleScreen);
           },
@@ -114,8 +130,11 @@ class HomeTabView extends GetView<HomeTabViewController> {
             ),
           ),
         )),
-        const SizedBox(width: 20,),
-        Expanded(child: Bounceable(
+        const SizedBox(
+          width: 20,
+        ),
+        Expanded(
+            child: Bounceable(
           onTap: () {
             Get.toNamed(AppRoutes.resultScreen);
           },
@@ -147,16 +166,24 @@ class HomeTabView extends GetView<HomeTabViewController> {
             ),
           ],
         ),
-        const SizedBox(height: 10,),
-        CustomScoreCard(
-          averageScore: 8.5, 
-          totalScore: 850, 
-          rank: 5, 
-          currentMonth: "មិថុនា"
-        )
+        const SizedBox(
+          height: 10,
+        ),
+        Obx(() {
+          if (resultController.isLoading.value) {
+            return _buildAttendanceCardSkeleton();
+          }
+
+          if (resultController.filterScores.isEmpty) {
+            return const Text("No score");
+          }
+
+          return CustomScoreCard();
+        })
       ],
     );
   }
+
   Widget _buildAttendanceCardSkeleton() {
     return Shimmer.fromColors(
       baseColor: AppColors.skeletonBaseColor,
@@ -187,7 +214,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
           const SizedBox(height: 10),
           Container(
             width: double.infinity,
-            height: 140, 
+            height: 140,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),

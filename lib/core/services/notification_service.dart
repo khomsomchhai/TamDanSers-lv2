@@ -24,8 +24,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> setupLocalNotifications() async {
-  const androidSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
 
   const iosSettings = DarwinInitializationSettings();
 
@@ -34,7 +33,7 @@ Future<void> setupLocalNotifications() async {
     iOS: iosSettings,
   );
 
-  await flutterLocalNotificationsPlugin.initialize(settings: settings);
+  await flutterLocalNotificationsPlugin.initialize(settings);
 
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
@@ -82,10 +81,10 @@ Future<void> setupFCM() async {
 
     if (notification != null && android != null) {
       await flutterLocalNotificationsPlugin.show(
-        id: notification.hashCode,
-        title: notification.title,
-        body: notification.body,
-        notificationDetails: NotificationDetails(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
           android: AndroidNotificationDetails(
             channel.id,
             channel.name,

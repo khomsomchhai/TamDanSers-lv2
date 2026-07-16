@@ -2,9 +2,14 @@ part of 'result_screen_view.dart';
 
 class ResultScreenViewController extends GetxController {
   ResultApi resultApi = ResultApi();
+
   final selectedSemester = 1.obs;
   final selectedMonth = RxnInt();
   final isLoading = false.obs;
+
+  final result = <ScoreModel>[].obs;
+  final rank = Rxn<ScoreModel>();
+
   final Map<int, String> months = {
     1: "month_1",
     2: "month_2",
@@ -20,14 +25,15 @@ class ResultScreenViewController extends GetxController {
     12: "month_12",
   };
 
-  var result = <ScoreModel>[].obs;
-
   Future<void> getResult() async {
     try {
       isLoading.value = true;
-      var response = await resultApi.getResult();
+
+      final response = await resultApi.getResult();
       result.assignAll(response);
+
       selectFisrtMonth();
+      await getRank();
     } catch (e) {
       Get.snackbar('Error', e.toString());
     } finally {
@@ -35,10 +41,13 @@ class ResultScreenViewController extends GetxController {
     }
   }
 
-  final rank = Rxn<ScoreModel>();
-
   Future<void> getRank() async {
-    rank.value = await resultApi.getRankStudent();
+    if (selectedMonth.value == null) return;
+
+    rank.value = await resultApi.getRankStudent(
+      month: selectedMonth.value!,
+      semester: selectedSemester.value,
+    );
   }
 
   List<int> get semesterMonths {
@@ -55,15 +64,9 @@ class ResultScreenViewController extends GetxController {
       final sameSemester = e.semester == selectedSemester.value;
       final sameMonth =
           selectedMonth.value == null || e.month == selectedMonth.value;
+
       return sameSemester && sameMonth;
     }).toList();
-  }
-
-  double get monthTotalScore {
-    return filterScores.fold(
-      0.0,
-      (sum, item) => sum + item.totalScore,
-    );
   }
 
   void selectFisrtMonth() {
@@ -71,22 +74,13 @@ class ResultScreenViewController extends GetxController {
       selectedMonth.value = semesterMonths.first;
     } else {
       selectedMonth.value = null;
+      rank.value = null;
     }
   }
-
-  final Map<int, String> subjects = {
-    1: "khmer",
-    2: "math",
-    3: "english",
-    4: "science",
-    5: "social",
-    6: "biology"
-  };
 
   @override
   void onInit() {
     super.onInit();
     getResult();
-    getRank();
   }
 }

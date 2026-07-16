@@ -18,7 +18,7 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
       () => Scaffold(
         body: IndexedStack(
           index: controller.currentIndex.value,
-          children: const [
+          children:  [
             HomeTabView(),
             HomeworkTabView(),
             AttendanceTabView(),

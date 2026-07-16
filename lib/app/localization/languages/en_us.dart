@@ -9,11 +9,14 @@ Map<String, String> enUs = {
   'login': 'Login',
   'no_account': "Don't have an account?",
   'register': 'Register',
-  "requred": "Required",
-  "good_morning": "Good morning!",
-  "good_afternoon": "Good afternoon!",
-  "good_evening": "Good evening!",
-  "good_night": "Good night!",
+  "requred" : "Required",
+  "good_morning" : "Good morning!",
+  "good_afternoon" : "Good afternoon!",
+  "good_evening" : "Good evening!",
+  "good_night" : "Good night!",
+  "morning" : "Morning",
+  "afternoon" : "Afternoon",
+
   'homework': 'Homework',
   'ongoing': 'Ongoing',
   'completed': 'Completed',
@@ -31,7 +34,6 @@ Map<String, String> enUs = {
   'view_details': 'View details',
 
   "home" : "Home",
-  "homework" : "Homework",
   "attendance" : "Attendance",
   "profile" : "Profile",
 
@@ -43,6 +45,8 @@ Map<String, String> enUs = {
   "semester 1" : "Semester 1",
   "semester 2" : "Semester 2",
   'ranking_for_month': 'Ranking for Month',
+  'average': 'Average',
+  'total_score': 'Total Score',
 
   //months
   'month_1': 'January',
@@ -60,7 +64,6 @@ Map<String, String> enUs = {
 
   //subjects
   'khmer': 'Khmer',
-  'math': 'Math',
   'english': 'English',
   'science': 'Science',
   'social': 'Social',

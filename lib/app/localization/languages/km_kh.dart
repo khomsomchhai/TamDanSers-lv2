@@ -15,6 +15,9 @@ Map<String, String> kmKh = {
   "good_evening" : "សាយណ្ហសួស្ដី!",
   "good_night" : "រាត្រីសួស្ដី!",
 
+  "morning" : "ព្រឹក",
+  "afternoon" : "រសៀល",
+
   "home" : "ទំព័រដើម",
   "homework" : "កិច្ចការផ្ទះ",
   "attendance" : "អវត្តមាន",
@@ -42,7 +45,10 @@ Map<String, String> kmKh = {
   'view_details': 'មើលលម្អិត',
   "semester 1" : "ឆមាស 1",
   "semester 2" : "ឆមាស 2",
-  'ranking_for_month': 'ចំណាត់ថ្នាក់សម្រាប់ខែ',
+  'ranking_for_month': 'ចំណាត់ថ្នាក់ខែ',
+  'average': 'មធ្យមភាគ',
+  'total_score': 'ពិន្ទុសរុប',
+
 
   //months
   'month_1': 'មករា',
