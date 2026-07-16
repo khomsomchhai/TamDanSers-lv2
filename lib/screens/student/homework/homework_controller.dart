@@ -62,7 +62,7 @@ class HomeworkViewController extends GetxController {
         date: '11-01-2026',
         icon: Icons.calculate_outlined,
         iconColor: const Color(0xff6763EB),
-        iconBgColor: const Color(0xff6763EB).withOpacity(0.12),
+        iconBgColor: const Color(0xff6763EB).withValues(alpha: 0.12),
       ),
       HomeworkItem(
         subjectKey: 'khmer_literature',
@@ -71,7 +71,7 @@ class HomeworkViewController extends GetxController {
         date: '12-01-2026',
         icon: Icons.translate_rounded,
         iconColor: const Color(0xffC95EDB),
-        iconBgColor: const Color(0xffC95EDB).withOpacity(0.12),
+        iconBgColor: const Color(0xffC95EDB).withValues(alpha: 0.12),
       ),
       HomeworkItem(
         subjectKey: 'physics',
@@ -80,7 +80,7 @@ class HomeworkViewController extends GetxController {
         date: '14-01-2026',
         icon: Icons.science_outlined,
         iconColor: const Color(0xff10B981),
-        iconBgColor: const Color(0xff10B981).withOpacity(0.12),
+        iconBgColor: const Color(0xff10B981).withValues(alpha: 0.12),
       ),
       HomeworkItem(
         subjectKey: 'history',
@@ -89,7 +89,7 @@ class HomeworkViewController extends GetxController {
         date: '04-01-2026',
         icon: Icons.menu_book_rounded,
         iconColor: const Color(0xffEF4444),
-        iconBgColor: const Color(0xffEF4444).withOpacity(0.12),
+        iconBgColor: const Color(0xffEF4444).withValues(alpha: 0.12),
       ),
     ]);
 
@@ -101,7 +101,7 @@ class HomeworkViewController extends GetxController {
         date: '08-01-2026',
         icon: Icons.calculate_outlined,
         iconColor: const Color(0xff6763EB),
-        iconBgColor: const Color(0xff6763EB).withOpacity(0.12),
+        iconBgColor: const Color(0xff6763EB).withValues(alpha: 0.12),
       ),
       HomeworkItem(
         subjectKey: 'physics',
@@ -110,7 +110,7 @@ class HomeworkViewController extends GetxController {
         date: '05-01-2026',
         icon: Icons.science_outlined,
         iconColor: const Color(0xff10B981),
-        iconBgColor: const Color(0xff10B981).withOpacity(0.12),
+        iconBgColor: const Color(0xff10B981).withValues(alpha: 0.12),
       ),
       HomeworkItem(
         subjectKey: 'geography',
@@ -119,7 +119,7 @@ class HomeworkViewController extends GetxController {
         date: '03-01-2026',
         icon: Icons.public_rounded,
         iconColor: const Color(0xffF59E0B),
-        iconBgColor: const Color(0xffF59E0B).withOpacity(0.12),
+        iconBgColor: const Color(0xffF59E0B).withValues(alpha: 0.12),
       ),
       HomeworkItem(
         subjectKey: 'khmer_literature',
@@ -128,7 +128,7 @@ class HomeworkViewController extends GetxController {
         date: '30-12-2025',
         icon: Icons.translate_rounded,
         iconColor: const Color(0xffC95EDB),
-        iconBgColor: const Color(0xffC95EDB).withOpacity(0.12),
+        iconBgColor: const Color(0xffC95EDB).withValues(alpha: 0.12),
       ),
     ]);
   }

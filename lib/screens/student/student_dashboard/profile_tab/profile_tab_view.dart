@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
@@ -255,7 +255,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: SweepGradient(
-              startAngle: 2.356, // 135°
+              startAngle: 2.356, // 135�
               colors: [Color(0xFF7F77DD), Color(0xFF5DCAA5), Color(0xFF7F77DD)],
             ),
           ),
@@ -382,7 +382,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),

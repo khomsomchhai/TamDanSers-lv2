@@ -63,5 +63,3 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
     );
   }
 }
-
-

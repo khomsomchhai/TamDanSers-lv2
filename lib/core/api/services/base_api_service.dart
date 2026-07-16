@@ -7,28 +7,24 @@ class BaseApiService {
   Future <dynamic> post({
     required String endpoint,
     required dynamic data,
-  })async {
+  }) async {
     try {
       var response = await apiConfig.dio.post(endpoint, data: data);
       return response.data;
-    } on DioException catch (e) {
+    } on DioException {
       rethrow;
     } catch (e) {
       throw Exception("Failed");
     }
   }
 
-  Future <dynamic> get({
-    required String endpoint,
-    Map<String, dynamic>? queryParameters
-  }) async {
-    try{
-      var response = await apiConfig.dio.get(
-        endpoint,
-        queryParameters: queryParameters
-      );
+  Future<dynamic> get(
+      {required String endpoint, Map<String, dynamic>? queryParameters}) async {
+    try {
+      var response =
+          await apiConfig.dio.get(endpoint, queryParameters: queryParameters);
       return response.data;
-    }on DioException catch (e) {
+    } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
         throw Exception("Unauthorized");
       }
@@ -37,26 +33,23 @@ class BaseApiService {
   }
 
   Future<dynamic> delete({required String endpoint}) async {
-    try{
+    try {
       var response = await apiConfig.dio.delete(endpoint);
       return response.data;
-    }catch (e) {
+    } catch (e) {
       throw Exception("Failed");
     }
   }
 
-  Future <dynamic> put({
+  Future<dynamic> put({
     required String endpoint,
     dynamic data,
-  })async {
+  }) async {
     try {
       var response = await apiConfig.dio.put(endpoint, data: data);
       return response.data;
-    }catch (e) {
+    } catch (e) {
       throw Exception("Failed");
     }
   }
-
-
-
 }
