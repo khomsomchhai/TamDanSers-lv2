@@ -46,7 +46,7 @@ class CustomTextField extends StatelessWidget {
         hintStyle: Get.textTheme.bodyLarge!.copyWith(color: AppColors.hintColor),
         prefixIcon: prefixIcon,
         suffixIcon: isPwd ? suffixIcon : null,
-        errorStyle: Get.textTheme.bodyLarge!.copyWith(color: AppColors.error),
+        errorStyle: Get.textTheme.bodySmall!.copyWith(color: AppColors.error),
         border:  OutlineInputBorder(
           borderSide: BorderSide.none,
           borderRadius: BorderRadius.circular(AppNumbers.radiusMedium)

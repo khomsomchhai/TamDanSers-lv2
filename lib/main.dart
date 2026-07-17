@@ -59,6 +59,9 @@ class _MainAppState extends State<MainApp> {
       darkTheme: darkTheme,
       themeMode: widget.themeService.themeMode,
       getPages: AppPages.getPages,
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        overscroll: false,
+      ),
     );
   }
 }

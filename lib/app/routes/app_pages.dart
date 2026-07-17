@@ -3,6 +3,7 @@ import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/screens/auth/change_password_screen/change_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/forget_password_screen/forget_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/login_screen/login_screen_view.dart';
+import 'package:tamdansers_lv2/screens/auth/register_parent_screen/register_parent_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/reset_password_screen/reset_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/splash_screen/splash_screen_view.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_dashboard_view.dart';
@@ -46,6 +47,12 @@ class AppPages {
       binding: ChangePasswordScreenViewBinding(),
       transition: Transition.rightToLeft,
     ),
+    GetPage(
+      name: AppRoutes.registerParentScreen,
+      page: () => const RegisterParentScreenView(),
+      binding: RegisterParentScreenViewBinding(),
+      transition: Transition.rightToLeft,
+    ),
 
     ///////////////////////////
     //Student
@@ -58,22 +65,22 @@ class AppPages {
         name: AppRoutes.askPermissionScreen,
         page: () => AskPermissionScreenView(),
         binding: AskPermissionScreenViewBinding(),
-        transition: Transition.leftToRight),
+        transition: Transition.rightToLeft),
     GetPage(
         name: AppRoutes.scheduleScreen,
         page: () => ScheduleScreenView(),
         binding: ScheduleScreenViewBinding(),
-        transition: Transition.leftToRight),
+        transition: Transition.rightToLeft),
     GetPage(
         name: AppRoutes.resultScreen,
         page: () => ResultScreenView(),
         binding: ResultScreenViewBinding(),
-        transition: Transition.leftToRight),
+        transition: Transition.rightToLeft),
     GetPage(
         name: AppRoutes.homeworkScreen,
         page: () => HomeworkView(),
         binding: HomeworkViewBinding(),
-        transition: Transition.leftToRight),
+        transition: Transition.rightToLeft),
     ////////////////////////////////
     //Parent
     GetPage(
