@@ -42,34 +42,246 @@ class ProfileTabViewController extends GetxController {
   void showImagePickerSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt_outlined),
-                title: Text('Take Photo'.tr),
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  pickImage(ImageSource.camera);
-                },
+        return Container(
+          decoration: BoxDecoration(
+            color: Get.theme.colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Update photo'.tr,
+                    style: Get.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Choose a new profile photo'.tr,
+                    style: Get.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.hintColor,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildImageOption(
+                    icon: PhosphorIconsRegular.camera,
+                    title: 'Take Photo'.tr,
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      pickImage(ImageSource.camera);
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  _buildImageOption(
+                    icon: PhosphorIconsRegular.image,
+                    title: 'Choose from Gallery'.tr,
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      pickImage(ImageSource.gallery);
+                    },
+                  ),
+                ],
               ),
-              ListTile(
-                leading: const Icon(Icons.photo_library_outlined),
-                title: Text('Choose from Gallery'.tr),
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  pickImage(ImageSource.gallery);
-                },
-              ),
-            ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildImageOption({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.lightBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: AppColors.primary, size: 22),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+              ),
+            ),
+            Icon(
+              PhosphorIconsRegular.caretRight,
+              color: AppColors.hintColor,
+              size: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void showThemeSheet(BuildContext context) {
+    final isDark = Get.isDarkMode;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Get.theme.colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Theme'.tr,
+                    style: Get.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Choose the look that fits your style'.tr,
+                    style: Get.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.hintColor,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildThemeOption(
+                    context: ctx,
+                    icon: PhosphorIconsRegular.sun,
+                    title: 'Light Mode'.tr,
+                    isSelected: !isDark,
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      ThemeService().box.write('isDarkMode', false);
+                      Get.changeThemeMode(ThemeMode.light);
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  _buildThemeOption(
+                    context: ctx,
+                    icon: PhosphorIconsRegular.moon,
+                    title: 'Dark Mode'.tr,
+                    isSelected: isDark,
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      ThemeService().box.write('isDarkMode', true);
+                      Get.changeThemeMode(ThemeMode.dark);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildThemeOption({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.08) : AppColors.lightBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.primary.withValues(alpha: 0.25) : AppColors.border,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary.withValues(alpha: 0.12) : AppColors.white,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected ? AppColors.primary : AppColors.hintColor,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: Get.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? AppColors.primary : AppColors.dark,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                PhosphorIconsRegular.checkCircle,
+                color: AppColors.primary,
+                size: 20,
+              ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -78,104 +290,69 @@ class ProfileTabViewController extends GetxController {
 
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Image.asset(
-                  AppIcons.englishIcon,
-                  width: 28,
-                  height: 28,
-                ),
-                title: Text('English'.tr),
-                trailing: currentLang == 'en' ? const Icon(Icons.check, color: Colors.blue) : null,
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  LocalizationService().changeLocale('en');
-                },
-              ),
-              ListTile(
-                leading: Image.asset(
-                  AppIcons.khmerIcon,
-                  width: 28,
-                  height: 28,
-                ),
-                title: Text('ភាសាខ្មែរ'),
-                trailing: currentLang == 'km' ? const Icon(Icons.check, color: Colors.blue) : null,
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  LocalizationService().changeLocale('km');
-                },
-              ),
-            ],
+        return Container(
+          decoration: BoxDecoration(
+            color: Get.theme.colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
-        );
-      },
-    );
-  }
-
-  void showFAQSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'FAQ'.tr,
-                  style: Get.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                ExpansionTile(
-                  title: Text('How do I reset my password?'.tr),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: Text(
-                        'Use the Forgot Password link on the login screen to request a reset.'.tr,
-                        style: Get.textTheme.bodyMedium,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(999),
                       ),
                     ),
-                  ],
-                ),
-                ExpansionTile(
-                  title: Text('How do I change my language?'.tr),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: Text(
-                        'Open the Language option in your profile and select your preferred language.'.tr,
-                        style: Get.textTheme.bodyMedium,
-                      ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Language'.tr,
+                    style: Get.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
-                  ],
-                ),
-                ExpansionTile(
-                  title: Text('Who do I contact for support?'.tr),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: Text(
-                        'Contact your school administrator or support team for account help.'.tr,
-                        style: Get.textTheme.bodyMedium,
-                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Choose your preferred language'.tr,
+                    style: Get.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.hintColor,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-              ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildLanguageOption(
+                    context: ctx,
+                    icon: AppIcons.englishIcon,
+                    title: 'English'.tr,
+                    isSelected: currentLang == 'en',
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      LocalizationService().changeLocale('en');
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  _buildLanguageOption(
+                    context: ctx,
+                    icon: AppIcons.khmerIcon,
+                    title: 'ភាសាខ្មែរ',
+                    isSelected: currentLang == 'km',
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      LocalizationService().changeLocale('km');
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -183,22 +360,249 @@ class ProfileTabViewController extends GetxController {
     );
   }
 
+  Widget _buildLanguageOption({
+    required BuildContext context,
+    required String icon,
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.08) : AppColors.lightBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.primary.withValues(alpha: 0.25) : AppColors.border,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary.withValues(alpha: 0.12) : AppColors.white,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Image.asset(
+                icon,
+                width: 24,
+                height: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: Get.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? AppColors.primary : AppColors.dark,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                PhosphorIconsRegular.checkCircle,
+                color: AppColors.primary,
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void showFAQSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Get.theme.colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'FAQ'.tr,
+                    style: Get.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Common questions and quick answers'.tr,
+                    style: Get.textTheme.bodyMedium?.copyWith(color: AppColors.hintColor),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildFAQItem(
+                    title: 'How do I reset my password?'.tr,
+                    content: 'Use the Forgot Password link on the login screen to request a reset.'.tr,
+                  ),
+                  const SizedBox(height: 10),
+                  _buildFAQItem(
+                    title: 'How do I change my language?'.tr,
+                    content: 'Open the Language option in your profile and select your preferred language.'.tr,
+                  ),
+                  const SizedBox(height: 10),
+                  _buildFAQItem(
+                    title: 'Who do I contact for support?'.tr,
+                    content: 'Contact your school administrator or support team for account help.'.tr,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFAQItem({required String title, required String content}) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.lightBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                PhosphorIconsRegular.question,
+                color: AppColors.primary,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            content,
+            style: Get.textTheme.bodyMedium?.copyWith(color: AppColors.hintColor),
+          ),
+        ],
+      ),
+    );
+  }
+
   void logout() {
     Get.dialog(
-      AlertDialog(
-        title: Text("Logout".tr),
-        content: Text(
-          "Are you sure?".tr,
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(
+                      PhosphorIconsRegular.signOut,
+                      color: AppColors.error,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Logout".tr,
+                          style: Get.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "Sign out of your account".tr,
+                          style: Get.textTheme.bodySmall?.copyWith(
+                            color: AppColors.hintColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Are you sure you want to log out?".tr,
+                textAlign: TextAlign.center,
+                style: Get.textTheme.bodyMedium?.copyWith(color: AppColors.hintColor),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColors.border),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text("No".tr),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        box.remove("token");
+                        Get.offAllNamed(AppRoutes.loginScreen);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text("Yes".tr),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          ElevatedButton(onPressed: () {
-            Get.back();
-          }, child: Text("No".tr)),
-          ElevatedButton(onPressed: () {
-            box.remove("token");
-            Get.offAllNamed(AppRoutes.loginScreen);
-          }, child: Text("Yes".tr))
-        ],
       ),
     );
   }

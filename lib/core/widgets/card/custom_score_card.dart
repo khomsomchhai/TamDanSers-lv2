@@ -45,7 +45,7 @@ class CustomScoreCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "$currentRank",
+                    currentRank,
                     style: AppTextStyles.headlineMedium.copyWith(
                       color: AppColors.lightBackground,
                       fontWeight: FontWeight.bold,
