@@ -2,67 +2,69 @@ part of 'ask_permission_screen_view.dart';
 
 class AskPermissionScreenViewController extends GetxController {
   final formKey = GlobalKey<FormState>();
-  final reasonCtrl = TextEditingController();
+  final reasonController = TextEditingController();
   final PermissionServices permissionServices = PermissionServices();
+  final ScheduleServices scheduleServices = ScheduleServices();
 
-  final selectedType = RxnString();
-  final fromDate = Rxn<DateTime>();
-  final toDate = Rxn<DateTime>();
+  final selectedRequestType = 'By Subject'.obs;
+  final selectedScheduleId = RxnInt();
+  final selectedPermissionType = ''.obs;
   final isLoading = false.obs;
+  final isScheduleLoading = false.obs;
 
   final permissionRequests = <PermissionModel>[].obs;
+  final schedules = <ScheduleModel>[].obs;
+
+  final requestTypes = const ['By Subject', 'Full Day'];
 
   final List<String> permissionTypes = const [
     'Sick',
-    'Family Matter',
+    'Family',
     'Personal',
     'Other',
   ];
 
+  Worker? _requestTypeWorker;
+
+  bool get isBySubject => selectedRequestType.value == 'By Subject';
+
+  String get requestTypeApiValue => isBySubject ? 'by_subject' : 'full_day';
+
   @override
   void onInit() {
     super.onInit();
+    if (isBySubject) {
+      fetchTodaySchedules();
+    }
+    _requestTypeWorker =
+        ever<String>(selectedRequestType, _onRequestTypeChanged);
     fetchMyPermissions();
   }
 
-  Future<void> pickFromDate(BuildContext context) async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: fromDate.value ?? now,
-      firstDate: now.subtract(const Duration(days: 30)),
-      lastDate: now.add(const Duration(days: 365)),
-    );
-
-    if (picked != null) {
-      fromDate.value = picked;
-      if (toDate.value != null && toDate.value!.isBefore(picked)) {
-        toDate.value = null;
-      }
+  void _onRequestTypeChanged(String value) {
+    if (value == 'By Subject') {
+      fetchTodaySchedules();
+      return;
     }
+
+    selectedScheduleId.value = null;
+    schedules.clear();
   }
 
-  Future<void> pickToDate(BuildContext context) async {
-    final now = DateTime.now();
-    final start = fromDate.value ?? now;
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: toDate.value ?? start,
-      firstDate: start,
-      lastDate: now.add(const Duration(days: 365)),
-    );
-
-    if (picked != null) {
-      toDate.value = picked;
+  Future<void> fetchTodaySchedules() async {
+    isScheduleLoading.value = true;
+    try {
+      final result = await scheduleServices.fetchSchedules();
+      final today = _todayDayName().toLowerCase();
+      final todaySchedules = result
+          .where((item) => item.day.trim().toLowerCase() == today)
+          .toList();
+      schedules.assignAll(todaySchedules);
+    } catch (_) {
+      schedules.clear();
+    } finally {
+      isScheduleLoading.value = false;
     }
-  }
-
-  String formatDate(DateTime? date) {
-    if (date == null) {
-      return 'Select date';
-    }
-
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   Future<void> fetchMyPermissions() async {
@@ -75,51 +77,45 @@ class AskPermissionScreenViewController extends GetxController {
   }
 
   Future<void> submitPermission() async {
-    if (selectedType.value == null || selectedType.value!.trim().isEmpty) {
-      CustomSnackbar.error('Please select permission type');
+    if (selectedRequestType.value.trim().isEmpty) {
+      CustomSnackbar.error('ask_permission_please_select_request_type'.tr);
       return;
     }
 
-    if (fromDate.value == null) {
-      CustomSnackbar.error('Please select from date');
+    if (isBySubject && selectedScheduleId.value == null) {
+      CustomSnackbar.error('ask_permission_please_select_subject'.tr);
       return;
     }
 
-    if (toDate.value == null) {
-      CustomSnackbar.error('Please select to date');
+    if (selectedPermissionType.value.trim().isEmpty) {
+      CustomSnackbar.error('ask_permission_please_select_permission_type'.tr);
       return;
     }
 
-    final reason = reasonCtrl.text.trim();
+    final reason = reasonController.text.trim();
     if (reason.isEmpty) {
-      CustomSnackbar.error('Please enter a reason');
-      return;
-    }
-
-    if (toDate.value!.isBefore(fromDate.value!)) {
-      CustomSnackbar.error('To date cannot be before from date');
+      CustomSnackbar.error('ask_permission_please_enter_reason'.tr);
       return;
     }
 
     isLoading.value = true;
     try {
       await permissionServices.createPermission(
-        type: selectedType.value!,
-        fromDate: formatDate(fromDate.value),
-        toDate: formatDate(toDate.value),
+        requestType: requestTypeApiValue,
+        scheduleId: isBySubject ? selectedScheduleId.value : null,
+        type: selectedPermissionType.value,
         reason: reason,
       );
 
-      CustomSnackbar.success('Permission request submitted');
+      CustomSnackbar.success('ask_permission_submitted'.tr);
 
-      selectedType.value = null;
-      fromDate.value = null;
-      toDate.value = null;
-      reasonCtrl.clear();
+      selectedScheduleId.value = null;
+      selectedPermissionType.value = '';
+      reasonController.clear();
 
       await fetchMyPermissions();
     } catch (_) {
-      CustomSnackbar.error('Failed to submit permission request');
+      CustomSnackbar.error('ask_permission_failed_submit'.tr);
     } finally {
       isLoading.value = false;
     }
@@ -127,7 +123,74 @@ class AskPermissionScreenViewController extends GetxController {
 
   @override
   void onClose() {
-    reasonCtrl.dispose();
+    _requestTypeWorker?.dispose();
+    reasonController.dispose();
     super.onClose();
+  }
+
+  String formatCreatedDate(String? rawDate) {
+    if (rawDate == null || rawDate.isEmpty) {
+      return '-';
+    }
+
+    final parsed = DateTime.tryParse(rawDate);
+    if (parsed == null) {
+      return rawDate;
+    }
+
+    final year = parsed.year.toString().padLeft(4, '0');
+    final month = parsed.month.toString().padLeft(2, '0');
+    final day = parsed.day.toString().padLeft(2, '0');
+    final hour = parsed.hour.toString().padLeft(2, '0');
+    final minute = parsed.minute.toString().padLeft(2, '0');
+
+    return '$year-$month-$day $hour:$minute';
+  }
+
+  String scheduleLabel(ScheduleModel item) {
+    return '${item.subjectName} - ${item.day} (${item.startTime} - ${item.endTime})';
+  }
+
+  String _todayDayName() {
+    switch (DateTime.now().weekday) {
+      case DateTime.monday:
+        return 'Monday';
+      case DateTime.tuesday:
+        return 'Tuesday';
+      case DateTime.wednesday:
+        return 'Wednesday';
+      case DateTime.thursday:
+        return 'Thursday';
+      case DateTime.friday:
+        return 'Friday';
+      case DateTime.saturday:
+        return 'Saturday';
+      case DateTime.sunday:
+        return 'Sunday';
+      default:
+        return '';
+    }
+  }
+
+  String formatRequestType(String value) {
+    switch (value.toLowerCase()) {
+      case 'by_subject':
+        return 'ask_permission_request_type_by_subject'.tr;
+      case 'full_day':
+        return 'ask_permission_request_type_full_day'.tr;
+      default:
+        return value;
+    }
+  }
+
+  String requestTypeLabel(String value) {
+    switch (value) {
+      case 'By Subject':
+        return 'ask_permission_request_type_by_subject'.tr;
+      case 'Full Day':
+        return 'ask_permission_request_type_full_day'.tr;
+      default:
+        return value;
+    }
   }
 }
