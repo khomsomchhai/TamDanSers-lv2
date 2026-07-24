@@ -12,6 +12,7 @@ import 'package:tamdansers_lv2/core/widgets/card/custom_score_card.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_action.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_placeholder.dart';
+import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
 import 'package:tamdansers_lv2/screens/student/result_screen/result_screen_view.dart';
 
 part 'home_tab_binding.dart';
@@ -20,6 +21,12 @@ part 'home_tab_controller.dart';
 class HomeTabView extends GetView<HomeTabViewController> {
   HomeTabView({super.key});
   final resultController = Get.put(ResultScreenViewController());
+
+  final NotificationController notificationController =
+      Get.isRegistered<NotificationController>()
+          ? Get.find<NotificationController>()
+          : Get.put(NotificationController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,10 +54,16 @@ class HomeTabView extends GetView<HomeTabViewController> {
                       const SizedBox(
                         width: 10,
                       ),
-                      CustomHeaderAction(
-                        onTapNotification: () {},
-                        unreadCount: 2,
-                      )
+                      Obx(
+                        () => CustomHeaderAction(
+                          unreadCount: notificationController.unreadCount.value,
+                          onTapNotification: () {
+                            notificationController.markAllRead();
+
+                            Get.toNamed(AppRoutes.notificationScreen);
+                          },
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(

@@ -19,7 +19,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'result'.tr),
+      appBar: CustomAppBar(title: 'result'.tr,showNotification: false,),
       body: Padding(
         padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
         child: DefaultTabController(
@@ -33,11 +33,11 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                 ),
                 child: TabBar(
                   onTap: (index) {
-  controller.selectedSemester.value = index + 1;
-  controller.selectedMonth.value = null;
-  controller.selectFisrtMonth();
-  controller.getRank();
-},
+                    controller.selectedSemester.value = index + 1;
+                    controller.selectedMonth.value = null;
+                    controller.selectFisrtMonth();
+                    controller.getRank();
+                  },
                   indicator: BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(10),
@@ -163,27 +163,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
     });
   }
 
-  Widget cartRanking() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.neutral500, width: 1),
-      ),
-      child: Obx(() => Column(
-            children: [
-              Text(
-                '${'ranking_for_month'.tr} ${controller.months[controller.selectedMonth.value]?.tr ?? ''}',
-                style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              )
-            ],
-          )),
-    );
-  }
+
 
   Widget scoreList() {
     return Obx(() {
@@ -230,7 +210,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                                     .copyWith(fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                'Teacher: ${score.teacherName ?? ''}',
+                                '${'teacher'.tr}: ${score.teacherName ?? ''}',
                                 style: AppTextStyles.bodyLarge
                                     .copyWith(color: AppColors.neutral500),
                               ),

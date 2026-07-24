@@ -16,7 +16,7 @@ Map<String, String> enUs = {
   "good_night" : "Good night!",
   "morning" : "Morning",
   "afternoon" : "Afternoon",
-
+  "notification" : "Notification",
   'homework': 'Homework',
   'ongoing': 'Ongoing',
   'completed': 'Completed',
@@ -48,6 +48,8 @@ Map<String, String> enUs = {
   'average': 'Average',
   'total_score': 'Total Score',
 
+  'teacher': 'Teacher',
+
   //months
   'month_1': 'January',
   'month_2': 'February',
@@ -63,11 +65,11 @@ Map<String, String> enUs = {
   'month_12': 'December',
 
   //subjects
-  'khmer': 'Khmer',
-  'english': 'English',
-  'science': 'Science',
-  'social': 'Social',
-  'biology': 'Biology',
+  'Khmer': 'Khmer',
+  'English': 'English',
+  'Science': 'Science',
+  'Social': 'Social',
+  'Biology': 'Biology',
 
 
 };

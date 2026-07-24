@@ -4,6 +4,7 @@ class HomeTabViewController extends GetxController {
 
   var userController = Get.find<UserController>();
 
+
   String getKhmerDate() {
     DateTime now = DateTime.now();
     List<String> khmerWeekDays = [
@@ -64,12 +65,18 @@ class HomeTabViewController extends GetxController {
     ).format(DateTime.now());
   }
 
+  final notificationController =
+      Get.isRegistered<NotificationController>()
+          ? Get.find<NotificationController>()
+          : Get.put(NotificationController());
+
   @override
   void onInit() {
     super.onInit();
     if(userController.user == null && userController.profile == null){
       userController.getProfile();
     }
+    notificationController.loadNotifications();
   }
 
   Future<void> refreshHome() async {

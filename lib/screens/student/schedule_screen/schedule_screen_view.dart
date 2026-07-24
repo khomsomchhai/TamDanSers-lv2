@@ -16,7 +16,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: CustomAppBar(title: 'schedule'.tr),
+        appBar: CustomAppBar(title: 'schedule'.tr, showNotification: false),
         body: Column(
           children: [
             Padding(
@@ -136,7 +136,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
   }
 
   Widget scheduleCard(dynamic item) {
-    final subject = item['subject_name'] ?? '';
+    final subject = item['subject_name'.tr] ?? '';
     return Container(
       margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -165,7 +165,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item['subject_name'] ?? ''.tr,
+                  item['subject_name'.tr] ?? '',
                   style: AppTextStyles.titleMedium
                       .copyWith(color: AppColors.hintColor),
                 ),

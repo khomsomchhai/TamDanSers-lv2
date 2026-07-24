@@ -7,6 +7,7 @@ class ScoreModel {
   final String subjectName;
   final String teacherName;
   final String rank;
+  final String average ;
 
   ScoreModel({
     required this.semester,
@@ -17,6 +18,8 @@ class ScoreModel {
     required this.subjectName,
     required this.teacherName,
     required this.rank,
+    required this.average,
+
   });
 
   factory ScoreModel.fromMap(Map<String, dynamic> map) {
@@ -29,6 +32,7 @@ class ScoreModel {
       subjectName: map['subject_name'] ?? '',
       teacherName: map['teacher_name'] ?? '',
       rank: map['rank']?.toString() ?? '',
+      average: map['average']?.toString() ?? '',
     );
   }
 }
