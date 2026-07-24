@@ -4,26 +4,29 @@ import 'package:tamdansers_lv2/data/model/permission_model.dart';
 class PermissionServices {
   final baseApi = BaseApiService();
 
-  // Backend must provide POST /permissions/ endpoint.
   Future<Map<String, dynamic>> createPermission({
+    required String requestType,
+    int? scheduleId,
     required String type,
-    required String fromDate,
-    required String toDate,
     required String reason,
   }) async {
+    final Map<String, dynamic> payload = {
+      'request_type': requestType,
+      'type': type,
+      'reason': reason,
+    };
+
+    if (scheduleId != null) {
+      payload['schedule_id'] = scheduleId;
+    }
+
     final response = await baseApi.post(
       endpoint: '/permissions/',
-      data: {
-        'type': type,
-        'start_date': fromDate,
-        'end_date': toDate,
-        'reason': reason,
-      },
+      data: payload,
     );
     return Map<String, dynamic>.from(response);
   }
 
-  // Backend must provide GET /permissions/student/me endpoint.
   Future<List<PermissionModel>> fetchMyPermissions() async {
     final response = await baseApi.get(
       endpoint: '/permissions/student/me',

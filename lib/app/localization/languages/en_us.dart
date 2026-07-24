@@ -1,23 +1,39 @@
 Map<String, String> enUs = {
+  // Language
   'language_english': 'English',
   'language_khmer': 'Khmer',
+
+  // Authentication
   'login_title': 'Login',
   'hint_id': 'Enter your ID',
   'hint_password': 'Enter your password',
   'required': 'Required',
-  'forget_password': 'Forget Password?',
+  'forget_password': 'Forgot Password?',
   'login': 'Login',
   'no_account': "Don't have an account?",
   'register': 'Register',
-  "requred" : "Required",
-  "good_morning" : "Good morning!",
-  "good_afternoon" : "Good afternoon!",
-  "good_evening" : "Good evening!",
-  "good_night" : "Good night!",
-  "morning" : "Morning",
-  "afternoon" : "Afternoon",
-  "notification" : "Notification",
+
+  // Greeting
+  'good_morning': 'Good morning!',
+  'good_afternoon': 'Good afternoon!',
+  'good_evening': 'Good evening!',
+  'good_night': 'Good night!',
+  'morning': 'Morning',
+  'afternoon': 'Afternoon',
+
+  // General
+  'notification': 'Notification',
+  'home': 'Home',
   'homework': 'Homework',
+  'attendance': 'Attendance',
+  'profile': 'Profile',
+  'class': 'Class ',
+  'ask_permission': 'Permission',
+  'schedule': 'Schedule',
+  'result': 'Result',
+  'teacher': 'Teacher',
+
+  // Homework
   'ongoing': 'Ongoing',
   'completed': 'Completed',
   'math': 'Mathematics',
@@ -33,43 +49,72 @@ Map<String, String> enUs = {
   'submitted_prefix': 'Submitted: ',
   'view_details': 'View details',
 
-  "home" : "Home",
-  "attendance" : "Attendance",
-  "profile" : "Profile",
-
-  "class" : "Class ",
-
-  "ask_permission" : "Permission",
-  "schedule" : "Schedule",
-  "result" : "Result",
-  "semester 1" : "Semester 1",
-  "semester 2" : "Semester 2",
+  // Result
+  'semester 1': 'Semester 1',
+  'semester 2': 'Semester 2',
   'ranking_for_month': 'Ranking for Month',
   'average': 'Average',
   'total_score': 'Total Score',
 
-  'teacher': 'Teacher',
-
-  //months
+  // Months
   'month_1': 'January',
   'month_2': 'February',
   'month_3': 'March',
   'month_4': 'April',
   'month_5': 'May',
   'month_6': 'June',
-  'month_7': 'July',  
+  'month_7': 'July',
   'month_8': 'August',
   'month_9': 'September',
   'month_10': 'October',
   'month_11': 'November',
   'month_12': 'December',
 
-  //subjects
+  // Subjects
   'Khmer': 'Khmer',
+  'khmer': 'Khmer',
+  'Math': 'Mathematics',
   'English': 'English',
   'Science': 'Science',
-  'Social': 'Social',
   'Biology': 'Biology',
+  'Earth': 'Earth Science',
+  'Social': 'Social Studies',
 
+  // Attendance
+  'attendance_no_records': 'No attendance records',
+  'attendance_select_date': 'Select date',
+  'attendance_all_days': 'All days',
+  'attendance_failed_load': 'Failed to load attendance records',
+  'attendance_status_present': 'Present',
+  'attendance_status_absent': 'Absent',
+  'attendance_status_late': 'Late',
+  'attendance_status_permission': 'Permission',
 
+  // Ask permission
+  'ask_permission_my_requests': 'My Permission Requests',
+  'ask_permission_no_requests': 'No permission requests yet',
+  'ask_permission_subject': 'Subject',
+  'ask_permission_permission_type': 'Permission Type',
+  'ask_permission_reason': 'Reason',
+  'ask_permission_created': 'Created',
+  'ask_permission_request_permission': 'Request Permission',
+  'ask_permission_request_type': 'Request Type',
+  'ask_permission_loading_subjects': 'Loading subjects...',
+  'ask_permission_select_subject': 'Select subject',
+  'ask_permission_select_permission_type': 'Select permission type',
+  'ask_permission_write_reason': 'Write your reason...',
+  'ask_permission_submit_request': 'Submit Request',
+  'ask_permission_please_select_request_type': 'Please select request type',
+  'ask_permission_please_select_subject': 'Please select subject',
+  'ask_permission_please_select_permission_type':
+      'Please select permission type',
+  'ask_permission_please_enter_reason': 'Please enter a reason',
+  'ask_permission_submitted': 'Permission request submitted',
+  'ask_permission_failed_submit': 'Failed to submit permission request',
+  'ask_permission_no_schedule_today':
+      'No schedule today. Full day permission is not allowed.',
+  'ask_permission_already_requested_today':
+      'You already requested permission for today.',
+  'ask_permission_request_type_by_subject': 'By Subject',
+  'ask_permission_request_type_full_day': 'Full Day',
 };

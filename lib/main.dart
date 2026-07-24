@@ -40,7 +40,7 @@ class MainApp extends StatefulWidget {
   final ThemeService themeService;
   const MainApp({super.key, required this.themeService});
 
-  @override
+  @override 
   State<MainApp> createState() => _MainAppState();
 }
 
@@ -59,6 +59,9 @@ class _MainAppState extends State<MainApp> {
       darkTheme: darkTheme,
       themeMode: widget.themeService.themeMode,
       getPages: AppPages.getPages,
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        overscroll: false,
+      ),
     );
   }
 }
