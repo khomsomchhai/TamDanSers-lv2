@@ -6,6 +6,7 @@ import 'package:tamdansers_lv2/screens/auth/login_screen/login_screen_view.dart'
 import 'package:tamdansers_lv2/screens/auth/register_parent_screen/register_parent_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/reset_password_screen/reset_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/splash_screen/splash_screen_view.dart';
+import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_dashboard_view.dart';
 import 'package:tamdansers_lv2/screens/student/ask_permission_screen/ask_permission_screen_view.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
@@ -88,5 +89,12 @@ class AppPages {
         page: () => ParentDashboardView(),
         binding: ParentDashboardViewBinding(),
         transition: Transition.fadeIn),
+
+    //Notification
+    GetPage(
+        name: AppRoutes.notificationScreen,
+        page: () => NotificationView(),
+        binding: NotificationViewBinding(),
+        transition: Transition.leftToRight)
   ];
 }

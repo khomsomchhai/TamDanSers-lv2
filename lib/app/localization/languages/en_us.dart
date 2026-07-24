@@ -1,20 +1,39 @@
 Map<String, String> enUs = {
+  // Language
   'language_english': 'English',
   'language_khmer': 'Khmer',
+
+  // Authentication
   'login_title': 'Login',
   'hint_id': 'Enter your ID',
   'hint_password': 'Enter your password',
   'required': 'Required',
-  'forget_password': 'Forget Password?',
+  'forget_password': 'Forgot Password?',
   'login': 'Login',
   'no_account': "Don't have an account?",
   'register': 'Register',
-  "requred": "Required",
-  "good_morning": "Good morning!",
-  "good_afternoon": "Good afternoon!",
-  "good_evening": "Good evening!",
-  "good_night": "Good night!",
+
+  // Greeting
+  'good_morning': 'Good morning!',
+  'good_afternoon': 'Good afternoon!',
+  'good_evening': 'Good evening!',
+  'good_night': 'Good night!',
+  'morning': 'Morning',
+  'afternoon': 'Afternoon',
+
+  // General
+  'notification': 'Notification',
+  'home': 'Home',
   'homework': 'Homework',
+  'attendance': 'Attendance',
+  'profile': 'Profile',
+  'class': 'Class ',
+  'ask_permission': 'Permission',
+  'schedule': 'Schedule',
+  'result': 'Result',
+  'teacher': 'Teacher',
+
+  // Homework
   'ongoing': 'Ongoing',
   'completed': 'Completed',
   'math': 'Mathematics',
@@ -30,21 +49,14 @@ Map<String, String> enUs = {
   'submitted_prefix': 'Submitted: ',
   'view_details': 'View details',
 
-  "home": "Home",
-  // "homework" : "Homework",
-  "attendance": "Attendance",
-  "profile": "Profile",
-
-  "class": "Class ",
-
-  "ask_permission": "Permission",
-  "schedule": "Schedule",
-  "result": "Result",
-  "semester 1": "Semester 1",
-  "semester 2": "Semester 2",
+  // Result
+  'semester 1': 'Semester 1',
+  'semester 2': 'Semester 2',
   'ranking_for_month': 'Ranking for Month',
+  'average': 'Average',
+  'total_score': 'Total Score',
 
-  //months
+  // Months
   'month_1': 'January',
   'month_2': 'February',
   'month_3': 'March',
@@ -58,15 +70,17 @@ Map<String, String> enUs = {
   'month_11': 'November',
   'month_12': 'December',
 
-  //subjects
+  // Subjects
+  'Khmer': 'Khmer',
   'khmer': 'Khmer',
-  // 'math': 'Math',
-  'english': 'English',
-  'science': 'Science',
-  'social': 'Social',
-  'biology': 'Biology',
+  'Math': 'Mathematics',
+  'English': 'English',
+  'Science': 'Science',
+  'Biology': 'Biology',
+  'Earth': 'Earth Science',
+  'Social': 'Social Studies',
 
-  //Attendance
+  // Attendance
   'attendance_no_records': 'No attendance records',
   'attendance_select_date': 'Select date',
   'attendance_all_days': 'All days',
@@ -76,7 +90,7 @@ Map<String, String> enUs = {
   'attendance_status_late': 'Late',
   'attendance_status_permission': 'Permission',
 
-  //Ask permission
+  // Ask permission
   'ask_permission_my_requests': 'My Permission Requests',
   'ask_permission_no_requests': 'No permission requests yet',
   'ask_permission_subject': 'Subject',

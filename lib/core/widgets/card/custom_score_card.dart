@@ -20,7 +20,7 @@ class CustomScoreCard extends StatelessWidget {
       final month = rankData?.month;
       final currentRank = rankData?.rank ?? "-";
       final totalMax = rankData?.maxScore ?? 100;
-
+      final average = rankData?.average ?? "-";
       final percent =
           totalMax > 0 ? (totalScore / totalMax).clamp(0.0, 1.0) : 0.0;
 
@@ -79,7 +79,7 @@ class CustomScoreCard extends StatelessWidget {
                           borderRadius:
                               BorderRadius.circular(AppNumbers.radiusSmall),
                         ),
-                        child: Text('${'average'.tr}: ${(totalMax > 0 ? (totalScore / totalMax * 100) : 0).toStringAsFixed(2)}%',
+                        child: Text('${'average'.tr}: $average',
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.info,
                             fontWeight: FontWeight.bold,
