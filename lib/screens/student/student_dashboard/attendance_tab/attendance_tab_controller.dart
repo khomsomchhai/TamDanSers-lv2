@@ -34,7 +34,9 @@ class AttendanceTabViewController extends GetxController {
     isLoading.value = true;
     try {
       final result = await attendanceService.getMyAttendance();
-      attendanceList.assignAll(result);
+      attendanceList.assignAll(
+        result.where((item) => !_isPendingApproval(item)).toList(),
+      );
     } catch (_) {
       CustomSnackbar.error('attendance_failed_load'.tr);
     } finally {
@@ -96,6 +98,11 @@ class AttendanceTabViewController extends GetxController {
         return 'attendance_status_absent'.tr;
       case 'L':
         return 'attendance_status_late'.tr;
+      case 'E':
+      case 'EXCUSED':
+      case 'PERMISSION':
+      case 'PM':
+        return 'attendance_status_permission'.tr;
       default:
         return value;
     }
@@ -109,9 +116,19 @@ class AttendanceTabViewController extends GetxController {
         return AppColors.error;
       case 'L':
         return AppColors.warning;
+      case 'E':
+      case 'EXCUSED':
+      case 'PERMISSION':
+      case 'PM':
+        return AppColors.info;
       default:
         return AppColors.grey;
     }
+  }
+
+  bool _isPendingApproval(AttendanceModel item) {
+    final combined = '${item.status} ${item.remark}'.toLowerCase();
+    return combined.contains('pending');
   }
 
   String _timeOnly(String raw) {

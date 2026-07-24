@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
@@ -363,9 +364,7 @@ class AskPermissionScreenView
                         ? controller.selectedScheduleId.value?.toString()
                         : null,
                     hint: Text(
-                      controller.isScheduleLoading.value
-                          ? 'ask_permission_loading_subjects'.tr
-                          : 'ask_permission_select_subject'.tr,
+                      'ask_permission_select_subject'.tr,
                       style: Get.textTheme.bodyMedium
                           ?.copyWith(color: AppColors.hintColor),
                     ),

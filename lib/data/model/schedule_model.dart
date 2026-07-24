@@ -16,11 +16,10 @@ class ScheduleModel {
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
     return ScheduleModel(
       id: _asInt(json['id']) ?? 0,
-      subjectName:
-          (json['subject_name'] ?? json['subjectName'] ?? '').toString(),
-      day: (json['day'] ?? '').toString(),
-      startTime: (json['start_time'] ?? json['startTime'] ?? '').toString(),
-      endTime: (json['end_time'] ?? json['endTime'] ?? '').toString(),
+      subjectName: _asString(json['subject_name'] ?? json['subjectName']),
+      day: _asString(json['day']),
+      startTime: _asString(json['start_time'] ?? json['startTime']),
+      endTime: _asString(json['end_time'] ?? json['endTime']),
     );
   }
 
@@ -32,5 +31,9 @@ class ScheduleModel {
       return int.tryParse(value);
     }
     return null;
+  }
+
+  static String _asString(dynamic value) {
+    return value?.toString() ?? '';
   }
 }

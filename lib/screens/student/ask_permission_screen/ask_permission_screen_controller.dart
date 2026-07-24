@@ -28,27 +28,23 @@ class AskPermissionScreenViewController extends GetxController {
 
   bool get isBySubject => selectedRequestType.value == 'By Subject';
 
-  String get requestTypeApiValue => isBySubject ? 'by_subject' : 'full_day';
+  String get requestTypeApiValue => isBySubject ? 'subject' : 'full_day';
 
   @override
   void onInit() {
     super.onInit();
-    if (isBySubject) {
-      fetchTodaySchedules();
-    }
+    fetchTodaySchedules();
     _requestTypeWorker =
         ever<String>(selectedRequestType, _onRequestTypeChanged);
     fetchMyPermissions();
   }
 
   void _onRequestTypeChanged(String value) {
-    if (value == 'By Subject') {
+    if (value == 'By Subject' && schedules.isEmpty) {
       fetchTodaySchedules();
-      return;
     }
 
     selectedScheduleId.value = null;
-    schedules.clear();
   }
 
   Future<void> fetchTodaySchedules() async {
@@ -79,6 +75,21 @@ class AskPermissionScreenViewController extends GetxController {
   Future<void> submitPermission() async {
     if (selectedRequestType.value.trim().isEmpty) {
       CustomSnackbar.error('ask_permission_please_select_request_type'.tr);
+      return;
+    }
+
+    await Future.wait([
+      fetchTodaySchedules(),
+      fetchMyPermissions(),
+    ]);
+
+    if (!isBySubject && schedules.isEmpty) {
+      CustomSnackbar.error('ask_permission_no_schedule_today'.tr);
+      return;
+    }
+
+    if (_hasRequestedToday()) {
+      CustomSnackbar.error('ask_permission_already_requested_today'.tr);
       return;
     }
 
@@ -114,8 +125,18 @@ class AskPermissionScreenViewController extends GetxController {
       reasonController.clear();
 
       await fetchMyPermissions();
-    } catch (_) {
-      CustomSnackbar.error('ask_permission_failed_submit'.tr);
+    } catch (e) {
+      String message = 'ask_permission_failed_submit'.tr;
+      if (e is DioException) {
+        final serverMsg = e.response?.data?['message'] ??
+            e.response?.data?['detail'] ??
+            e.response?.data?.toString();
+        if (serverMsg != null && serverMsg.toString().isNotEmpty) {
+          message = serverMsg.toString();
+        }
+      }
+      debugPrint('[submitPermission] error: $e');
+      CustomSnackbar.error(message);
     } finally {
       isLoading.value = false;
     }
@@ -174,6 +195,7 @@ class AskPermissionScreenViewController extends GetxController {
 
   String formatRequestType(String value) {
     switch (value.toLowerCase()) {
+      case 'subject':
       case 'by_subject':
         return 'ask_permission_request_type_by_subject'.tr;
       case 'full_day':
@@ -192,5 +214,28 @@ class AskPermissionScreenViewController extends GetxController {
       default:
         return value;
     }
+  }
+
+  bool _hasRequestedToday() {
+    return permissionRequests.any(
+      (request) => _isToday(request.createdAt),
+    );
+  }
+
+  bool _isToday(String? rawDate) {
+    if (rawDate == null || rawDate.isEmpty) {
+      return false;
+    }
+
+    final parsed = DateTime.tryParse(rawDate);
+    if (parsed == null) {
+      return false;
+    }
+
+    final now = DateTime.now();
+    final local = parsed.toLocal();
+    return local.year == now.year &&
+        local.month == now.month &&
+        local.day == now.day;
   }
 }

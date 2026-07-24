@@ -2,7 +2,7 @@ import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
 
 class AttendanceService {
-  final BaseApiService baseApi = BaseApiService();
+  final baseApi = BaseApiService();
 
   Future<List<AttendanceModel>> getMyAttendance() async {
     final response = await baseApi.get(endpoint: '/attendance/me');
