@@ -36,20 +36,20 @@ class AttendanceModel {
   factory AttendanceModel.fromJson(Map<String, dynamic> json) {
     return AttendanceModel(
       id: _asInt(json['id']) ?? 0,
-      studentId: _asInt(json['student_id']) ?? 0,
-      scheduleId: _asInt(json['schedule_id']) ?? 0,
-      classId: _asInt(json['class_id']) ?? 0,
-      className: (json['class_name'] ?? '').toString(),
-      subjectId: _asInt(json['subject_id']) ?? 0,
-      subjectName: (json['subject_name'] ?? '').toString(),
-      teacherId: _asInt(json['teacher_id']) ?? 0,
-      teacherName: (json['teacher_name'] ?? '').toString(),
-      date: (json['date'] ?? '').toString(),
-      day: (json['day'] ?? '').toString(),
-      startTime: (json['start_time'] ?? '').toString(),
-      endTime: (json['end_time'] ?? '').toString(),
-      status: (json['status'] ?? '').toString(),
-      remark: (json['remark'] ?? '').toString(),
+      studentId: _asInt(json['student_id'] ?? json['studentId']) ?? 0,
+      scheduleId: _asInt(json['schedule_id'] ?? json['scheduleId']) ?? 0,
+      classId: _asInt(json['class_id'] ?? json['classId']) ?? 0,
+      className: _asString(json['class_name'] ?? json['className']),
+      subjectId: _asInt(json['subject_id'] ?? json['subjectId']) ?? 0,
+      subjectName: _asString(json['subject_name'] ?? json['subjectName']),
+      teacherId: _asInt(json['teacher_id'] ?? json['teacherId']) ?? 0,
+      teacherName: _asString(json['teacher_name'] ?? json['teacherName']),
+      date: _asString(json['date']),
+      day: _asString(json['day']),
+      startTime: _asString(json['start_time'] ?? json['startTime']),
+      endTime: _asString(json['end_time'] ?? json['endTime']),
+      status: _asString(json['status']),
+      remark: _asString(json['remark']),
     );
   }
 
@@ -61,5 +61,9 @@ class AttendanceModel {
       return int.tryParse(value);
     }
     return null;
+  }
+
+  static String _asString(dynamic value) {
+    return value?.toString() ?? '';
   }
 }

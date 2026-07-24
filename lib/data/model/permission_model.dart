@@ -1,5 +1,5 @@
 class PermissionModel {
-  final dynamic id;
+  final int id;
   final String requestType;
   final int? scheduleId;
   final String type;
@@ -26,29 +26,25 @@ class PermissionModel {
   });
 
   factory PermissionModel.fromJson(Map<String, dynamic> json) {
-    final schedule = json['schedule'] is Map<String, dynamic>
-        ? json['schedule'] as Map<String, dynamic>
-        : <String, dynamic>{};
+    final schedule = _asMap(json['schedule']);
 
     return PermissionModel(
-      id: json['id'],
-      requestType:
-          (json['request_type'] ?? json['requestType'] ?? '').toString(),
+      id: _asInt(json['id']) ?? 0,
+      requestType: _asString(json['request_type'] ?? json['requestType']),
       scheduleId:
           _asInt(json['schedule_id'] ?? json['scheduleId'] ?? schedule['id']),
-      type: (json['type'] ?? '').toString(),
-      subjectName: (json['subject_name'] ??
-              json['subjectName'] ??
-              schedule['subject_name'] ??
-              schedule['subjectName'] ??
-              '')
-          .toString(),
-      day: (json['day'] ?? schedule['day'] ?? '').toString(),
-      startTime:
-          (json['start_time'] ?? schedule['start_time'] ?? '').toString(),
-      endTime: (json['end_time'] ?? schedule['end_time'] ?? '').toString(),
-      reason: (json['reason'] ?? '').toString(),
-      status: (json['status'] ?? '').toString(),
+      type: _asString(json['type']),
+      subjectName: _asString(
+        json['subject_name'] ??
+            json['subjectName'] ??
+            schedule['subject_name'] ??
+            schedule['subjectName'],
+      ),
+      day: _asString(json['day'] ?? schedule['day']),
+      startTime: _asString(json['start_time'] ?? schedule['start_time']),
+      endTime: _asString(json['end_time'] ?? schedule['end_time']),
+      reason: _asString(json['reason']),
+      status: _asString(json['status']),
       createdAt: (json['created_at'] ?? json['createdAt'])?.toString(),
     );
   }
@@ -61,5 +57,16 @@ class PermissionModel {
       return int.tryParse(value);
     }
     return null;
+  }
+
+  static String _asString(dynamic value) {
+    return value?.toString() ?? '';
+  }
+
+  static Map<String, dynamic> _asMap(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return value;
+    }
+    return <String, dynamic>{};
   }
 }

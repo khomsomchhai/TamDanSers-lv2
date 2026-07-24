@@ -77,6 +77,7 @@ Map<String, String> kmKh = {
   'attendance_status_present': 'មានវត្តមាន',
   'attendance_status_absent': 'អវត្តមាន',
   'attendance_status_late': 'យឺត',
+  'attendance_status_permission': 'សុំច្បាប់',
 
   //Ask permission
   'ask_permission_my_requests': 'សំណើរសុំច្បាប់របស់ខ្ញុំ',
@@ -98,6 +99,10 @@ Map<String, String> kmKh = {
   'ask_permission_please_enter_reason': 'សូមបញ្ចូលមូលហេតុ',
   'ask_permission_submitted': 'បានដាក់សំណើសុំច្បាប់រួចរាល់',
   'ask_permission_failed_submit': 'មិនអាចដាក់សំណើសុំច្បាប់បានទេ',
+  'ask_permission_no_schedule_today':
+      'ថ្ងៃនេះមិនមានកាលវិភាគទេ។ មិនអាចសុំច្បាប់ពេញមួយថ្ងៃបានទេ។',
+  'ask_permission_already_requested_today':
+      'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
   'ask_permission_request_type_by_subject': 'តាមមុខវិជ្ជា',
   'ask_permission_request_type_full_day': 'ពេញមួយថ្ងៃ',
 };

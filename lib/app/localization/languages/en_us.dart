@@ -74,6 +74,7 @@ Map<String, String> enUs = {
   'attendance_status_present': 'Present',
   'attendance_status_absent': 'Absent',
   'attendance_status_late': 'Late',
+  'attendance_status_permission': 'Permission',
 
   //Ask permission
   'ask_permission_my_requests': 'My Permission Requests',
@@ -96,6 +97,10 @@ Map<String, String> enUs = {
   'ask_permission_please_enter_reason': 'Please enter a reason',
   'ask_permission_submitted': 'Permission request submitted',
   'ask_permission_failed_submit': 'Failed to submit permission request',
+  'ask_permission_no_schedule_today':
+      'No schedule today. Full day permission is not allowed.',
+  'ask_permission_already_requested_today':
+      'You already requested permission for today.',
   'ask_permission_request_type_by_subject': 'By Subject',
   'ask_permission_request_type_full_day': 'Full Day',
 };
