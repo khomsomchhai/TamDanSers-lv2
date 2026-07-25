@@ -1,8 +1,10 @@
 import 'package:get/route_manager.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/screens/auth/change_password_screen/change_password_screen_view.dart';
+import 'package:tamdansers_lv2/screens/auth/create_password_parent/create_password_parent_view.dart';
 import 'package:tamdansers_lv2/screens/auth/forget_password_screen/forget_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/login_screen/login_screen_view.dart';
+import 'package:tamdansers_lv2/screens/auth/parent_verify_otp/parent_verify_otp_view.dart';
 import 'package:tamdansers_lv2/screens/auth/register_parent_screen/register_parent_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/reset_password_screen/reset_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/splash_screen/splash_screen_view.dart';
@@ -52,6 +54,19 @@ class AppPages {
       name: AppRoutes.registerParentScreen,
       page: () => const RegisterParentScreenView(),
       binding: RegisterParentScreenViewBinding(),
+      transition: Transition.rightToLeft,
+    ),
+
+    GetPage(
+      name: AppRoutes.parentVerifyOtp,
+      page: () => const ParentVerifyOtpView(),
+      binding: ParentVerifyOtpViewBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.parentCreatePassword,
+      page: () => const CreatePasswordParentView(),
+      binding: CreatePasswordParentViewBinding(),
       transition: Transition.rightToLeft,
     ),
 

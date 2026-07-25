@@ -8,7 +8,7 @@ class ForgetPasswordScreenViewController extends GetxController {
 
   Future<void> submitPhone() async {
     if (!formKey.currentState!.validate()) {
-      CustomSnackbar.error('Please enter your phone number.'.tr);
+      CustomSnackbar.error('please_enter_phone_number'.tr);
       return;
     }
 
@@ -20,7 +20,7 @@ class ForgetPasswordScreenViewController extends GetxController {
     try {
       isLoading.value = true;
       var response = await authService.forgotPasswordService(phone: phone);
-      var message = response['message']?.toString() ?? 'An OTP has been sent to your phone number.'.tr;
+      var message = response['message']?.toString() ?? 'otp_sent'.tr;
       CustomSnackbar.success(message);
       Get.toNamed(AppRoutes.resetPasswordScreen, arguments: {'phone': phone});
     } catch (error) {
@@ -34,7 +34,7 @@ class ForgetPasswordScreenViewController extends GetxController {
     if (error is DioException) {
       final resp = error.response;
       if (resp != null) {
-        String msg = 'Request failed'.tr;
+        String msg = 'request_failed'.tr;
         try {
           final data = resp.data;
           if (data != null) {
@@ -42,15 +42,15 @@ class ForgetPasswordScreenViewController extends GetxController {
           }
         } catch (_) {}
 
-        if ((msg.isEmpty) || (msg == 'Request failed'.tr)) {
+        if ((msg.isEmpty) || (msg == 'request_failed'.tr)) {
           if (resp.statusCode == 401) {
-            msg = 'Unauthorized. Please login again.'.tr;
+            msg = 'unauthorized_login_again'.tr;
           } else if (resp.statusCode == 404) {
-            msg = 'Not found. Please check the phone number.'.tr;
+            msg = 'not_found_phone'.tr;
           } else if (resp.statusCode == 500) {
-            msg = 'We could not send the SMS. Please check your phone number and try again.'.tr;
+            msg = 'sms_send_failed'.tr;
           } else if (resp.statusCode != null) {
-            msg = 'Request failed'.tr;
+            msg = 'request_failed'.tr;
           }
         }
 
@@ -61,23 +61,23 @@ class ForgetPasswordScreenViewController extends GetxController {
       if (error.type == DioExceptionType.connectionTimeout ||
           error.type == DioExceptionType.sendTimeout ||
           error.type == DioExceptionType.receiveTimeout) {
-        CustomSnackbar.error('Connection timed out. Please check your internet connection.'.tr);
+        CustomSnackbar.error('unable_to_connect'.tr);
       } else if (error.type == DioExceptionType.unknown) {
         var errorText = error.error?.toString().toLowerCase() ?? "";
         if (errorText.contains("socketexception") || errorText.contains("connection") || errorText.contains("network")) {
-          CustomSnackbar.error('Unable to connect. Please check your internet connection.'.tr);
+          CustomSnackbar.error('unable_to_connect'.tr);
         } else {
-          CustomSnackbar.error('Request failed'.tr);
+          CustomSnackbar.error('request_failed'.tr);
         }
       } else {
-        CustomSnackbar.error('Request failed'.tr);
+        CustomSnackbar.error('request_failed'.tr);
       }
     } else {
       var message = error.toString().replaceFirst('Exception: ', '');
       if (message.isEmpty || message == 'Failed') {
-        message = 'Request failed'.tr;
+        message = 'request_failed'.tr;
       }
-      CustomSnackbar.error("Something went wrong");
+      CustomSnackbar.error('something_went_wrong'.tr);
     }
   }
 
@@ -102,7 +102,7 @@ class ForgetPasswordScreenViewController extends GetxController {
             if (firstValue is String && firstValue.trim().isNotEmpty) {
               final normalized = firstValue.trim().toLowerCase();
               if (normalized.contains('not linked') || normalized.contains('telegram') || normalized.contains('sms')) {
-                return 'We could not send the SMS. Please check your phone number and try again.'.tr;
+                return 'sms_send_failed'.tr;
               }
               return firstValue.trim();
             }
@@ -118,7 +118,7 @@ class ForgetPasswordScreenViewController extends GetxController {
     } else if (data is String && data.trim().isNotEmpty) {
       final normalized = data.trim().toLowerCase();
       if (normalized.contains('not linked') || normalized.contains('telegram')) {
-        return 'Your phone number is not linked to Telegram. Please link it first.'.tr;
+        return 'phone_not_linked_telegram'.tr;
       }
       return data.trim();
     }

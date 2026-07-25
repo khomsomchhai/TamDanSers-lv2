@@ -12,7 +12,7 @@ class ChangePasswordScreenView extends GetView<ChangePasswordScreenViewControlle
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Change Password", 
+        title: 'change_password_title'.tr, 
         showNotification: false,
       ),
       body: Padding(

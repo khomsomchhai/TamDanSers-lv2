@@ -1,11 +1,16 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
+import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
+import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
+import 'package:tamdansers_lv2/core/utils/dio_exception_handler.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
+import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/core/widgets/textfield.dart/custom_textfield.dart';
 import 'package:tamdansers_lv2/core/widgets/textfield.dart/phone_textfield.dart';
 
@@ -23,18 +28,26 @@ class RegisterParentScreenView
       appBar: const CustomAppBar(title: '', showNotification: false),
       body: SafeArea(
         top: false,
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-          child: Column(
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 28),
-              _buildRegistrationForm(),
-              const SizedBox(height: 20),
-              _buildLoginPrompt(),
-            ],
-          ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+                child: Column(
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 28),
+                    _buildRegistrationForm(),
+                    const SizedBox(height: 20),
+                    
+                  ],
+                ),
+              ),
+            ),
+            _buildLoginPrompt(),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
@@ -58,14 +71,14 @@ class RegisterParentScreenView
             ],
           ),
           child: Icon(
-            PhosphorIconsRegular.usersThree,
+            PhosphorIconsRegular.users,
             color: AppColors.white,
             size: 38,
           ),
         ),
         const SizedBox(height: 18),
         Text(
-          'Create parent account'.tr,
+          'create_parent_account'.tr,
           textAlign: TextAlign.center,
           style: Get.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w700,
@@ -73,7 +86,7 @@ class RegisterParentScreenView
         ),
         const SizedBox(height: 8),
         Text(
-          'Link your account to your child using their student ID.'.tr,
+          'link_account_child'.tr,
           textAlign: TextAlign.center,
           style: Get.textTheme.bodyMedium?.copyWith(
             color: AppColors.hintColor,
@@ -91,44 +104,44 @@ class RegisterParentScreenView
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
             Text(
-              'Account details'.tr,
+              'account_details'.tr,
               style: Get.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              'Enter the details registered with the school.'.tr,
+              'account_details_hint'.tr,
               style: Get.textTheme.bodySmall?.copyWith(
                 color: AppColors.hintColor,
               ),
             ),
             const SizedBox(height: 24),
-            _FieldLabel(label: 'Student ID'.tr, required: true),
+            _FieldLabel(label: 'student_id_label'.tr, required: true),
             const SizedBox(height: 8),
             CustomTextField(
-              hintText: 'Enter your child’s student ID'.tr,
+              hintText: 'enter_student_id'.tr,
               controller: controller.studentIdCtrl,
               prefixIcon: Icon(PhosphorIconsRegular.user),
               validator: (value) {
-                if (value == null || value.trim().isEmpty) return 'Student ID is required.'.tr;
-                if (value.trim().length < 3) return 'Enter a valid student ID.'.tr;
+                if (value == null || value.trim().isEmpty) return 'student_id_required'.tr;
+                if (value.trim().length < 3) return 'enter_valid_student_id'.tr;
                 return null;
               },
             ),
             const SizedBox(height: 18),
-            _FieldLabel(label: 'Parent’s phone number'.tr, required: true),
+            _FieldLabel(label: 'parent_phone_number'.tr, required: true),
             const SizedBox(height: 8),
             PhoneTextField(
-              hintText: 'Enter your phone number'.tr,
+              hintText: 'enter_phone_number'.tr,
               controller: controller.phoneCtrl,
               countryCode: '+855',
               flagAsset: AppIcons.khmerIcon,
               validator: (value) {
                 final phone = value?.trim() ?? '';
-                if (phone.isEmpty) return 'Phone number is required.'.tr;
+                if (phone.isEmpty) return 'parent_phone_required'.tr;
                 if (!RegExp(r'^[0-9]{8,10}$').hasMatch(phone)) {
-                  return 'Enter a valid phone number.'.tr;
+                  return 'enter_valid_phone'.tr;
                 }
                 return null;
               },
@@ -141,15 +154,11 @@ class RegisterParentScreenView
               height: 52,
               child: Obx(
                 () => CustomButton(
-                  text: 'Continue'.tr,
+                  text: 'continue_label'.tr,
                   onPressed: controller.continueRegistration,
                   isLoading: controller.isLoading.value,
                   variant: ButtonVariant.primary,
-                  suffixIcon: Icon(
-                    PhosphorIconsRegular.arrowRight,
-                    color: AppColors.white,
-                    size: 20,
-                  ),
+                  
                 ),
               ),
             ),
@@ -163,15 +172,15 @@ class RegisterParentScreenView
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Already have an account?'.tr,
-          style: Get.textTheme.bodyMedium?.copyWith(color: AppColors.hintColor),
+          'already_have_account'.tr,
+          style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.hintColor),
         ),
         const SizedBox(width: 8),
         Bounceable(
           onTap: Get.back,
           child: Text(
-            'Sign in'.tr,
-            style: Get.textTheme.bodyMedium?.copyWith(
+            'sign_in'.tr,
+            style: Get.textTheme.bodyLarge?.copyWith(
               color: AppColors.info,
               fontWeight: FontWeight.w700,
             ),
@@ -195,11 +204,11 @@ class _FieldLabel extends StatelessWidget {
         text: label,
         style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
         children: [
-          if (required)
-            const TextSpan(
-              text: ' *',
-              style: TextStyle(color: AppColors.error),
-            ),
+          // if (required)
+          //   const TextSpan(
+          //     text: ' *',
+          //     style: TextStyle(color: AppColors.error),
+          //   ),
         ],
       ),
     );
@@ -220,7 +229,7 @@ class _PrivacyNotice extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-            'Your information is securely used only to verify your parent account.'.tr,
+            'privacy_notice'.tr,
             style: Get.textTheme.bodySmall?.copyWith(
               color: AppColors.hintColor,
               height: 1.4,
