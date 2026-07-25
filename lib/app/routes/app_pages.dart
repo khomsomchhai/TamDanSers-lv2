@@ -103,7 +103,6 @@ class AppPages {
         name: AppRoutes.parentDashboard,
         page: () => ParentDashboardView(),
         binding: ParentDashboardViewBinding(),
-<<<<<<< HEAD
         transition: Transition.fadeIn),
 
     //Notification
@@ -112,9 +111,5 @@ class AppPages {
         page: () => NotificationView(),
         binding: NotificationViewBinding(),
         transition: Transition.leftToRight)
-=======
-        transition: Transition.fadeIn
-    ),
->>>>>>> somchhai
   ];
 }

@@ -4,8 +4,6 @@ import 'package:tamdansers_lv2/core/api/api_config.dart';
 class BaseApiService {
   final ApiConfig apiConfig = ApiConfig();
 
-<<<<<<< HEAD
-=======
   static const int _maxRetry = 3;
 
   bool _shouldRetry(DioException e) {
@@ -45,7 +43,6 @@ class BaseApiService {
     throw Exception("Request failed");
   }
 
->>>>>>> somchhai
   Future<dynamic> post({
     required String endpoint,
     required dynamic data,
