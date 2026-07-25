@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:472035819317:android:1536da06e95f232ee7d67c",
+        "mobilesdk_app_id": "1:472035819317:android:120e584c5c57c168e7d67c",
         "android_client_info": {
-          "package_name": "com.example.tamdansers_lv2"
+          "package_name": "tamdansers.app"
         }
       },
       "oauth_client": [],
