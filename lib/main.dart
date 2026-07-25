@@ -57,6 +57,7 @@ class _MainAppState extends State<MainApp> {
       locale: LocalizationService().getLocale(),
       theme: lightTheme,
       darkTheme: darkTheme,
+
       themeMode: widget.themeService.themeMode,
       getPages: AppPages.getPages,
       scrollBehavior: const MaterialScrollBehavior().copyWith(

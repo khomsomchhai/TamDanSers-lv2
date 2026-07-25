@@ -42,7 +42,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
             if (user == null || profile == null) {
               return Center(
                 child: Text(
-                  "No profile data available".tr,
+                  'profile_no_data'.tr,
                   style: Get.textTheme.bodyLarge,
                 ),
               );
@@ -56,7 +56,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                   const SizedBox(height: 20),
                   _buildProfileHero(user, context),
                   const SizedBox(height: 24),
-                  _buildSectionTitle("PERSONAL INFORMATION"),
+                  _buildSectionTitle('personal_information'.tr),
                   const SizedBox(height: 12),
                   _buildCard(
                     children: [
@@ -66,8 +66,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                           color: AppColors.primary,
                           size: 22,
                         ),
-                        title: "Student's Information",
-                        subtitle: "Your information",
+                        title: 'students_information'.tr,
+                        subtitle: 'your_information'.tr,
                         onTap: () => _showStudentInformationDialog(
                             context, user, profile),
                       ),
@@ -78,8 +78,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                           color: AppColors.primary,
                           size: 22,
                         ),
-                        title: "Parent's Information",
-                        subtitle: "Your parent's information",
+                        title: 'parents_information'.tr,
+                        subtitle: 'your_parents_information'.tr,
                         onTap: () =>
                             _showParentInformationDialog(context, profile),
                       ),
@@ -90,15 +90,15 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                           color: AppColors.primary,
                           size: 22,
                         ),
-                        title: "Forget Password",
-                        subtitle: "Reset your password",
+                        title: 'forget_password_action'.tr,
+                        subtitle: 'reset_your_password'.tr,
                         onTap: () =>
                             Get.toNamed(AppRoutes.forgetPasswordScreen),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  _buildSectionTitle("GENERAL"),
+                  _buildSectionTitle('general_section'.tr),
                   const SizedBox(height: 12),
                   _buildCard(
                     children: [
@@ -108,8 +108,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                           color: AppColors.primary,
                           size: 22,
                         ),
-                        title: "Change Theme",
-                        subtitle: "Toggle app theme",
+                        title: 'change_theme'.tr,
+                        subtitle: 'toggle_app_theme'.tr,
                         onTap: () => controller.showThemeSheet(context),
                       ),
                       _buildDivider(),
@@ -119,8 +119,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                           color: AppColors.primary,
                           size: 22,
                         ),
-                        title: "Language",
-                        subtitle: "Change app language",
+                        title: 'language_khmer'.tr,
+                        subtitle: 'change_app_language'.tr,
                         onTap: () => controller.showLanguageSheet(context),
                       ),
                       _buildDivider(),
@@ -130,14 +130,14 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                           color: AppColors.primary,
                           size: 22,
                         ),
-                        title: "FAQ",
-                        subtitle: "Read frequently asked questions",
+                        title: 'faq'.tr,
+                        subtitle: 'read_frequently_asked_questions'.tr,
                         onTap: () => controller.showFAQSheet(context),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  _buildSectionTitle("LEGAL"),
+                  _buildSectionTitle('legal_section'.tr),
                   const SizedBox(height: 12),
                   _buildCard(
                     children: [
@@ -147,8 +147,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                           color: AppColors.error,
                           size: 22,
                         ),
-                        title: "Logout",
-                        subtitle: "Sign out of your account",
+                        title: 'logout_action'.tr,
+                        subtitle: 'sign_out_account'.tr,
                         onTap: controller.logout,
                         titleColor: AppColors.error,
                         iconColor: AppColors.error,
@@ -171,48 +171,64 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     return Shimmer.fromColors(
       baseColor: AppColors.skeletonBaseColor,
       highlightColor: AppColors.skeletonHighlightColor,
+      period: const Duration(milliseconds: 1300),
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            Center(
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Container(
-                width: 160,
-                height: 20,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
-            _buildSkeletonSectionTitle(),
-            const SizedBox(height: 12),
-            _buildSkeletonCard(),
+            _buildProfileHeroSkeleton(),
             const SizedBox(height: 24),
             _buildSkeletonSectionTitle(),
             const SizedBox(height: 12),
-            _buildSkeletonCard(),
+            _buildSkeletonCard(itemCount: 3),
             const SizedBox(height: 24),
             _buildSkeletonSectionTitle(),
             const SizedBox(height: 12),
-            _buildSkeletonCard(),
+            _buildSkeletonCard(itemCount: 3),
+            const SizedBox(height: 24),
+            _buildSkeletonSectionTitle(),
+            const SizedBox(height: 12),
+            _buildSkeletonCard(itemCount: 1),
             const SizedBox(height: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeroSkeleton() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const _SkeletonBlock(width: 64, height: 64, isCircle: true),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    _SkeletonBlock(width: 88, height: 11),
+                    SizedBox(height: 9),
+                    _SkeletonBlock(width: 155, height: 18),
+                    SizedBox(height: 8),
+                    _SkeletonBlock(width: 120, height: 12),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          const _SkeletonBlock(width: 142, height: 34, radius: 999),
+        ],
       ),
     );
   }
@@ -228,7 +244,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     );
   }
 
-  Widget _buildSkeletonCard() {
+  Widget _buildSkeletonCard({required int itemCount}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -237,35 +253,40 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            height: 16,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
+        children: List.generate(
+          itemCount,
+          (index) => Column(
+            children: [
+              _buildSkeletonOption(),
+              if (index < itemCount - 1) ...[
+                const SizedBox(height: 14),
+                Divider(color: AppColors.border, height: 1),
+                const SizedBox(height: 14),
+              ],
+            ],
           ),
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            height: 16,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            width: double.infinity,
-            height: 16,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildSkeletonOption() {
+    return const Row(
+      children: [
+        _SkeletonBlock(width: 44, height: 44, radius: 14),
+        SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SkeletonBlock(width: 128, height: 14),
+              SizedBox(height: 8),
+              _SkeletonBlock(width: 184, height: 11),
+            ],
+          ),
+        ),
+        _SkeletonBlock(width: 16, height: 16, radius: 8),
+      ],
     );
   }
 
@@ -299,7 +320,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      user.role == "parent" ? "Parent account" : "Student account",
+                      user.role == "parent" ? 'parent_account'.tr : 'student_account'.tr,
                       style: Get.textTheme.labelLarge?.copyWith(
                         color: Colors.white.withValues(alpha: 0.85),
                         fontWeight: FontWeight.w600,
@@ -347,7 +368,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "Manage your account with confidence",
+                  'manage_account_confidence'.tr,
                   style: Get.textTheme.bodySmall?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -607,14 +628,14 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Student's Information".tr,
+                            'students_information'.tr,
                             style: Get.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Your academic profile details'.tr,
+                            'academic_profile_details'.tr,
                             style: Get.textTheme.bodySmall?.copyWith(
                               color: AppColors.hintColor,
                             ),
@@ -633,17 +654,17 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                   ),
                   child: Column(
                     children: [
-                      _buildInfoRow("Full Name".tr, user.fullName ?? ''),
+                      _buildInfoRow('full_name'.tr, user.fullName ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow("Email".tr, user.email ?? ''),
+                      _buildInfoRow('email'.tr, user.email ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow("Student Code".tr, profile.studentCode ?? ''),
+                      _buildInfoRow('student_code'.tr, profile.studentCode ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow("Class".tr, profile.className ?? ''),
+                      _buildInfoRow('class_label'.tr, profile.className ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow("Gender".tr, profile.gender ?? ''),
+                      _buildInfoRow('gender'.tr, profile.gender ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow("Guardian Phone".tr, profile.guardianPhone ?? ''),
+                      _buildInfoRow('guardian_phone'.tr, profile.guardianPhone ?? ''),
                     ],
                   ),
                 ),
@@ -660,7 +681,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     ),
-                    child: Text('Close'.tr),
+                    child: Text('close_button'.tr),
                   ),
                 ),
               ],
@@ -732,14 +753,14 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Parent's Information".tr,
+                            'parents_information'.tr,
                             style: Get.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Guardian and contact details'.tr,
+                            'guardian_contact_details'.tr,
                             style: Get.textTheme.bodySmall?.copyWith(
                               color: AppColors.hintColor,
                             ),
@@ -758,11 +779,11 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                   ),
                   child: Column(
                     children: [
-                      _buildInfoRow("Guardian Name".tr, profile.guardianName ?? ''),
+                      _buildInfoRow('guardian_name'.tr, profile.guardianName ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow("Guardian Phone".tr, profile.guardianPhone ?? ''),
+                      _buildInfoRow('guardian_phone'.tr, profile.guardianPhone ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow("Address".tr, profile.address ?? ''),
+                      _buildInfoRow('address'.tr, profile.address ?? ''),
                     ],
                   ),
                 ),
@@ -779,7 +800,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     ),
-                    child: Text('Close'.tr),
+                    child: Text('close_button'.tr),
                   ),
                 ),
               ],
@@ -787,6 +808,33 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
           ),
         );
       },
+    );
+  }
+}
+
+class _SkeletonBlock extends StatelessWidget {
+  const _SkeletonBlock({
+    required this.width,
+    required this.height,
+    this.radius = 8,
+    this.isCircle = false,
+  });
+
+  final double width;
+  final double height;
+  final double radius;
+  final bool isCircle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
+        borderRadius: isCircle ? null : BorderRadius.circular(radius),
+      ),
     );
   }
 }

@@ -13,6 +13,7 @@ import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
+import 'package:tamdansers_lv2/core/utils/dio_exception_handler.dart';
 import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/core/widgets/textfield.dart/custom_textfield.dart';
@@ -71,6 +72,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                         ),
                         const SizedBox(height: 8),
                         _buildHeader(theme),
+                        const SizedBox(height: 46,),
+                        _buildAuthTabBar(),
                         const SizedBox(height: 24),
                         _buildForm(),
                       ],
@@ -96,8 +99,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
         Hero(
           tag: 'app_logo',
           child: Container(
-            width: 128,
-            height: 128,
+            width: 140,
+            height: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.primary,
@@ -118,23 +121,155 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             ),
           ),
         ),
-        const SizedBox(height: 18),
-        Text(
-          'Welcome back'.tr,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'Login to continue to your account'.tr,
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.hintColor,
-            height: 1.4,
-          ),
-        ),
       ],
+    );
+  }
+  Widget _buildAuthTabBar() {
+    return Container(
+      height: 56,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: AppColors.border,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final tabWidth = (constraints.maxWidth - 8) / 2;
+          return Obx(
+            () => Stack(
+              children: [
+                // Sliding pill indicator
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  left: controller.selectedTab.value == 0 ? 3 : (tabWidth + 6),
+                  top: 2,
+                  child: Container(
+                    width: tabWidth,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF5B5FEF),
+                          Color(0xFF7B61FF),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(26),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF5B5FEF).withValues(alpha: 0.2),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Tab buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => controller.changeTab(0),
+                          borderRadius: BorderRadius.circular(26),
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AnimatedScale(
+                                  duration: const Duration(milliseconds: 200),
+                                  scale: controller.selectedTab.value == 0 ? 1.1 : 0.95,
+                                  child: Icon(
+                                    PhosphorIconsRegular.student,
+                                    size: 20,
+                                    color: controller.selectedTab.value == 0
+                                        ? Colors.white
+                                        : AppColors.hintColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 200),
+                                  style: Get.textTheme.bodyLarge!.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: controller.selectedTab.value == 0
+                                        ? Colors.white
+                                        : AppColors.dark,
+                                  ),
+                                  child: Text('student'.tr),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => controller.changeTab(1),
+                          borderRadius: BorderRadius.circular(26),
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AnimatedScale(
+                                  duration: const Duration(milliseconds: 200),
+                                  scale: controller.selectedTab.value == 1 ? 1.1 : 0.95,
+                                  child: Icon(
+                                    PhosphorIconsRegular.users,
+                                    size: 20,
+                                    color: controller.selectedTab.value == 1
+                                        ? Colors.white
+                                        : AppColors.hintColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 200),
+                                  style: Get.textTheme.bodyLarge!.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: controller.selectedTab.value == 1
+                                        ? Colors.white
+                                        : AppColors.dark,
+                                  ),
+                                  child: Text('parent'.tr),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -151,7 +286,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             children: [
               Image.asset(AppIcons.englishIcon, width: 22),
               const SizedBox(width: 10),
-              Text('English', style: Get.textTheme.bodyMedium),
+              Text('language_english'.tr, style: Get.textTheme.bodyMedium),
             ],
           ),
         ),
@@ -161,7 +296,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             children: [
               Image.asset(AppIcons.khmerIcon, width: 22),
               const SizedBox(width: 10),
-              Text('ភាសាខ្មែរ', style: GoogleFonts.kantumruyPro()),
+              Text('language_khmer'.tr, style: GoogleFonts.kantumruyPro()),
             ],
           ),
         ),
@@ -191,7 +326,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             ),
             const SizedBox(width: 8),
             Text(
-              Get.locale?.languageCode == 'km' ? 'ភាសាខ្មែរ' : 'English',
+              Get.locale?.languageCode == 'km' ? 'language_khmer'.tr : 'language_english'.tr,
               style: GoogleFonts.kantumruyPro(fontSize: 13, fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 4),
@@ -209,220 +344,285 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
   Widget _buildForm() {
     return Form(
       key: controller.formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'login_title'.tr,
-            style: Get.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 20),
-          CustomTextField(
-            hintText: 'hint_id'.tr,
-            controller: controller.idCtrl,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Required'.tr;
-              }
-              return null;
-            },
-            prefixIcon: Icon(PhosphorIconsRegular.user),
-          ),
-          const SizedBox(height: 16),
-          Obx(
-            () => CustomTextField(
-              hintText: 'hint_password'.tr,
-              controller: controller.pwdCtrl,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Required'.tr;
-                }
-                return null;
-              },
-              prefixIcon: Icon(PhosphorIconsRegular.lock),
-              isPwd: true,
-              isHide: controller.isHidePwd.value,
-              suffixIcon: Bounceable(
-                onTap: () {
-                  controller.togglePwd();
-                },
-                child: Icon(
-                  controller.isHidePwd.value
-                      ? PhosphorIconsRegular.eyeSlash
-                      : PhosphorIconsRegular.eye,
-                  color: AppColors.dark,
+      child: Obx(
+        () => AnimatedSwitcher(
+          duration: const Duration(milliseconds: 450),
+          transitionBuilder: (child, animation) {
+            final direction = controller.selectedTab.value >= controller.previousTab.value ? 1 : -1;
+            final slideOffset = Tween<Offset>(
+              begin: Offset(direction.toDouble() * 0.3, 0),
+              end: Offset.zero,
+            );
+            final scale = Tween<double>(begin: 0.92, end: 1.0);
+            final opacity = Tween<double>(begin: 0.0, end: 1.0);
+            
+            return SlideTransition(
+              position: slideOffset.animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
+              ),
+              child: ScaleTransition(
+                scale: scale.animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
+                ),
+                child: FadeTransition(
+                  opacity: opacity.animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
+                  ),
+                  child: child,
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            );
+          },
+          child: Column(
+            key: ValueKey(controller.selectedTab.value),
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Bounceable(
-                onTap: () {
-                  Get.toNamed(AppRoutes.forgetPasswordScreen);
+              Text(
+                'sign_in_title'.tr,
+                style: Get.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 20),
+              CustomTextField(
+                hintText: controller.selectedTab.value == 1
+                    ? 'hint_parent_student_id'.tr
+                    : 'hint_id'.tr,
+                controller: controller.idCtrl,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'student_id_required'.tr;
+                  }
+                  return null;
                 },
-                child: Text(
-                  'forget_password'.tr,
-                  style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.info),
+                prefixIcon: Icon(PhosphorIconsRegular.user),
+              ),
+              const SizedBox(height: 16),
+              Obx(
+                () => CustomTextField(
+                  hintText: 'hint_password'.tr,
+                  controller: controller.pwdCtrl,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Password is required'.tr;
+                    }
+                    return null;
+                  },
+                  prefixIcon: Icon(PhosphorIconsRegular.lock),
+                  isPwd: true,
+                  isHide: controller.isHidePwd.value,
+                  suffixIcon: Bounceable(
+                    onTap: () {
+                      controller.togglePwd();
+                    },
+                    child: Icon(
+                      controller.isHidePwd.value
+                          ? PhosphorIconsRegular.eyeSlash
+                          : PhosphorIconsRegular.eye,
+                      color: AppColors.dark,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Bounceable(
+                    onTap: () {
+                      Get.toNamed(AppRoutes.forgetPasswordScreen);
+                    },
+                    child: Text(
+                      'forget_password'.tr,
+                      style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.info),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Obx(
+                () => SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: CustomButton(
+                    text: 'sign_in_title'.tr,
+                    onPressed: () {
+                      Get.focusScope?.unfocus();
+                      controller.login();
+                    },
+                    isLoading: controller.isLoading.value,
+                    variant: ButtonVariant.primary,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 18),
-          Obx(
-            () => SizedBox(
-              height: 50,
-              width: double.infinity,
-              child: CustomButton(
-                text: 'login_title'.tr,
-                onPressed: () {
-                  Get.focusScope?.unfocus();
-                  controller.login();
-                },
-                isLoading: controller.isLoading.value,
-                variant: ButtonVariant.primary,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildFooter(BuildContext context, ThemeData theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'no_account'.tr,
-          style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.hintColor),
-        ),
-        const SizedBox(width: 8),
-        Bounceable(
-          onTap: () {
-            _showRegistrationSheet(context);
-          },
-          child: Text(
-            'register'.tr,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.info,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+    return Obx(
+      () {
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          transitionBuilder: (child, animation) {
+            final isVisibleFooter = child.key == const ValueKey('footer_visible');
+            final isOutgoing = animation.status == AnimationStatus.reverse;
+            final begin = isVisibleFooter && !isOutgoing
+                ? const Offset(0.2, 0)
+                : Offset.zero;
+            final end = isVisibleFooter && isOutgoing
+                ? const Offset(0.2, 0)
+                : Offset.zero;
 
-  void _showRegistrationSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Get.theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: AppColors.border,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Join Tamdansers'.tr,
-                    style: Get.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Choose how you would like to use the app.'.tr,
-                    style: Get.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.hintColor,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(sheetContext).pop();
-                      Get.toNamed(AppRoutes.registerParentScreen);
-                    },
-                    borderRadius: BorderRadius.circular(AppNumbers.radiusLarge),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightBackground,
-                        borderRadius: BorderRadius.circular(AppNumbers.radiusLarge),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Icon(
-                              PhosphorIconsRegular.usersThree,
-                              color: AppColors.primary,
-                              size: 25,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'I am a parent'.tr,
-                                  style: Get.textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  'Stay connected to your child’s school life.'.tr,
-                                  style: Get.textTheme.bodySmall?.copyWith(
-                                    color: AppColors.hintColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            PhosphorIconsRegular.caretRight,
-                            color: AppColors.hintColor,
-                            size: 20,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+            return SlideTransition(
+              position: Tween<Offset>(begin: begin, end: end)
+                  .animate(CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic)),
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
               ),
-            ),
-          ),
+            );
+          },
+          child: controller.selectedTab.value == 0
+              ? const SizedBox(key: ValueKey('footer_hidden'))
+              : Row(
+                  key: const ValueKey('footer_visible'),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'no_account'.tr,
+                      style: theme.textTheme.bodyLarge?.copyWith(color: AppColors.hintColor),
+                    ),
+                    const SizedBox(width: 8),
+                    Bounceable(
+                      onTap: () {
+                        Get.toNamed(AppRoutes.registerParentScreen);
+                      },
+                      child: Text(
+                        'sign_up'.tr,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: AppColors.info,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
         );
       },
     );
   }
+
+  // void _showRegistrationSheet(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (sheetContext) {
+  //       return Container(
+  //         decoration: BoxDecoration(
+  //           color: Get.theme.colorScheme.surface,
+  //           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+  //         ),
+  //         child: SafeArea(
+  //           child: Padding(
+  //             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Center(
+  //                   child: Container(
+  //                     width: 44,
+  //                     height: 5,
+  //                     decoration: BoxDecoration(
+  //                       color: AppColors.border,
+  //                       borderRadius: BorderRadius.circular(999),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 20),
+  //                 Text(
+  //                   'join_app'.tr,
+  //                   style: Get.textTheme.titleLarge?.copyWith(
+  //                     fontWeight: FontWeight.w700,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 8),
+  //                 Text(
+  //                   'choose_how_to_use'.tr,
+  //                   style: Get.textTheme.bodyMedium?.copyWith(
+  //                     color: AppColors.hintColor,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 20),
+  //                 InkWell(
+  //                   onTap: () {
+  //                     Navigator.of(sheetContext).pop();
+  //                     Get.toNamed(AppRoutes.registerParentScreen);
+  //                   },
+  //                   borderRadius: BorderRadius.circular(AppNumbers.radiusLarge),
+  //                   child: Container(
+  //                     padding: const EdgeInsets.all(16),
+  //                     decoration: BoxDecoration(
+  //                       color: AppColors.lightBackground,
+  //                       borderRadius: BorderRadius.circular(AppNumbers.radiusLarge),
+  //                       border: Border.all(color: AppColors.border),
+  //                     ),
+  //                     child: Row(
+  //                       children: [
+  //                         Container(
+  //                           width: 48,
+  //                           height: 48,
+  //                           decoration: BoxDecoration(
+  //                             color: AppColors.primary.withValues(alpha: 0.12),
+  //                             borderRadius: BorderRadius.circular(14),
+  //                           ),
+  //                           child: Icon(
+  //                             PhosphorIconsRegular.usersThree,
+  //                             color: AppColors.primary,
+  //                             size: 25,
+  //                           ),
+  //                         ),
+  //                         const SizedBox(width: 14),
+  //                         Expanded(
+  //                           child: Column(
+  //                             crossAxisAlignment: CrossAxisAlignment.start,
+  //                             children: [
+  //                               Text(
+  //                                 'i_am_parent'.tr,
+  //                                 style: Get.textTheme.bodyLarge?.copyWith(
+  //                                   fontWeight: FontWeight.w700,
+  //                                 ),
+  //                               ),
+  //                               const SizedBox(height: 3),
+  //                               Text(
+  //                                 'stay_connected_child'.tr,
+  //                                 style: Get.textTheme.bodySmall?.copyWith(
+  //                                   color: AppColors.hintColor,
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                         Icon(
+  //                           PhosphorIconsRegular.caretRight,
+  //                           color: AppColors.hintColor,
+  //                           size: 20,
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }

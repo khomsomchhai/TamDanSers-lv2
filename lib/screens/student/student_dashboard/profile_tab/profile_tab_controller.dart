@@ -69,14 +69,14 @@ class ProfileTabViewController extends GetxController {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Update photo'.tr,
+                    'update_photo'.tr,
                     style: Get.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Choose a new profile photo'.tr,
+                    'choose_new_profile_photo'.tr,
                     style: Get.textTheme.bodyMedium?.copyWith(
                       color: AppColors.hintColor,
                     ),
@@ -84,7 +84,7 @@ class ProfileTabViewController extends GetxController {
                   const SizedBox(height: 16),
                   _buildImageOption(
                     icon: PhosphorIconsRegular.camera,
-                    title: 'Take Photo'.tr,
+                    title: 'take_photo'.tr,
                     onTap: () {
                       Navigator.of(ctx).pop();
                       pickImage(ImageSource.camera);
@@ -93,7 +93,7 @@ class ProfileTabViewController extends GetxController {
                   const SizedBox(height: 10),
                   _buildImageOption(
                     icon: PhosphorIconsRegular.image,
-                    title: 'Choose from Gallery'.tr,
+                    title: 'choose_from_gallery'.tr,
                     onTap: () {
                       Navigator.of(ctx).pop();
                       pickImage(ImageSource.gallery);
@@ -184,14 +184,14 @@ class ProfileTabViewController extends GetxController {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Theme'.tr,
+                    'theme'.tr,
                     style: Get.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Choose the look that fits your style'.tr,
+                    'choose_look_fits_style'.tr,
                     style: Get.textTheme.bodyMedium?.copyWith(
                       color: AppColors.hintColor,
                     ),
@@ -200,7 +200,7 @@ class ProfileTabViewController extends GetxController {
                   _buildThemeOption(
                     context: ctx,
                     icon: PhosphorIconsRegular.sun,
-                    title: 'Light Mode'.tr,
+                    title: 'light_mode'.tr,
                     isSelected: !isDark,
                     onTap: () {
                       Navigator.of(ctx).pop();
@@ -212,7 +212,7 @@ class ProfileTabViewController extends GetxController {
                   _buildThemeOption(
                     context: ctx,
                     icon: PhosphorIconsRegular.moon,
-                    title: 'Dark Mode'.tr,
+                    title: 'dark_mode'.tr,
                     isSelected: isDark,
                     onTap: () {
                       Navigator.of(ctx).pop();
@@ -317,14 +317,14 @@ class ProfileTabViewController extends GetxController {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Language'.tr,
+                    'language'.tr,
                     style: Get.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Choose your preferred language'.tr,
+                    'choose_preferred_language'.tr,
                     style: Get.textTheme.bodyMedium?.copyWith(
                       color: AppColors.hintColor,
                     ),
@@ -333,7 +333,7 @@ class ProfileTabViewController extends GetxController {
                   _buildLanguageOption(
                     context: ctx,
                     icon: AppIcons.englishIcon,
-                    title: 'English'.tr,
+                    title: 'english'.tr,
                     isSelected: currentLang == 'en',
                     onTap: () {
                       Navigator.of(ctx).pop();
@@ -344,7 +344,7 @@ class ProfileTabViewController extends GetxController {
                   _buildLanguageOption(
                     context: ctx,
                     icon: AppIcons.khmerIcon,
-                    title: 'ភាសាខ្មែរ',
+                    title: 'khmer'.tr,
                     isSelected: currentLang == 'km',
                     onTap: () {
                       Navigator.of(ctx).pop();
@@ -446,28 +446,28 @@ class ProfileTabViewController extends GetxController {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'FAQ'.tr,
+                    'faq'.tr,
                     style: Get.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Common questions and quick answers'.tr,
+                    'common_questions_answers'.tr,
                     style: Get.textTheme.bodyMedium?.copyWith(color: AppColors.hintColor),
                   ),
                   const SizedBox(height: 16),
                   _buildFAQItem(
-                    title: 'How do I reset my password?'.tr,
-                    content: 'Use the Forgot Password link on the login screen to request a reset.'.tr,
+                    title: 'how_reset_password'.tr,
+                    content: 'forgot_password_link_login'.tr,
                   ),
                   const SizedBox(height: 10),
                   _buildFAQItem(
-                    title: 'How do I change my language?'.tr,
-                    content: 'Open the Language option in your profile and select your preferred language.'.tr,
+                    title: 'how_change_language'.tr,
+                    content: 'open_language_option'.tr,
                   ),
                   const SizedBox(height: 10),
                   _buildFAQItem(
-                    title: 'Who do I contact for support?'.tr,
-                    content: 'Contact your school administrator or support team for account help.'.tr,
+                    title: 'who_contact_support'.tr,
+                    content: 'contact_school_administrator'.tr,
                   ),
                 ],
               ),
@@ -564,7 +564,7 @@ class ProfileTabViewController extends GetxController {
               ),
               const SizedBox(height: 16),
               Text(
-                "Are you sure you want to log out?".tr,
+                'are_sure_logout'.tr,
                 textAlign: TextAlign.center,
                 style: Get.textTheme.bodyMedium?.copyWith(color: AppColors.hintColor),
               ),
@@ -579,14 +579,19 @@ class ProfileTabViewController extends GetxController {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: Text("No".tr),
+                      child: Text('no'.tr),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        box.remove("token");
+                      onPressed: () async {
+                        final userController = Get.find<UserController>();
+
+                        // Clear memory
+                        userController.clearUser();
+                        await box.remove("token");
+                        await box.remove("role");
                         Get.offAllNamed(AppRoutes.loginScreen);
                       },
                       style: ElevatedButton.styleFrom(
@@ -595,7 +600,7 @@ class ProfileTabViewController extends GetxController {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: Text("Yes".tr),
+                      child: Text('yes'.tr),
                     ),
                   ),
                 ],

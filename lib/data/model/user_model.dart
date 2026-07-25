@@ -17,15 +17,19 @@ class UserModel {
     this.avatarUrl,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
+  factory UserModel.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? <String, dynamic>{};
+
     return UserModel(
-      id: json['id'] ?? 0,
-      firstName: json['first_name'] ?? '',
-      lastName: json['last_name'] ?? '',
-      fullName: json['full_name'] ?? '',
-      email: json['email'] ?? '',
-      role: json['role'] ?? '',
-      avatarUrl: json['avatar_url'] ?? "",
+      id: data['id'] is int
+          ? data['id'] as int
+          : int.tryParse(data['id']?.toString() ?? '') ?? 0,
+      firstName: data['first_name'] ?? '',
+      lastName: data['last_name'] ?? '',
+      fullName: data['full_name'] ?? '',
+      email: data['email'] ?? '',
+      role: data['role'] ?? '',
+      avatarUrl: data['avatar_url'] ?? "",
     );
   }
 }

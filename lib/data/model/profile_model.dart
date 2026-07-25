@@ -23,18 +23,27 @@ class ProfileModel {
     required this.address,
   });
 
-  factory ProfileModel.fromJson(Map<String, dynamic> json) {
+  factory ProfileModel.fromJson(Map<String, dynamic>? json) {
+    final data = json ?? <String, dynamic>{};
+
+    int parseInt(dynamic value) {
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
+
     return ProfileModel(
-      id: json['id'] ?? 0,
-      studentCode: json['student_code'] ?? '',
-      userId: json['user_id'] ?? "",
-      classId: json['class_id'] ?? "",
-      className: json['class_name'] ?? '',
-      rollNo: json['roll_no'] ?? "",
-      gender: json['gender'] ?? '',
-      guardianName: json['guardian_name'] ?? '',
-      guardianPhone: json['guardian_phone'] ?? '',
-      address: json['address'] ?? '',
+      id: parseInt(data['id']),
+      studentCode: data['student_code'] ?? '',
+      userId: parseInt(data['user_id']),
+      classId: parseInt(data['class_id']),
+      className: data['class_name'] ?? '',
+      rollNo: data['roll_no']?.toString(),
+      gender: data['gender'] ?? '',
+      guardianName: data['guardian_name'] ?? '',
+      guardianPhone: data['guardian_phone'] ?? '',
+      address: data['address'] ?? '',
     );
   }
 }
