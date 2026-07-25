@@ -3,34 +3,29 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
+import 'package:tamdansers_lv2/core/utils/dio_exception_handler.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
-import 'package:tamdansers_lv2/core/widgets/textfield.dart/custom_textfield.dart';
 
-part 'reset_password_screen_binding.dart';
-part 'reset_password_screen_controller.dart';
+part 'parent_verify_otp_binding.dart';
+part 'parent_verify_otp_controller.dart';
 
-class ResetPasswordScreenView
-    extends GetView<ResetPasswordScreenViewController> {
-  const ResetPasswordScreenView({super.key});
+class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
+  const ParentVerifyOtpView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
       resizeToAvoidBottomInset: true,
-      appBar: CustomAppBar(
-        title: '',
-        showNotification: false,
-      ),
+      appBar: const CustomAppBar(title: '', showNotification: false),
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(
@@ -65,11 +60,11 @@ class ResetPasswordScreenView
               ),
             ],
           ),
-          child: const Icon(Icons.lock_reset_rounded, color: AppColors.white, size: 36),
+          child: const Icon(PhosphorIconsRegular.shieldCheck, color: AppColors.white, size: 36),
         ),
         const SizedBox(height: 18),
         Text(
-          'create_new_password'.tr,
+          'verification_code_otp'.tr,
           style: Get.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 8),
@@ -88,16 +83,10 @@ class ResetPasswordScreenView
   Widget _buildForm(BuildContext context) {
     return Form(
       key: controller.formKey,
-      child: AutofillGroup(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-          Text(
-            'verification_code_otp'.tr,
-            style: Get.textTheme.bodyLarge
-                ?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
           Row(
             children: List.generate(
               6,
@@ -105,90 +94,13 @@ class ResetPasswordScreenView
             ),
           ),
           const SizedBox(height: 22),
-          Text(
-            'new_password'.tr,
-            style: Get.textTheme.bodyLarge
-                ?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
-          Obx(
-            () => CustomTextField(
-              hintText: 'enter_new_password'.tr,
-              controller: controller.newPasswordCtrl,
-              prefixIcon: Icon(PhosphorIconsRegular.lock),
-              isPwd: true,
-              isHide: controller.isHideNewPwd.value,
-              suffixIcon: Bounceable(
-                onTap: () {
-                  controller.toggleNewPwd();
-                },
-                child: Icon(
-                  controller.isHideNewPwd.value
-                      ? PhosphorIconsRegular.eyeSlash
-                      : PhosphorIconsRegular.eye,
-                  color: AppColors.dark,
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Required'.tr;
-                }
-                if (value.length < 6) {
-                  return 'password_min_length'.tr;
-                }
-                return null;
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'confirm_password'.tr,
-            style: Get.textTheme.bodyLarge
-                ?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
-          Obx(
-            () => CustomTextField(
-              hintText: 'confirm_new_password'.tr,
-              controller: controller.confirmPasswordCtrl,
-              prefixIcon: Icon(PhosphorIconsRegular.lock),
-              isPwd: true,
-              isHide: controller.isHideCfPwd.value,
-              suffixIcon: Bounceable(
-                onTap: () {
-                  controller.toggleCfPwd();
-                },
-                child: Icon(
-                  controller.isHideCfPwd.value
-                      ? PhosphorIconsRegular.eyeSlash
-                      : PhosphorIconsRegular.eye,
-                  color: AppColors.dark,
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Required'.tr;
-                }
-                if (value != controller.newPasswordCtrl.text) {
-                  return 'passwords_do_not_match'.tr;
-                }
-                return null;
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
           Obx(
             () => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  controller.timerText.value,
-                  style: Get.textTheme.bodySmall,
-                ),
+                Text(controller.timerText.value, style: Get.textTheme.bodySmall),
                 TextButton(
-                  onPressed: controller.canResend.value
-                      ? controller.resendOtp
-                      : null,
+                  onPressed: controller.canResend.value ? controller.resendOtp : null,
                   child: Text('resend_otp'.tr),
                 ),
               ],
@@ -198,20 +110,16 @@ class ResetPasswordScreenView
           SizedBox(
             height: 50,
             width: double.infinity,
-            child: Obx(
+              child: Obx(
               () => CustomButton(
-                text: 'reset_password'.tr,
-                onPressed: () {
-                  Get.focusScope?.unfocus();
-                  controller.resetPassword();
-                },
+                text: 'continue_label'.tr,
+                onPressed: controller.verifyOtp,
                 variant: ButtonVariant.primary,
                 isLoading: controller.isLoading.value,
               ),
             ),
           ),
-          ],
-        ),
+        ],
       ),
     );
   }

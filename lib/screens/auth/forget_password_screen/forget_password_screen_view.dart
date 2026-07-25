@@ -55,7 +55,7 @@ class ForgetPasswordScreenView extends GetView<ForgetPasswordScreenViewControlle
                       // Headline
                       Center(
                         child: Text(
-                          'Forgot Password?'.tr,
+                          'forgot_password_title'.tr,
                           textAlign: TextAlign.center,
                           style: theme.textTheme.titleLarge
                         ),
@@ -65,8 +65,7 @@ class ForgetPasswordScreenView extends GetView<ForgetPasswordScreenViewControlle
                       // Subtitle
                       Center(
                         child: Text(
-                          'Enter your phone number and we will send you a verification code by SMS.'
-                              .tr,
+                          'forgot_password_subtitle'.tr,
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ??
@@ -85,15 +84,15 @@ class ForgetPasswordScreenView extends GetView<ForgetPasswordScreenViewControlle
                             
                             PhoneTextField(
                               controller: controller.phoneCtrl,
-                              hintText: 'Enter your phone number'.tr,
+                              hintText: 'enter_phone_number'.tr,
                               countryCode: '+855',
                               flagAsset: AppIcons.khmerIcon,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return "Required".tr;
+                                  return 'Required'.tr;
                                 }
                                 if (!RegExp(r'^[0-9]{8,10}$').hasMatch(value)) {
-                                  return "Invalid phone number".tr;
+                                  return 'invalid_phone_number'.tr;
                                 }
                                 return null;
                               },
@@ -116,7 +115,7 @@ class ForgetPasswordScreenView extends GetView<ForgetPasswordScreenViewControlle
                       width: double.infinity,
                       child: Obx(
                         () => CustomButton(
-                          text: "Continue".tr,
+                          text: 'continue_label'.tr,
                           onPressed: () {
                             Get.focusScope?.unfocus();
                             controller.submitPhone();
