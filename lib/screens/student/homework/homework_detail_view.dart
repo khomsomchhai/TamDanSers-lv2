@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide MultipartFile;
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tamdansers_lv2/screens/student/homework/in_app_pdf_viewer.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
 
@@ -70,16 +71,25 @@ class HomeworkDetailView extends StatefulWidget {
 
 class _HomeworkDetailViewState extends State<HomeworkDetailView> {
   final _answerController = TextEditingController();
-  XFile? _selectedFile;
+  final List<XFile> _selectedFiles = [];
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final XFile? image = await _picker.pickImage(source: source);
-      if (image != null) {
-        setState(() {
-          _selectedFile = image;
-        });
+      if (source == ImageSource.gallery) {
+        final List<XFile> images = await _picker.pickMultiImage();
+        if (images.isNotEmpty) {
+          setState(() {
+            _selectedFiles.addAll(images);
+          });
+        }
+      } else {
+        final XFile? image = await _picker.pickImage(source: source);
+        if (image != null) {
+          setState(() {
+            _selectedFiles.add(image);
+          });
+        }
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to pick image: $e");
@@ -91,10 +101,15 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
       final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
+        allowMultiple: true,
       );
-      if (result != null && result.files.single.path != null) {
+      if (result != null) {
         setState(() {
-          _selectedFile = XFile(result.files.single.path!);
+          _selectedFiles.addAll(
+            result.files
+                .where((f) => f.path != null)
+                .map((f) => XFile(f.path!)),
+          );
         });
       }
     } catch (e) {
@@ -479,72 +494,133 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                 ),
               ),
               const SizedBox(height: 10),
-              GestureDetector(
-                onTap: () => _showFullScreenImage(item.filePath!),
-                child: Container(
-                  width: double.maxFinite,
-                  height: 160,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? const Color(0xffE2E8F0)
-                          : Colors.white.withOpacity(0.05),
+              Builder(builder: (context) {
+                final teacherFile = item.filePath!;
+                final isTeacherPdf = teacherFile.toLowerCase().endsWith('.pdf');
+                if (isTeacherPdf) {
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(() => InAppPdfViewer(
+                            url: teacherFile,
+                            title: teacherFile.split('/').last,
+                          ));
+                    },
+                    child: Container(
+                      width: double.maxFinite,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red.withOpacity(0.3)),
+                        color: Colors.red.withOpacity(0.04),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            alignment: Alignment.center,
+                            child: const Icon(Icons.picture_as_pdf_outlined,
+                                color: Colors.red, size: 24),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  teacherFile.split('/').last,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  isKm ? 'ចុចដើម្បីបើក PDF' : 'Tap to open PDF',
+                                  style: const TextStyle(
+                                      color: Colors.grey, fontSize: 11),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.open_in_new,
+                              color: Colors.grey, size: 16),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Image.network(
-                          item.filePath!,
-                          width: double.maxFinite,
-                          height: 160,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
+                  );
+                }
+                return GestureDetector(
+                  onTap: () => _showFullScreenImage(teacherFile),
+                  child: Container(
+                    width: double.maxFinite,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? const Color(0xffE2E8F0)
+                            : Colors.white.withOpacity(0.05),
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Image.network(
+                            teacherFile,
+                            width: double.maxFinite,
+                            height: 160,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                height: 160,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? const Color(0xffF1F5F9)
+                                    : const Color(0xff1C1C1F),
+                                child: const Center(
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2)),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
                               height: 160,
                               color: Theme.of(context).brightness ==
                                       Brightness.light
                                   ? const Color(0xffF1F5F9)
                                   : const Color(0xff1C1C1F),
                               child: const Center(
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2)),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                            height: 160,
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                    ? const Color(0xffF1F5F9)
-                                    : const Color(0xff1C1C1F),
-                            child: const Center(
-                                child: Icon(Icons.broken_image_rounded,
-                                    color: Colors.grey, size: 28)),
-                          ),
-                        ),
-                        // Clean Zoom Overlay in the corner
-                        Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.6),
-                              shape: BoxShape.circle,
+                                  child: Icon(Icons.broken_image_rounded,
+                                      color: Colors.grey, size: 28)),
                             ),
-                            child: const Icon(Icons.zoom_in_rounded,
-                                color: Colors.white, size: 16),
                           ),
-                        ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.6),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.zoom_in_rounded,
+                                  color: Colors.white, size: 16),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              }),
               const SizedBox(height: 24),
             ],
 
@@ -655,71 +731,72 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               ),
 
               // Attached list items
-              if (_selectedFile != null) ...[
+              if (_selectedFiles.isNotEmpty) ...[
                 const SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () {
-                    final isPdf =
-                        _selectedFile!.name.toLowerCase().endsWith('.pdf');
-                    if (!isPdf) {
-                      _showFullScreenLocalImage(File(_selectedFile!.path));
-                    } else {
-                      Get.snackbar(
-                        isKm ? 'ព័ត៌មាន' : 'Information',
-                        isKm
-                            ? 'មិនអាចបង្ហាញឯកសារ PDF ជាទម្រង់រូបភាពបានឡើយ'
-                            : 'PDF files cannot be previewed as images',
-                        backgroundColor: Colors.blue.withOpacity(0.1),
-                      );
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.light
-                          ? const Color(0xffF1F5F9)
-                          : const Color(0xff25252A),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Builder(
-                          builder: (context) {
-                            final isPdf = _selectedFile!.name
-                                .toLowerCase()
-                                .endsWith('.pdf');
-                            return Icon(
-                              isPdf ? Icons.picture_as_pdf : Icons.image,
-                              color: isPdf ? Colors.red : primaryThemeColor,
-                              size: 18,
+                Column(
+                  children: _selectedFiles.map((file) {
+                    final isPdf = file.name.toLowerCase().endsWith('.pdf');
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (!isPdf) {
+                            _showFullScreenLocalImage(File(file.path));
+                          } else {
+                            Get.snackbar(
+                              isKm ? 'ព័ត៌មាន' : 'Information',
+                              isKm
+                                  ? 'មិនអាចបង្ហាញឯកសារ PDF ជាទម្រង់រូបភាពបានឡើយ'
+                                  : 'PDF files cannot be previewed as images',
+                              backgroundColor: Colors.blue.withOpacity(0.1),
                             );
-                          },
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            _selectedFile!.name,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 13),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? const Color(0xffF1F5F9)
+                                    : const Color(0xff25252A),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                isPdf ? Icons.picture_as_pdf : Icons.image,
+                                color: isPdf ? Colors.red : primaryThemeColor,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  file.name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close,
+                                    color: Colors.grey, size: 18),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedFiles.remove(file);
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.close,
-                              color: Colors.grey, size: 18),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: () {
-                            setState(() {
-                              _selectedFile = null;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ],
               const SizedBox(height: 28),
@@ -739,7 +816,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                   ),
                   onPressed: () {
                     final text = _answerController.text.trim();
-                    if (text.isEmpty && _selectedFile == null) {
+                    if (text.isEmpty && _selectedFiles.isEmpty) {
                       Get.snackbar(
                         isKm ? 'កំហុស' : 'Error',
                         isKm
@@ -751,7 +828,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                       return;
                     }
                     widget.controller.executeSubmitHomework(
-                        context, item.id, text, _selectedFile);
+                        context, item.id, text, _selectedFiles);
                   },
                   child: Text(
                     isKm ? 'បញ្ជូនកិច្ចការ' : 'Submit Homework',
@@ -949,149 +1026,126 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                     const SizedBox(height: 20),
 
                     // C. Submitted file attachments
-                    if (filePath != null && filePath.isNotEmpty) ...[
-                      Builder(
-                        builder: (context) {
-                          final isPdf = filePath.toLowerCase().endsWith('.pdf');
-                          if (isPdf) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  isKm
-                                      ? 'ឯកសារចម្លើយដែលបានប្រគល់៖'
-                                      : 'Submitted PDF Answer:',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 13),
-                                ),
-                                const SizedBox(height: 10),
-                                GestureDetector(
-                                  onTap: () {
-                                    Get.to(
-                                      () => Scaffold(
-                                        appBar: AppBar(
-                                          title: Text(isKm
-                                              ? 'មើលឯកសារ PDF'
-                                              : 'View PDF Document'),
-                                        ),
-                                        body: Center(
-                                          child: Text(
-                                            isKm
-                                                ? 'ចុចទីនេះដើម្បីបើកមើលឯកសារ PDF'
-                                                : 'Tap here to open PDF document',
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          ),
-                                        ),
-                                        floatingActionButton:
-                                            FloatingActionButton.extended(
-                                          onPressed: () {
-                                            Get.back();
-                                          },
-                                          label: Text(
-                                              isKm ? 'បើកមើល' : 'Open Link'),
-                                          icon:
-                                              const Icon(Icons.open_in_browser),
-                                        ),
+                    Builder(
+                      builder: (context) {
+                        final pathsToUse = (sub?.filePaths != null &&
+                                sub!.filePaths.isNotEmpty)
+                            ? sub.filePaths
+                            : (filePath != null && filePath.isNotEmpty
+                                ? [filePath]
+                                : <String>[]);
+
+                        if (pathsToUse.isEmpty) return const SizedBox.shrink();
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isKm
+                                  ? 'ឯកសារចម្លើយដែលបានប្រគល់៖'
+                                  : 'Submitted Answer Files:',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 13),
+                            ),
+                            const SizedBox(height: 10),
+                            ...pathsToUse.map((path) {
+                              final isPdf = path.toLowerCase().endsWith('.pdf');
+                              if (isPdf) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Get.to(() => InAppPdfViewer(
+                                            url: path,
+                                            title: path.split('/').last,
+                                          ));
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                            color: Colors.red.withOpacity(0.3)),
+                                        color: Colors.red.withOpacity(0.03),
                                       ),
-                                    );
-                                  },
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                              Icons.picture_as_pdf_outlined,
+                                              color: Colors.red,
+                                              size: 18),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Text(
+                                              path.split('/').last,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 13),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          const Icon(Icons.open_in_new,
+                                              color: Colors.grey, size: 16),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: GestureDetector(
+                                  onTap: () => _showFullScreenImage(path),
                                   child: Container(
-                                    padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                          color: Colors.red.withOpacity(0.3)),
-                                      color: Colors.red.withOpacity(0.03),
+                                        color: Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? const Color(0xffE2E8F0)
+                                            : Colors.white.withOpacity(0.05),
+                                      ),
                                     ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                            Icons.picture_as_pdf_outlined,
-                                            color: Colors.red,
-                                            size: 18),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            filePath.split('/').last,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 13),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Stack(
+                                        alignment: Alignment.bottomRight,
+                                        children: [
+                                          Image.network(
+                                            path,
+                                            width: double.maxFinite,
+                                            height: 160,
+                                            fit: BoxFit.cover,
                                           ),
-                                        ),
-                                        const Icon(Icons.open_in_new,
-                                            color: Colors.grey, size: 16),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                              ],
-                            );
-                          }
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                isKm
-                                    ? 'រូបភាពចម្លើយដែលបានប្រគល់៖'
-                                    : 'Submitted Image Answer:',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 13),
-                              ),
-                              const SizedBox(height: 10),
-                              GestureDetector(
-                                onTap: () => _showFullScreenImage(filePath),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Theme.of(context).brightness ==
-                                              Brightness.light
-                                          ? const Color(0xffE2E8F0)
-                                          : Colors.white.withOpacity(0.05),
-                                    ),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Stack(
-                                      alignment: Alignment.bottomRight,
-                                      children: [
-                                        Image.network(
-                                          filePath,
-                                          width: double.maxFinite,
-                                          height: 160,
-                                          fit: BoxFit.cover,
-                                        ),
-                                        // Minimal corner Zoom overlay
-                                        Padding(
-                                          padding: const EdgeInsets.all(10),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(6),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Colors.black.withOpacity(0.6),
-                                              shape: BoxShape.circle,
+                                          // Minimal corner Zoom overlay
+                                          Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black
+                                                    .withOpacity(0.6),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(Icons.zoom_in,
+                                                  color: Colors.white,
+                                                  size: 16),
                                             ),
-                                            child: const Icon(Icons.zoom_in,
-                                                color: Colors.white, size: 16),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 20),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
+                              );
+                            }),
+                            const SizedBox(height: 8),
+                          ],
+                        );
+                      },
+                    ),
 
                     // D. Sleek, Quotation-style Teacher Feedback Block
                     if (teacherComment != null &&

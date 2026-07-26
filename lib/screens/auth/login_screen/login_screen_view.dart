@@ -9,6 +9,7 @@ import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
+import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
 import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
@@ -31,34 +32,39 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Obx(() => SingleChildScrollView(
-                physics: controller.isKeyboardOpen.value
-                ? BouncingScrollPhysics()
-                : NeverScrollableScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    physics: controller.isKeyboardOpen.value
+                        ? BouncingScrollPhysics()
+                        : NeverScrollableScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
                             children: [
                               _buildHeader(),
-                              SizedBox(height: 50,),
+                              SizedBox(
+                                height: 50,
+                              ),
                               _buildForm(),
-                              SizedBox(height: 10,),
+                              SizedBox(
+                                height: 10,
+                              ),
                             ],
                           ),
                           Column(
                             children: [
                               _buildFooter(),
-                              SizedBox(height: 20,),
+                              SizedBox(
+                                height: 20,
+                              ),
                             ],
                           ),
                         ],
                       ),
-                ),
-              )),
+                    ),
+                  )),
             );
           },
         ),
@@ -88,7 +94,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                           AppIcons.englishIcon,
                           width: 24,
                         ),
-                        SizedBox(width: 10,),
+                        SizedBox(
+                          width: 10,
+                        ),
                         Text(
                           "English",
                           style: Get.textTheme.bodyMedium,
@@ -104,7 +112,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                           AppIcons.khmerIcon,
                           width: 24,
                         ),
-                        SizedBox(width: 10,),
+                        SizedBox(
+                          width: 10,
+                        ),
                         Text(
                           "ភាសាខ្មែរ",
                           style: GoogleFonts.kantumruyPro(),
@@ -123,7 +133,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                         : AppIcons.englishIcon,
                     width: 24,
                   ),
-                  SizedBox(width: 10,),
+                  SizedBox(
+                    width: 10,
+                  ),
                   Text(
                     Get.locale?.languageCode == 'km' ? "ភាសាខ្មែរ" : "English",
                     style: GoogleFonts.kantumruyPro(),
@@ -133,11 +145,14 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             ),
           ],
         ),
-        SizedBox(height: 20,),
+        SizedBox(
+          height: 20,
+        ),
         SizedBox(
           height: 140,
           child: ClipRRect(
-            borderRadius: BorderRadiusGeometry.circular(AppNumbers.radiusMedium),
+            borderRadius:
+                BorderRadiusGeometry.circular(AppNumbers.radiusMedium),
             child: SvgPicture.asset(
               AppIcons.appIconPrimary,
               fit: BoxFit.contain,
@@ -160,7 +175,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             "login_title".tr,
             style: Get.textTheme.titleLarge,
           ),
-          SizedBox(height: 20,),
+          SizedBox(
+            height: 20,
+          ),
           CustomTextField(
             hintText: "hint_id".tr,
             controller: controller.idCtrl,
@@ -251,8 +268,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             GestureDetector(
               onTap: () {},
               child: Text("register".tr,
-                  style: Get.textTheme.bodyLarge!
-                      .copyWith(color: AppColors.info)),
+                  style:
+                      Get.textTheme.bodyLarge!.copyWith(color: AppColors.info)),
             ),
           ],
         ),

@@ -72,6 +72,9 @@ class HomeworkViewController extends GetxController {
     logBuffer.writeln("=== FETCH HOMEWORK LOG at ${DateTime.now()} ===");
     try {
       final userController = Get.find<UserController>();
+      if (userController.profile == null) {
+        await userController.getProfile();
+      }
       final studentClassId = userController.profile?.classId;
       final studentId = userController.profile?.id;
 
@@ -307,7 +310,7 @@ class HomeworkViewController extends GetxController {
   }
 
   Future<void> executeSubmitHomework(
-      BuildContext context, int homeworkId, String answerText, XFile? selectedFile) async {
+      BuildContext context, int homeworkId, String answerText, List<XFile> selectedFiles) async {
     try {
       Get.dialog(
         const Center(child: CircularProgressIndicator()),
@@ -315,6 +318,9 @@ class HomeworkViewController extends GetxController {
       );
 
       final userController = Get.find<UserController>();
+      if (userController.profile == null) {
+        await userController.getProfile();
+      }
       final studentId = userController.profile?.id ?? 0;
 
       if (studentId == 0) {
@@ -323,19 +329,19 @@ class HomeworkViewController extends GetxController {
         return;
       }
 
-      MultipartFile? filePart;
-      if (selectedFile != null) {
-        filePart = await MultipartFile.fromFile(
-          selectedFile.path,
-          filename: selectedFile.name,
-        );
+      final List<MultipartFile> fileParts = [];
+      for (var file in selectedFiles) {
+        fileParts.add(await MultipartFile.fromFile(
+          file.path,
+          filename: file.name,
+        ));
       }
 
       await homeworkServices.submitHomework(
         homeworkId: homeworkId,
         studentId: studentId,
         answerText: answerText,
-        file: filePart,
+        files: fileParts,
       );
 
       Get.back(); // close loading

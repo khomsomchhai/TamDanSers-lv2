@@ -5,9 +5,9 @@ class InitialBinding extends Bindings {
   @override
   void dependencies() {
     // TODO: implement dependencies
-    Get.lazyPut<UserController>(
-      () => UserController(),
-      fenix: true,
+    Get.put<UserController>(
+      UserController(),
+      permanent: true,
     );
   }
 }

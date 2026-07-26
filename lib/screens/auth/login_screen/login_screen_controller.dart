@@ -44,6 +44,10 @@ class LoginScreenViewController extends GetxController {
           "role",
           response["role"],
         );
+        
+        // Fetch profile immediately after login success
+        await Get.find<UserController>().getProfile();
+
         // CustomSnackbar.success("Login successful");
         if(response["role"] == "student"){
           Get.offAllNamed(

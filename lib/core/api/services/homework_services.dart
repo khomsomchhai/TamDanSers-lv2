@@ -56,15 +56,15 @@ class HomeworkServices {
     required int homeworkId,
     required int studentId,
     required String answerText,
-    MultipartFile? file,
+    List<MultipartFile> files = const [],
   }) async {
     final Map<String, dynamic> data = {
       "homework_id": homeworkId,
       "student_id": studentId,
       "answer_text": answerText,
     };
-    if (file != null) {
-      data["file"] = file;
+    if (files.isNotEmpty) {
+      data["files"] = files;
     }
     final formData = FormData.fromMap(data);
     final response = await baseApi.post(
