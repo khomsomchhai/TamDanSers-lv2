@@ -1,4 +1,4 @@
-package com.example.tamdansers_lv2
+package tamdansers.app
 
 import io.flutter.embedding.android.FlutterActivity
 
