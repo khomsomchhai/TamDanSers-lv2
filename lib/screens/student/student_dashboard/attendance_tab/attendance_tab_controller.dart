@@ -25,8 +25,8 @@ class AttendanceTabViewController extends GetxController {
   }
 
   @override
-  void onInit() {
-    super.onInit();
+  void onReady() {
+    super.onReady();
     fetchAttendance();
   }
 

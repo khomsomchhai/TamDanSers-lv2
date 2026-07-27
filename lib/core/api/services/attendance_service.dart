@@ -6,13 +6,39 @@ class AttendanceService {
 
   Future<List<AttendanceModel>> getMyAttendance() async {
     final response = await baseApi.get(endpoint: '/attendance/me');
-    final data = response is List
-        ? response
-        : (response['data'] ?? response['attendance'] ?? []);
+    final data = _extractList(response);
+
+    if (data is! List) {
+      return [];
+    }
 
     return List<AttendanceModel>.from(
       data.map(
-          (item) => AttendanceModel.fromJson(Map<String, dynamic>.from(item))),
+        (item) => AttendanceModel.fromJson(Map<String, dynamic>.from(item)),
+      ),
     );
+  }
+
+  dynamic _extractList(dynamic response) {
+    if (response is List) {
+      return response;
+    }
+
+    if (response is Map) {
+      for (final key in ['data', 'attendance', 'result', 'items']) {
+        final value = response[key];
+        if (value is List) {
+          return value;
+        }
+        if (value is Map) {
+          final nested = _extractList(value);
+          if (nested is List) {
+            return nested;
+          }
+        }
+      }
+    }
+
+    return [];
   }
 }
