@@ -25,10 +25,10 @@ class ProfileModel {
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
-      id: json['id'] ?? 0,
+      id: json['id'] ?? json['student_id'] ?? 0,
       studentCode: json['student_code'] ?? '',
-      userId: json['user_id'] ?? "",
-      classId: json['class_id'] ?? "",
+      userId: json['user_id'] ?? 0,
+      classId: json['class_id'] ?? 0,
       className: json['class_name'] ?? '',
       rollNo: json['roll_no'] ?? "",
       gender: json['gender'] ?? '',

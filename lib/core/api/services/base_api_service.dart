@@ -11,9 +11,13 @@ class BaseApiService {
       var response = await apiConfig.dio.post(endpoint, data: data);
       return response.data;
     } on DioException catch (e) {
-      rethrow;
+      final detail = e.response?.data;
+      if (detail != null) {
+        throw Exception(detail.toString());
+      }
+      throw Exception(e.message ?? "Failed");
     } catch (e) {
-      throw Exception("Failed");
+      throw Exception(e.toString());
     }
   }
 

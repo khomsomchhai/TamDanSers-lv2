@@ -3,12 +3,11 @@ import 'package:get_storage/get_storage.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class ApiConfig {
-
   late Dio dio;
   ApiConfig() {
     dio = Dio(
       BaseOptions(
-        baseUrl: "https://tamdanses-lv2.onrender.com",
+        baseUrl: "https://tamdansers-56q81mrhl79g8.sabay.com",
         connectTimeout: const Duration(seconds: 20),
         receiveTimeout: const Duration(seconds: 20),
         headers: {

@@ -10,14 +10,14 @@ class LoginScreenViewController extends GetxController {
   var isHidePwd = true.obs;
   var isLoading = false.obs;
 
-  // var isKeyboardOpen = false.obs;
+  var isKeyboardOpen = false.obs;
 
   var authService = AuthServices();
   var box = GetStorage();
 
-  // void updateKeyboard(BuildContext context) {
-  //   isKeyboardOpen.value = MediaQuery.of(context).viewInsets.bottom > 0;
-  // }
+  void updateKeyboard(BuildContext context) {
+    isKeyboardOpen.value = MediaQuery.of(context).viewInsets.bottom > 0;
+  }
 
   void togglePwd(){
     isHidePwd.value = !isHidePwd.value;
@@ -44,6 +44,10 @@ class LoginScreenViewController extends GetxController {
           "role",
           response["role"],
         );
+        
+        // Fetch profile immediately after login success
+        await Get.find<UserController>().getProfile();
+
         // CustomSnackbar.success("Login successful");
         if(response["role"] == "student"){
           Get.offAllNamed(

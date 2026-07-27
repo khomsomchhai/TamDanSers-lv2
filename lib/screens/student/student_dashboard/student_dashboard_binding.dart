@@ -6,7 +6,7 @@ class StudentDashboardViewBinding extends Bindings {
   void dependencies() {
       Get.lazyPut(() => StudentDashboardViewController());
       Get.lazyPut(() => HomeTabViewController(),);
-      Get.lazyPut(() => HomeworkTabViewController(),);
+      Get.lazyPut(() => HomeworkViewController(),);
       Get.lazyPut(() => AttendanceTabViewController(),);
       Get.lazyPut(() => ProfileTabViewController(),);
   }
