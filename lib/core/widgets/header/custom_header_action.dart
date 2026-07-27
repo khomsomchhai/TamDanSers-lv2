@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 
 class CustomHeaderAction extends StatelessWidget {
   final VoidCallback? onTapNotification;
@@ -26,38 +24,11 @@ class CustomHeaderAction extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        PopupMenuButton<String>(
-          onSelected: (lang) {
-            LocalizationService().changeLocale(lang);
-          },
-          position: PopupMenuPosition.under,
-          borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-          itemBuilder: (context) {
-            return [
-              PopupMenuItem(
-                value: 'en',
-                child: Row(
-                  children: [
-                    Image.asset(AppIcons.englishIcon, width: 24),
-                    const SizedBox(width: 10),
-                    Text("English", style: Get.textTheme.bodyMedium),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'km',
-                child: Row(
-                  children: [
-                    Image.asset(AppIcons.khmerIcon, width: 24),
-                    const SizedBox(width: 10),
-                    Text(
-                      "ភាសាខ្មែរ",
-                      style: GoogleFonts.kantumruyPro(),
-                    ),
-                  ],
-                ),
-              ),
-            ];
+        GestureDetector(
+          onTap: () {
+            final currentLang = Get.locale?.languageCode ?? 'en';
+            final nextLang = currentLang == 'km' ? 'en' : 'km';
+            LocalizationService().changeLocale(nextLang);
           },
           child: Image.asset(
             Get.locale?.languageCode == 'km'
@@ -66,14 +37,12 @@ class CustomHeaderAction extends StatelessWidget {
             width: 24,
           ),
         ),
-
-        const SizedBox(width: 12),
-
+        const SizedBox(width: 6,),
         GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onTapNotification ?? _openNotification,
           child: SizedBox(
-            width: 44,
+            width: 28,
             height: 44,
             child: Stack(
               clipBehavior: Clip.none,
@@ -83,11 +52,10 @@ class CustomHeaderAction extends StatelessWidget {
                   Icons.notifications_rounded,
                   size: 28,
                 ),
-
                 if (unreadCount > 0)
                   Positioned(
-                    right: 6,
-                    top: 4,
+                    right: -4,
+                    top: 2,
                     child: Container(
                       constraints: const BoxConstraints(
                         minWidth: 14,
