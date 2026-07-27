@@ -57,7 +57,12 @@ class LoginScreenViewController extends GetxController {
       }
 
       await box.write("token", token);
-      await box.write("role", response["role"]);
+await box.write("role", response["role"]);
+
+if (response["role"] == "parent") {
+  await box.write("parent", response["parent"]);
+  await box.write("students", response["students"]);
+}
 
       // Fetch profile immediately after login success
       try {

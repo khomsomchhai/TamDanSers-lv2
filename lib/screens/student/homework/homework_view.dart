@@ -31,7 +31,6 @@ class HomeworkView extends GetView<HomeworkViewController> {
       body: SafeArea(
         child: Column(
           children: [
-            // 1. Top Custom App Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               child: Row(

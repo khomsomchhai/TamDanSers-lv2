@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
+import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/card/attendance_card.dart';
@@ -18,9 +19,9 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: 'attendance'.tr,
-        showBackButton: false,
+      appBar: AppBar(
+        title:Text('attendance'.tr,style: AppTextStyles.titleMedium),
+        
       ),
       body: RefreshIndicator(
         onRefresh: controller.fetchAttendance,

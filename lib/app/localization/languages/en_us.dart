@@ -276,4 +276,9 @@ Map<String, String> enUs = {
       'You already requested permission for today.',
   'ask_permission_request_type_by_subject': 'By Subject',
   'ask_permission_request_type_full_day': 'Full Day',
+
+
+  //parent
+  'hello_parent': 'Hello guardian of\n student',
 };
+

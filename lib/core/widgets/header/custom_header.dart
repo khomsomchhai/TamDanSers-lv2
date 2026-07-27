@@ -27,6 +27,7 @@ class CustomHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return controller.user == null? SizedBox.shrink(): Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CircleAvatar(
           backgroundColor: AppColors.skeletonBaseColor,

@@ -49,7 +49,7 @@ class CustomHeaderAction extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 const Icon(
-                  Icons.notifications_rounded,
+                  Icons.notifications_none_rounded,
                   size: 28,
                 ),
                 if (unreadCount > 0)

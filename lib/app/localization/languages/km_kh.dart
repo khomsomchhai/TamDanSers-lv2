@@ -270,4 +270,8 @@ Map<String, String> kmKh = {
       'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
   'ask_permission_request_type_by_subject': 'តាមមុខវិជ្ជា',
   'ask_permission_request_type_full_day': 'ពេញមួយថ្ងៃ',
+
+
+  //prent
+  'hello_parent': 'សួស្ដីអាណាព្យាបាល\n សិស្ស',
 };

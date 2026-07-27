@@ -42,6 +42,7 @@ class CustomScoreCard extends StatelessWidget {
                         : '${'ranking_for_month'.tr} ${(controller.months[month] ?? "").tr}',
                     style: AppTextStyles.bodyLarge.copyWith(
                       color: AppColors.white,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
@@ -56,17 +57,30 @@ class CustomScoreCard extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                            horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           color: AppColors.lightBackground,
                           borderRadius:
                               BorderRadius.circular(AppNumbers.radiusSmall),
                         ),
-                        child: Text(
-                          "${'total_score'.tr}: ${totalScore.toStringAsFixed(0)}",
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.info,
-                            fontWeight: FontWeight.bold,
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '${'total_score'.tr}: ',
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.info,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: '$totalScore',
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: AppColors.error,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -79,7 +93,8 @@ class CustomScoreCard extends StatelessWidget {
                           borderRadius:
                               BorderRadius.circular(AppNumbers.radiusSmall),
                         ),
-                        child: Text('${'average'.tr}: $average',
+                        child: Text(
+                          '${'average'.tr}: $average',
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.info,
                             fontWeight: FontWeight.bold,
