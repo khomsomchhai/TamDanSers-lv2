@@ -12,6 +12,7 @@ class LoginScreenViewController extends GetxController {
   final isHidePwd = true.obs;
   final isLoading = false.obs;
 
+  var isKeyboardOpen = false.obs;
   final authService = AuthServices();
   final box = GetStorage();
 
@@ -21,7 +22,9 @@ class LoginScreenViewController extends GetxController {
     selectedTab.value = index;
   }
 
-
+  void updateKeyboard(BuildContext context) {
+    isKeyboardOpen.value = MediaQuery.of(context).viewInsets.bottom > 0;
+  }
 
   void togglePwd() {
     isHidePwd.value = !isHidePwd.value;
@@ -60,6 +63,13 @@ if (response["role"] == "parent") {
   await box.write("parent", response["parent"]);
   await box.write("students", response["students"]);
 }
+
+      // Fetch profile immediately after login success
+      try {
+        await Get.find<UserController>().getProfile();
+      } catch (e) {
+        debugPrint("GetProfile Error: $e");
+      }
 
       // Save FCM Token (don't block login if it fails)
       try {

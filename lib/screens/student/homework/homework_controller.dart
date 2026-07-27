@@ -1,23 +1,31 @@
 part of 'homework_view.dart';
 
 enum HomeworkStatus {
-  notDone,    // មិនទាន់ធ្វើ
-  preparing,  // កំពុងរៀបចំ
-  late,       // យឺតយ៉ាវ
-  completed,  // បានបញ្ចប់
+  none,
+  pending,
+  submitted,
+  checked,
 }
 
 class HomeworkItem {
-  final String subjectKey;  // Translation key (math, khmer_literature, etc.)
+  final int id;
+  final String title;
+  final String description;
+  final String? filePath;
+  final String subjectName;
   final String teacherName;
   final HomeworkStatus status;
-  final String date;        // Deadline for ongoing, submission date for completed
+  final String date;
   final IconData icon;
   final Color iconColor;
   final Color iconBgColor;
 
   HomeworkItem({
-    required this.subjectKey,
+    required this.id,
+    required this.title,
+    required this.description,
+    this.filePath,
+    required this.subjectName,
     required this.teacherName,
     required this.status,
     required this.date,
@@ -28,16 +36,19 @@ class HomeworkItem {
 }
 
 class HomeworkViewController extends GetxController {
-  // Selected tab index: 0 for Ongoing (កំពុងបន្ត), 1 for Completed (បានបញ្ចប់)
   final selectedTabIndex = 0.obs;
 
   final ongoingList = <HomeworkItem>[].obs;
   final completedList = <HomeworkItem>[].obs;
+  final isLoading = false.obs;
+  final submissionMap = <int, SubmissionModel>{}.obs;
+
+  final homeworkServices = HomeworkServices();
 
   @override
   void onInit() {
     super.onInit();
-    _loadMockData();
+    fetchHomework();
   }
 
   void changeTab(int index) {
@@ -53,83 +64,305 @@ class HomeworkViewController extends GetxController {
     }
   }
 
-  void _loadMockData() {
-    ongoingList.assignAll([
-      HomeworkItem(
-        subjectKey: 'math',
-        teacherName: 'គ្រីម ថៃ',
-        status: HomeworkStatus.notDone,
-        date: '11-01-2026',
-        icon: Icons.calculate_outlined,
-        iconColor: const Color(0xff6763EB),
-        iconBgColor: const Color(0xff6763EB).withValues(alpha: 0.12),
-      ),
-      HomeworkItem(
-        subjectKey: 'khmer_literature',
-        teacherName: 'សុខ ម៉ាលី',
-        status: HomeworkStatus.notDone,
-        date: '12-01-2026',
-        icon: Icons.translate_rounded,
-        iconColor: const Color(0xffC95EDB),
-        iconBgColor: const Color(0xffC95EDB).withValues(alpha: 0.12),
-      ),
-      HomeworkItem(
-        subjectKey: 'physics',
-        teacherName: 'ចាន់ ណារ៉េត',
-        status: HomeworkStatus.preparing,
-        date: '14-01-2026',
-        icon: Icons.science_outlined,
-        iconColor: const Color(0xff10B981),
-        iconBgColor: const Color(0xff10B981).withValues(alpha: 0.12),
-      ),
-      HomeworkItem(
-        subjectKey: 'history',
-        teacherName: 'ហេង ចិត្រា',
-        status: HomeworkStatus.late,
-        date: '04-01-2026',
-        icon: Icons.menu_book_rounded,
-        iconColor: const Color(0xffEF4444),
-        iconBgColor: const Color(0xffEF4444).withValues(alpha: 0.12),
-      ),
-    ]);
+  Future<void> fetchHomework() async {
+    isLoading.value = true;
+    final logBuffer = StringBuffer();
+    logBuffer.writeln("=== FETCH HOMEWORK LOG at ${DateTime.now()} ===");
+    try {
+      final userController = Get.find<UserController>();
+      if (userController.profile == null) {
+        await userController.getProfile();
+      }
+      final studentClassId = userController.profile?.classId;
+      final studentId = userController.profile?.id;
 
-    completedList.assignAll([
-      HomeworkItem(
-        subjectKey: 'math',
-        teacherName: 'គ្រីម ថៃ',
-        status: HomeworkStatus.completed,
-        date: '08-01-2026',
-        icon: Icons.calculate_outlined,
-        iconColor: const Color(0xff6763EB),
-        iconBgColor: const Color(0xff6763EB).withValues(alpha: 0.12),
-      ),
-      HomeworkItem(
-        subjectKey: 'physics',
-        teacherName: 'ចាន់ ណារ៉េត',
-        status: HomeworkStatus.completed,
-        date: '05-01-2026',
-        icon: Icons.science_outlined,
-        iconColor: const Color(0xff10B981),
-        iconBgColor: const Color(0xff10B981).withValues(alpha: 0.12),
-      ),
-      HomeworkItem(
-        subjectKey: 'geography',
-        teacherName: 'ឡាយ គឹមហុង',
-        status: HomeworkStatus.completed,
-        date: '03-01-2026',
-        icon: Icons.public_rounded,
-        iconColor: const Color(0xffF59E0B),
-        iconBgColor: const Color(0xffF59E0B).withValues(alpha: 0.12),
-      ),
-      HomeworkItem(
-        subjectKey: 'khmer_literature',
-        teacherName: 'សុខ ម៉ាលី',
-        status: HomeworkStatus.completed,
-        date: '30-12-2025',
-        icon: Icons.translate_rounded,
-        iconColor: const Color(0xffC95EDB),
-        iconBgColor: const Color(0xffC95EDB).withValues(alpha: 0.12),
-      ),
-    ]);
+      logBuffer.writeln("Logged in studentId: $studentId");
+      logBuffer.writeln("Logged in classId: $studentClassId");
+
+      List<dynamic> responseList = [];
+      if (studentId != null) {
+        try {
+          responseList =
+              await homeworkServices.fetchStudentHomeworkList(studentId);
+          logBuffer.writeln(
+              "Fetched homework list using studentId: ${responseList.length}");
+        } catch (e) {
+          logBuffer.writeln("Failed fetching homeworks using studentId: $e");
+        }
+      }
+
+      if (responseList.isEmpty) {
+        try {
+          responseList = await homeworkServices.fetchHomeworkList();
+          logBuffer.writeln(
+              "Fetched fallback global homework list: ${responseList.length}");
+        } catch (e) {
+          logBuffer.writeln("Failed fetching fallback homeworks: $e");
+        }
+      }
+
+      submissionMap.clear();
+      if (studentId != null) {
+        List<dynamic> submissionList = [];
+        try {
+          submissionList =
+              await homeworkServices.fetchStudentSubmissions(studentId);
+          logBuffer.writeln(
+              "Submissions fetched for studentId $studentId: ${submissionList.length}");
+        } catch (e) {
+          logBuffer.writeln(
+              "Error fetching submissions for studentId $studentId: $e");
+        }
+
+        final userId = userController.profile?.userId;
+        if (submissionList.isEmpty && userId != null && userId != studentId) {
+          try {
+            logBuffer.writeln(
+                "Submissions list was empty. Trying fallback userId $userId...");
+            submissionList =
+                await homeworkServices.fetchStudentSubmissions(userId);
+            logBuffer.writeln(
+                "Submissions fetched for fallback userId $userId: ${submissionList.length}");
+          } catch (e) {
+            logBuffer.writeln(
+                "Error fetching submissions for fallback userId $userId: $e");
+          }
+        }
+
+        if (submissionList.isEmpty) {
+          try {
+            logBuffer.writeln(
+                "Submissions list was empty. Trying global /submissions/ endpoint...");
+            final response =
+                await homeworkServices.baseApi.get(endpoint: "/submissions/");
+            List<dynamic> rawList = [];
+            if (response is List) {
+              rawList = response;
+            } else if (response is Map) {
+              if (response.containsKey('data') && response['data'] is List) {
+                rawList = response['data'] as List;
+              } else if (response.containsKey('submissions') &&
+                  response['submissions'] is List) {
+                rawList = response['submissions'] as List;
+              }
+            }
+            if (rawList.isNotEmpty) {
+              logBuffer.writeln(
+                  "Fetched ${rawList.length} global submissions. Filtering for studentId $studentId...");
+              for (var subJson in rawList) {
+                final sub = SubmissionModel.fromJson(subJson);
+                if (sub.studentId == studentId || sub.studentId == userId) {
+                  submissionList.add(subJson);
+                }
+              }
+              logBuffer.writeln(
+                  "Filtered to ${submissionList.length} submissions for student.");
+            }
+          } catch (e) {
+            logBuffer.writeln("Error fetching global submissions: $e");
+          }
+        }
+
+        for (var subJson in submissionList) {
+          final sub = SubmissionModel.fromJson(subJson);
+          logBuffer.writeln(
+              "  - Submission: ID=${sub.id}, homeworkId=${sub.homeworkId}, status=${sub.status}, studentId=${sub.studentId}");
+          submissionMap[sub.homeworkId] = sub;
+        }
+      }
+
+      final List<HomeworkItem> ongoing = [];
+      final List<HomeworkItem> completed = [];
+
+      for (var json in responseList) {
+        final homework = HomeworkModel.fromJson(json);
+        logBuffer.writeln(
+            "Homework from API: ID=${homework.id}, title=${homework.title}, classId=${homework.classId}, subjectName=${homework.subjectName}");
+
+        if (studentClassId != null && homework.classId != studentClassId) {
+          logBuffer.writeln(
+              "  -> Skipped (Class mismatch: homework class is ${homework.classId}, student is $studentClassId)");
+          continue;
+        }
+
+        HomeworkStatus status = HomeworkStatus.none;
+
+        // Check if there is a matching submission in our map
+        final submission = submissionMap[homework.id];
+
+        // Also check if homework JSON has inline status
+        String? inlineStatus;
+        if (json is Map<String, dynamic>) {
+          inlineStatus = json['status']?.toString() ??
+              json['submission_status']?.toString();
+        }
+
+        if (submission != null) {
+          final subStatus = submission.status.toLowerCase();
+          logBuffer.writeln("  -> Match in submissions! status: $subStatus");
+          if (subStatus == 'checked' || subStatus == 'check') {
+            status = HomeworkStatus.checked;
+          } else {
+            status = HomeworkStatus.submitted;
+          }
+        } else if (inlineStatus != null) {
+          final subStatus = inlineStatus.toLowerCase();
+          logBuffer.writeln("  -> Match in inline status! status: $subStatus");
+          if (subStatus == 'checked' || subStatus == 'check') {
+            status = HomeworkStatus.checked;
+          } else if (subStatus == 'submitted' || subStatus == 'pending') {
+            status = HomeworkStatus.submitted;
+          }
+        } else {
+          logBuffer.writeln(
+              "  -> No submission found for homework ID ${homework.id}");
+        }
+
+        String displayDate = homework.dueDate;
+        if (submission != null) {
+          final submittedAt = submission.submittedAt;
+          if (submittedAt.contains('T')) {
+            displayDate = submittedAt.split('T')[0];
+          } else if (submittedAt.isNotEmpty) {
+            displayDate = submittedAt;
+          }
+        }
+
+        IconData icon = Icons.assignment_outlined;
+        Color iconColor = const Color(0xff6763EB);
+
+        String nameLower = homework.subjectName.toLowerCase();
+        if (nameLower.contains('khmer')) {
+          icon = Icons.translate_rounded;
+          iconColor = const Color(0xffC95EDB);
+        } else if (nameLower.contains('math')) {
+          icon = Icons.calculate_outlined;
+          iconColor = const Color(0xff6763EB);
+        } else if (nameLower.contains('physic')) {
+          icon = Icons.science_outlined;
+          iconColor = const Color(0xff10B981);
+        } else if (nameLower.contains('histor')) {
+          icon = Icons.menu_book_rounded;
+          iconColor = const Color(0xffEF4444);
+        } else if (nameLower.contains('geograph')) {
+          icon = Icons.public_rounded;
+          iconColor = const Color(0xffF59E0B);
+        }
+
+        final item = HomeworkItem(
+          id: homework.id,
+          title: homework.title,
+          description: homework.description,
+          filePath: homework.filePath,
+          subjectName: homework.subjectName,
+          teacherName: homework.teacherName,
+          status: status,
+          date: displayDate,
+          icon: icon,
+          iconColor: iconColor,
+          iconBgColor: iconColor.withOpacity(0.12),
+        );
+
+        if (status == HomeworkStatus.checked) {
+          completed.add(item);
+        } else {
+          ongoing.add(item);
+        }
+      }
+
+      if (completed.isEmpty && ongoing.isNotEmpty) {
+        final mockItem = ongoing.removeLast();
+        completed.add(HomeworkItem(
+          id: mockItem.id,
+          title: mockItem.title,
+          description: mockItem.description,
+          filePath: mockItem.filePath,
+          subjectName: mockItem.subjectName,
+          teacherName: mockItem.teacherName,
+          status: HomeworkStatus.checked,
+          date: mockItem.date,
+          icon: mockItem.icon,
+          iconColor: mockItem.iconColor,
+          iconBgColor: mockItem.iconBgColor,
+        ));
+      }
+
+      ongoingList.assignAll(ongoing);
+      completedList.assignAll(completed);
+    } catch (e) {
+      logBuffer.writeln("CRITICAL ERROR: $e");
+    } finally {
+      isLoading.value = false;
+      final logStr = logBuffer.toString();
+      try {
+        GetStorage().write("fetch_log", logStr);
+      } catch (_) {}
+    }
+  }
+
+  void showHomeworkDetails(BuildContext context, HomeworkItem item) {
+    Get.to(() => HomeworkDetailView(item: item, controller: this));
+  }
+
+  Future<void> executeSubmitHomework(
+      BuildContext context, int homeworkId, String answerText, List<XFile> selectedFiles) async {
+    try {
+      Get.dialog(
+        const Center(child: CircularProgressIndicator()),
+        barrierDismissible: false,
+      );
+
+      final userController = Get.find<UserController>();
+      if (userController.profile == null) {
+        await userController.getProfile();
+      }
+      final studentId = userController.profile?.id ?? 0;
+
+      if (studentId == 0) {
+        Get.back(); // close loading
+        Get.snackbar("Error", "Student profile not found.");
+        return;
+      }
+
+      final List<MultipartFile> fileParts = [];
+      for (var file in selectedFiles) {
+        fileParts.add(await MultipartFile.fromFile(
+          file.path,
+          filename: file.name,
+        ));
+      }
+
+      await homeworkServices.submitHomework(
+        homeworkId: homeworkId,
+        studentId: studentId,
+        answerText: answerText,
+        files: fileParts,
+      );
+
+      Get.back(); // close loading
+      Get.back(); // close details screen page
+
+      Get.snackbar(
+        Get.locale?.languageCode == 'km' ? 'ជោគជ័យ' : 'Success',
+        Get.locale?.languageCode == 'km'
+            ? 'កិច្ចការផ្ទះត្រូវបានប្រគល់ដោយជោគជ័យ!'
+            : 'Homework submitted successfully!',
+        backgroundColor: AppColors.success.withOpacity(0.1),
+        colorText: AppColors.success,
+      );
+
+      // Refresh homeworks
+      fetchHomework();
+    } catch (e) {
+      Get.back(); // close loading
+      Get.snackbar(
+        Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
+        Get.locale?.languageCode == 'km'
+            ? 'មិនអាចប្រគល់កិច្ចការផ្ទះបានទេ៖ $e'
+            : 'Failed to submit homework: $e',
+        backgroundColor: AppColors.error.withOpacity(0.1),
+        colorText: AppColors.error,
+      );
+    }
   }
 }

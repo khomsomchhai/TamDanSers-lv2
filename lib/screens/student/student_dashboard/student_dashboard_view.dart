@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/attendance_tab/attendance_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
-import 'package:tamdansers_lv2/screens/student/student_dashboard/homework_tab/homework_tab_view.dart';
+import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/profile_tab/profile_tab_view.dart';
 
 part 'student_dashboard_binding.dart';
@@ -20,7 +20,7 @@ class StudentDashboardView extends GetView<StudentDashboardViewController> {
           index: controller.currentIndex.value,
           children:  [
             HomeTabView(),
-            HomeworkTabView(),
+            HomeworkView(),
             AttendanceTabView(),
             ProfileTabView(),
           ],

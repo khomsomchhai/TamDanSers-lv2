@@ -34,7 +34,7 @@ class ProfileModel {
     }
 
     return ProfileModel(
-      id: parseInt(data['id']),
+      id: parseInt(data['id'] ?? data['student_id']),
       studentCode: data['student_code'] ?? '',
       userId: parseInt(data['user_id']),
       classId: parseInt(data['class_id']),
