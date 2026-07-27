@@ -30,7 +30,7 @@ class CustomHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CircleAvatar(
-          backgroundColor: AppColors.neutral500,
+          backgroundColor: AppColors.skeletonBaseColor,
           radius: 24,
           onBackgroundImageError: (exception, stackTrace) => Image.asset("assets/images/app_logo.png"),
           backgroundImage: controller.user!.avatarUrl != null

@@ -110,6 +110,6 @@ class AppPages {
         name: AppRoutes.notificationScreen,
         page: () => NotificationView(),
         binding: NotificationViewBinding(),
-        transition: Transition.leftToRight)
+        transition: Transition.rightToLeft)
   ];
 }

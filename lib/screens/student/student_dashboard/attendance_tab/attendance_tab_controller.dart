@@ -25,8 +25,8 @@ class AttendanceTabViewController extends GetxController {
   }
 
   @override
-  void onInit() {
-    super.onInit();
+  void onReady() {
+    super.onReady();
     fetchAttendance();
   }
 
@@ -96,8 +96,6 @@ class AttendanceTabViewController extends GetxController {
         return 'attendance_status_present'.tr;
       case 'A':
         return 'attendance_status_absent'.tr;
-      case 'L':
-        return 'attendance_status_late'.tr;
       case 'E':
       case 'EXCUSED':
       case 'PERMISSION':
@@ -114,8 +112,6 @@ class AttendanceTabViewController extends GetxController {
         return AppColors.success;
       case 'A':
         return AppColors.error;
-      case 'L':
-        return AppColors.warning;
       case 'E':
       case 'EXCUSED':
       case 'PERMISSION':

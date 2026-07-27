@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
+import 'package:tamdansers_lv2/core/widgets/card/attendance_card.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
 
@@ -27,13 +29,9 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
           if (controller.isLoading.value && controller.attendanceList.isEmpty) {
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              children: const [
-                SizedBox(
-                  height: 520,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
+              padding: const EdgeInsets.all(AppNumbers.screenPadding),
+              children: [
+                _buildAttendanceSkeleton(),
               ],
             );
           }
@@ -71,12 +69,89 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
                   (item) => Padding(
                     padding:
                         const EdgeInsets.only(bottom: AppNumbers.spacingMedium),
-                    child: _buildAttendanceCard(item),
+                    child: AttendanceCard(
+                      item: item,
+                      mapStatus: controller.mapStatus,
+                      statusColor: controller.statusColor,
+                      formatDate: controller.formatDate,
+                      formatTimeRange: controller.formatTimeRange,
+                    ),
                   ),
                 ),
             ],
           );
         }),
+      ),
+    );
+  }
+
+  Widget _buildAttendanceSkeleton() {
+    return Shimmer.fromColors(
+      baseColor: AppColors.skeletonBaseColor,
+      highlightColor: AppColors.skeletonHighlightColor,
+      period: const Duration(milliseconds: 1200),
+      child: Column(
+        children: List.generate(
+          3,
+          (_) => Padding(
+            padding: const EdgeInsets.only(bottom: AppNumbers.spacingMedium),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppNumbers.cardPadding),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(AppNumbers.radiusRounded),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(0, 0, 0, 0.03),
+                    blurRadius: AppNumbers.shadowBlur,
+                    offset: Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 180,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  const SizedBox(height: AppNumbers.spacingSmall),
+                  Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: AppNumbers.spacingSmall),
+                  Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: AppNumbers.spacingSmall),
+                  Container(
+                    width: 120,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -179,133 +254,5 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
         ),
       );
     });
-  }
-
-  Widget _buildAttendanceCard(AttendanceModel item) {
-    final statusText = controller.mapStatus(item.status);
-    final badgeColor = controller.statusColor(item.status);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 2),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppNumbers.cardPadding,
-        vertical: AppNumbers.cardPadding,
-      ),
-      decoration: BoxDecoration(
-        color: Get.theme.cardColor,
-        borderRadius: BorderRadius.circular(AppNumbers.radiusRounded),
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.03),
-            blurRadius: AppNumbers.shadowBlur,
-            offset: Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: AppNumbers.avatarLarge,
-                height: AppNumbers.avatarLarge,
-                decoration: BoxDecoration(
-                  color: AppColors.secondary,
-                  borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                ),
-                child: const Icon(
-                  Icons.menu_book_rounded,
-                  color: AppColors.primary,
-                  size: AppNumbers.iconMedium,
-                ),
-              ),
-              const SizedBox(width: AppNumbers.spacingMedium),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${item.subjectName} - ${item.className}',
-                      style: Get.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Teacher: ${item.teacherName}',
-                      style: Get.textTheme.bodySmall?.copyWith(
-                        color: AppColors.grey,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: AppNumbers.spacingSmall, vertical: 5),
-                decoration: BoxDecoration(
-                  color: badgeColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                ),
-                child: Text(
-                  statusText,
-                  style: Get.textTheme.bodySmall?.copyWith(
-                    color: badgeColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Divider(height: 1, color: AppColors.border),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.calendar_today_outlined,
-                    color: AppColors.grey,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    controller.formatDate(item.date),
-                    style: Get.textTheme.bodySmall?.copyWith(
-                      color: AppColors.grey,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.access_time_rounded,
-                    color: AppColors.grey,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    controller.formatTimeRange(item.startTime, item.endTime),
-                    style: Get.textTheme.bodySmall?.copyWith(
-                      color: AppColors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }
