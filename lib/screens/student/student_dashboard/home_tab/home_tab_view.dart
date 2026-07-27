@@ -6,14 +6,19 @@ import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
+import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
+import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
+import 'package:tamdansers_lv2/core/widgets/card/attendance_card.dart';
 import 'package:tamdansers_lv2/core/widgets/card/custom_function_card.dart';
 import 'package:tamdansers_lv2/core/widgets/card/custom_score_card.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_action.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_placeholder.dart';
+import 'package:tamdansers_lv2/data/model/attendance_model.dart';
 import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
 import 'package:tamdansers_lv2/screens/student/result_screen/result_screen_view.dart';
+import 'package:tamdansers_lv2/screens/student/student_dashboard/student_dashboard_view.dart';
 
 part 'home_tab_binding.dart';
 part 'home_tab_controller.dart';
@@ -92,14 +97,76 @@ class HomeTabView extends GetView<HomeTabViewController> {
                         "attendance".tr,
                         style: Get.textTheme.titleSmall,
                       ),
-                      Spacer(),
-                      Text(
-                        "see all".tr,
-                        style: Get.textTheme.bodyMedium!
-                            .copyWith(color: AppColors.info),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          Get.find<StudentDashboardViewController>()
+                              .changeTab(2);
+                        },
+                        child: Text(
+                          "see all".tr,
+                          style: Get.textTheme.bodyMedium!
+                              .copyWith(color: AppColors.info),
+                        ),
                       ),
                     ],
-                  )
+                  ),
+                  const SizedBox(height: AppNumbers.spacingMedium),
+                  Obx(() {
+                    if (controller.isLoadingAttendance.value) {
+                      // Show loading skeletons
+                      return Column(
+                        children: List.generate(
+                          3,
+                          (_) => Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: AppNumbers.spacingMedium),
+                            child: Shimmer.fromColors(
+                              baseColor:
+                                  Get.theme.cardColor.withValues(alpha: 0.5),
+                              highlightColor:
+                                  Get.theme.cardColor.withValues(alpha: 1.0),
+                              child: Container(
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color: Get.theme.cardColor,
+                                  borderRadius: BorderRadius.circular(
+                                      AppNumbers.radiusRounded),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
+                    if (controller.recentAttendance.isEmpty) {
+                      return SizedBox(
+                        height: 120,
+                        child: Center(
+                          child: Text(
+                            'attendance_no_records'.tr,
+                            style: Get.textTheme.bodyMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return Column(
+                      children: controller.recentAttendance
+                          .map(
+                            (item) => AttendanceCard(
+                              item: item,
+                              mapStatus: controller.mapStatus,
+                              statusColor: controller.mapStatusColor,
+                              formatDate: controller.formatDate,
+                              formatTimeRange: controller.formatTimeRange,
+                            ),
+                          )
+                          .toList(),
+                    );
+                  })
                 ],
               ),
             ),
