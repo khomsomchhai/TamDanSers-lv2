@@ -320,8 +320,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      user.role == "parent" ? 'parent_account'.tr : 'student_account'.tr,
-                      style: Get.textTheme.labelLarge?.copyWith(
+                      'student_account'.tr,
+                      style: Get.textTheme.titleLarge?.copyWith(
                         color: Colors.white.withValues(alpha: 0.85),
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.8,
@@ -681,7 +681,10 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     ),
-                    child: Text('close_button'.tr),
+                    child: Text(
+                      'close_button'.tr,
+                      style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.white),
+                    ),
                   ),
                 ),
               ],
@@ -800,7 +803,9 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     ),
-                    child: Text('close_button'.tr),
+                    child: Text('close_button'.tr,
+                    style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.white),
+                    ),
                   ),
                 ),
               ],

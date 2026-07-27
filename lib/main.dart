@@ -29,11 +29,15 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   await setupLocalNotifications();
-  await setupFCM();
 
   runApp(MainApp(
     themeService: themeService,
   ));
+
+  // Start FCM setup after the app is visible to avoid blocking startup.
+  setupFCM().catchError((error) {
+    debugPrint('FCM setup failed: $error');
+  });
 }
 
 class MainApp extends StatefulWidget {

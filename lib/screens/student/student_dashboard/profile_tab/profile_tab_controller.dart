@@ -333,7 +333,7 @@ class ProfileTabViewController extends GetxController {
                   _buildLanguageOption(
                     context: ctx,
                     icon: AppIcons.englishIcon,
-                    title: 'english'.tr,
+                    title: 'language_english'.tr,
                     isSelected: currentLang == 'en',
                     onTap: () {
                       Navigator.of(ctx).pop();
@@ -344,7 +344,7 @@ class ProfileTabViewController extends GetxController {
                   _buildLanguageOption(
                     context: ctx,
                     icon: AppIcons.khmerIcon,
-                    title: 'khmer'.tr,
+                    title: 'language_khmer'.tr,
                     isSelected: currentLang == 'km',
                     onTap: () {
                       Navigator.of(ctx).pop();
@@ -545,14 +545,14 @@ class ProfileTabViewController extends GetxController {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Logout".tr,
+                          'logout_action'.tr,
                           style: Get.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          "Sign out of your account".tr,
+                          'sign_out_account'.tr,
                           style: Get.textTheme.bodySmall?.copyWith(
                             color: AppColors.hintColor,
                           ),
@@ -579,7 +579,10 @@ class ProfileTabViewController extends GetxController {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: Text('no'.tr),
+                      child: Text(
+                        'no'.tr,
+                        style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -600,7 +603,10 @@ class ProfileTabViewController extends GetxController {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: Text('yes'.tr),
+                      child: Text(
+                        'yes'.tr,
+                        style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: AppColors.white),
+                      ),
                     ),
                   ),
                 ],
