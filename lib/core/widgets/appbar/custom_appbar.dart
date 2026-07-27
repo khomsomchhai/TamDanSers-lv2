@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -28,13 +27,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final iconColor = theme.iconTheme.color ?? Colors.black;
+
     return AppBar(
       automaticallyImplyLeading: false,
       centerTitle: true,
       elevation: 0,
-      surfaceTintColor: Get.theme.scaffoldBackgroundColor,
-      backgroundColor: Get.theme.scaffoldBackgroundColor,
-      systemOverlayStyle: Get.isDarkMode
+      surfaceTintColor: theme.scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      systemOverlayStyle: theme.brightness == Brightness.dark
           ? SystemUiOverlayStyle.light
           : SystemUiOverlayStyle.dark,
       leading: showBackButton
@@ -47,17 +49,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: AppColors.white,
+                    color: theme.cardColor,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.lightGrey,
+                      color: theme.dividerColor,
                       width: 1,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_ios_new,
                     size: 16,
-                    color: Colors.black,
+                    color: iconColor,
                   ),
                 ),
               ),
@@ -65,7 +67,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           : const SizedBox(width: 54),
       title: Text(
         title,
-        style: Get.textTheme.titleMedium,
+        style: theme.textTheme.titleMedium,
       ),
       actions: [
         if (showNotification)
@@ -86,16 +88,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: AppColors.white,
+                        color: theme.cardColor,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppColors.lightGrey,
+                          color: theme.dividerColor,
                           width: 1,
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.notifications_none_rounded,
-                        color: AppColors.dark,
+                        color: iconColor,
                         size: 24,
                       ),
                     ),

@@ -4,7 +4,6 @@ class AppRoutes {
   static const String loginScreen = "/login_screen";
   static const String forgetPasswordScreen = "/forget_password_screen";
   static const String resetPasswordScreen = "/reset_password_screen";
-  static const String changePasswordScreen = "/change_password_screen";
   static const String registerParentScreen = "/register_parent_screen";
   static const String parentVerifyOtp = "/parent_verify_otp";
   static const String parentCreatePassword = "/parent_create_password";

@@ -10,7 +10,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
@@ -30,7 +29,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
@@ -40,9 +39,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             child: Container(
               width: 220,
               height: 220,
-              decoration: BoxDecoration(
+                decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primary.withValues(alpha: 0.08),
+                color: theme.colorScheme.primary.withOpacity(0.08),
               ),
             ),
           ),
@@ -52,9 +51,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             child: Container(
               width: 240,
               height: 240,
-              decoration: BoxDecoration(
+                decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.info.withValues(alpha: 0.08),
+                color: theme.colorScheme.secondary.withOpacity(0.08),
               ),
             ),
           ),
@@ -69,14 +68,14 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                       children: [
                         Align(
                           alignment: Alignment.centerRight,
-                          child: _buildLanguageSwitcher(),
+                          child: _buildLanguageSwitcher(theme),
                         ),
                         const SizedBox(height: 8),
                         _buildHeader(theme),
                         const SizedBox(height: 46,),
-                        _buildAuthTabBar(),
+                        _buildAuthTabBar(theme),
                         const SizedBox(height: 24),
-                        _buildForm(),
+                        _buildForm(theme),
                       ],
                     ),
                   ),
@@ -99,15 +98,15 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
       children: [
         Hero(
           tag: 'app_logo',
-          child: Container(
+            child: Container(
             width: 140,
             height: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primary,
+              color: theme.colorScheme.primary,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.18),
+                  color: theme.colorScheme.primary.withOpacity(0.18),
                   blurRadius: 22,
                   spreadRadius: 3,
                 ),
@@ -117,7 +116,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               padding: const EdgeInsets.all(24.0),
               child: SvgPicture.asset(
                 AppIcons.appIconPrimary,
-                colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(theme.colorScheme.onPrimary, BlendMode.srcIn),
               ),
             ),
           ),
@@ -125,20 +124,20 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
       ],
     );
   }
-  Widget _buildAuthTabBar() {
+  Widget _buildAuthTabBar(ThemeData theme) {
     return Container(
       height: 56,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-          color: AppColors.border,
+          color: theme.dividerColor,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -202,8 +201,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                                     PhosphorIconsRegular.student,
                                     size: 20,
                                     color: controller.selectedTab.value == 0
-                                        ? Colors.white
-                                        : AppColors.hintColor,
+                                      ? Colors.white
+                                      : theme.hintColor,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -212,8 +211,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                                   style: Get.textTheme.bodyLarge!.copyWith(
                                     fontWeight: FontWeight.w700,
                                     color: controller.selectedTab.value == 0
-                                        ? Colors.white
-                                        : AppColors.dark,
+                                      ? Colors.white
+                                      : theme.textTheme.bodyLarge?.color,
                                   ),
                                   child: Text('student'.tr),
                                 ),
@@ -243,8 +242,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                                     PhosphorIconsRegular.users,
                                     size: 20,
                                     color: controller.selectedTab.value == 1
-                                        ? Colors.white
-                                        : AppColors.hintColor,
+                                      ? Colors.white
+                                      : theme.hintColor,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -253,8 +252,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                                   style: Get.textTheme.bodyLarge!.copyWith(
                                     fontWeight: FontWeight.w700,
                                     color: controller.selectedTab.value == 1
-                                        ? Colors.white
-                                        : AppColors.dark,
+                                      ? Colors.white
+                                      : theme.textTheme.bodyLarge?.color,
                                   ),
                                   child: Text('parent'.tr),
                                 ),
@@ -274,7 +273,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     );
   }
 
-  Widget _buildLanguageSwitcher() {
+  Widget _buildLanguageSwitcher(ThemeData theme) {
     return PopupMenuButton<String>(
       onSelected: (lang) => LocalizationService().changeLocale(lang),
       position: PopupMenuPosition.under,
@@ -302,15 +301,15 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           ),
         ),
       ],
-      child: Container(
+            child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: theme.dividerColor),
           boxShadow: [
             BoxShadow(
-              color: AppColors.dark.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -328,13 +327,13 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             const SizedBox(width: 8),
             Text(
               Get.locale?.languageCode == 'km' ? 'language_khmer'.tr : 'language_english'.tr,
-              style: GoogleFonts.kantumruyPro(fontSize: 13, fontWeight: FontWeight.w600),
+              style: GoogleFonts.kantumruyPro(fontSize: 13, fontWeight: FontWeight.w600, color: theme.textTheme.bodyMedium?.color),
             ),
             const SizedBox(width: 4),
             Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 18,
-              color: AppColors.dark.withValues(alpha: 0.7),
+              color: theme.iconTheme.color?.withOpacity(0.7),
             ),
           ],
         ),
@@ -342,7 +341,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     );
   }
 
-  Widget _buildForm() {
+  Widget _buildForm(ThemeData theme) {
     return Form(
       key: controller.formKey,
       child: Obx(
@@ -414,11 +413,11 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                     onTap: () {
                       controller.togglePwd();
                     },
-                    child: Icon(
+                      child: Icon(
                       controller.isHidePwd.value
                           ? PhosphorIconsRegular.eyeSlash
                           : PhosphorIconsRegular.eye,
-                      color: AppColors.dark,
+                      color: theme.iconTheme.color,
                     ),
                   ),
                 ),
@@ -431,9 +430,9 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                     onTap: () {
                       Get.toNamed(AppRoutes.forgetPasswordScreen);
                     },
-                    child: Text(
+                      child: Text(
                       'forget_password'.tr,
-                      style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.info),
+                      style: Get.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.secondary),
                     ),
                   ),
                 ],
@@ -495,7 +494,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                   children: [
                     Text(
                       'no_account'.tr,
-                      style: theme.textTheme.bodyLarge?.copyWith(color: AppColors.hintColor),
+                        style: theme.textTheme.bodyLarge?.copyWith(color: theme.hintColor),
                     ),
                     const SizedBox(width: 8),
                     Bounceable(
@@ -505,7 +504,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                       child: Text(
                         'sign_up'.tr,
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          color: AppColors.info,
+                          color: theme.colorScheme.secondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

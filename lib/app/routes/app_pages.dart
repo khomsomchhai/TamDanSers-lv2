@@ -1,6 +1,5 @@
 import 'package:get/route_manager.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/screens/auth/change_password_screen/change_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/create_password_parent/create_password_parent_view.dart';
 import 'package:tamdansers_lv2/screens/auth/forget_password_screen/forget_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/login_screen/login_screen_view.dart';
@@ -41,13 +40,6 @@ class AppPages {
       name: AppRoutes.resetPasswordScreen,
       page: () => const ResetPasswordScreenView(),
       binding: ResetPasswordScreenViewBinding(),
-      transition: Transition.rightToLeft,
-    ),
-
-    GetPage(
-      name: AppRoutes.changePasswordScreen,
-      page: () => const ChangePasswordScreenView(),
-      binding: ChangePasswordScreenViewBinding(),
       transition: Transition.rightToLeft,
     ),
     GetPage(

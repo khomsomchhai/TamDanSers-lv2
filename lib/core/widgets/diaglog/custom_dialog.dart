@@ -46,6 +46,57 @@ class CustomDialog {
     );
   }
 
+  static Future<bool> showNetworkRetry({
+    String? title,
+    required String message,
+    String? retryText,
+    bool barrierDismissible = false,
+  }) async {
+    return await Get.dialog<bool>(
+          Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.wifi_off_outlined,
+                    size: 60,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    title ?? "network_error".tr,
+                    style: Get.textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: Get.textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Get.back(result: true),
+                      child: Text(
+                        retryText ?? "retry".tr,
+                        style: Get.textTheme.bodyMedium,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          barrierDismissible: barrierDismissible,
+        ) ??
+        false;
+  }
+
   static Future<void> showConfirm({
     String title = "Confirmation",
     required String message,

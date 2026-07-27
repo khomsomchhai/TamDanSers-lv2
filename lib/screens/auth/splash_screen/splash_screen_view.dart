@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
+import 'package:tamdansers_lv2/core/widgets/diaglog/custom_dialog.dart';
 
 part 'splash_screen_binding.dart';
 part 'splash_screen_controller.dart';
@@ -18,9 +18,10 @@ class SplashScreenView extends GetView<SplashScreenViewController> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final logoSize = (size.width * 0.4).clamp(120.0, 160.0);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: theme.colorScheme.primary,
       body: Center(
         child: AnimatedBuilder(
           animation: controller.animationController,

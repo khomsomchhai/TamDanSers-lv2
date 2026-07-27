@@ -106,64 +106,10 @@ class SplashScreenViewController extends GetxController
     }
 
     // Still failed
-    final shouldRetry = await Get.dialog<bool>(
-          Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.wifi_off_outlined,
-                    size: 60,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "network_error".tr,
-                    style: Get.textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "unable_to_verify_account".tr,
-                    textAlign: TextAlign.center,
-                    style: Get.textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () =>
-                              Get.back(result: false),
-                          child: Text(
-                            "continue_offline".tr,
-                            style: Get.textTheme.bodyMedium,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () =>
-                              Get.back(result: true),
-                          child: Text(
-                            "retry".tr,
-                            style: Get.textTheme.bodyMedium,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          barrierDismissible: false,
-        ) ??
-        false;
+    final shouldRetry = await CustomDialog.showNetworkRetry(
+      message: "unable_to_verify_account".tr,
+      barrierDismissible: false,
+    );
 
     if (shouldRetry) {
       return _resolveDestination(0);
