@@ -29,30 +29,22 @@ class NotificationView extends GetView<NotificationController> {
           itemCount: controller.notifications.length,
           itemBuilder: (context, index) {
             final notification = controller.notifications[index];
-
             return Card(
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              margin: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 4,
+              ),
               elevation: 2,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: IntrinsicHeight(
                 child: Row(
                   children: [
-                    Container(
-                      width: 5,
-                      decoration: BoxDecoration(
-                        color:
-                            controller.getNotificationColor(notification.title),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          bottomLeft: Radius.circular(20),
-                        ),
-                      ),
-                    ),
+                    
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding:  EdgeInsets.all(12),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -71,19 +63,36 @@ class NotificationView extends GetView<NotificationController> {
                             ),
                             const SizedBox(width: 16),
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  dividerColor: Colors.transparent,
+                                ),
+                                child: ExpansionTile(
+                                  tilePadding: EdgeInsets.zero,
+                                  childrenPadding:
+                                      const EdgeInsets.only(top: 8),
+                                  title: Text(
                                     notification.title,
-                                    style: AppTextStyles.titleSmall
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTextStyles.titleSmall,
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
+                                  subtitle: Text(
                                     notification.message,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: AppTextStyles.bodyLarge,
                                   ),
-                                ],
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        notification.message,
+                                        style: AppTextStyles.bodyLarge,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],

@@ -35,7 +35,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                   onTap: (index) {
                     controller.selectedSemester.value = index + 1;
                     controller.selectedMonth.value = null;
-                    controller.selectFisrtMonth();
+                    controller.selectLatestSemesterAndMonth();
                     controller.getRank();
                   },
                   indicator: BoxDecoration(

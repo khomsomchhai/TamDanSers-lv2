@@ -26,7 +26,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> setupLocalNotifications() async {
-  const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const androidSettings = AndroidInitializationSettings('@drawable/ic_notification');
 
   const iosSettings = DarwinInitializationSettings(
     requestAlertPermission: true,
@@ -123,7 +123,7 @@ Future<void> setupFCM() async {
           priority: Priority.max,
           playSound: true,
           enableVibration: true,
-          icon: '@mipmap/ic_launcher',
+          icon: '@drawable/ic_notification',
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,
