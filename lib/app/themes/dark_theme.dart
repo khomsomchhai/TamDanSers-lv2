@@ -6,17 +6,16 @@ ThemeData get darkTheme => ThemeData(
   brightness: Brightness.dark,
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.darkBackground,
-  cardColor: AppColors.grey,
+  cardColor: const Color(0xFF1F1F2D),
   dividerColor: Colors.white12,
   hintColor: AppColors.hintColor,
   colorScheme: const ColorScheme.dark(
     primary: AppColors.primary,
-    surface: AppColors.white,
+    surface: Color(0xFF1E1E2C),
     onPrimary: AppColors.white,
-    onSurface: AppColors.dark,
+    onSurface: AppColors.white,
     error: AppColors.error,
-    onError: AppColors.white
-
+    onError: AppColors.white,
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.darkBackground,

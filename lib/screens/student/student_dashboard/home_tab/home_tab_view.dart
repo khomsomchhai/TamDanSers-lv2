@@ -114,30 +114,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                   const SizedBox(height: AppNumbers.spacingMedium),
                   Obx(() {
                     if (controller.isLoadingAttendance.value) {
-                      // Show loading skeletons
-                      return Column(
-                        children: List.generate(
-                          3,
-                          (_) => Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: AppNumbers.spacingMedium),
-                            child: Shimmer.fromColors(
-                              baseColor:
-                                  Get.theme.cardColor.withValues(alpha: 0.5),
-                              highlightColor:
-                                  Get.theme.cardColor.withValues(alpha: 1.0),
-                              child: Container(
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: Get.theme.cardColor,
-                                  borderRadius: BorderRadius.circular(
-                                      AppNumbers.radiusRounded),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
+                      return _buildRecentAttendanceSkeleton();
                     }
 
                     if (controller.recentAttendance.isEmpty) {
@@ -254,10 +231,6 @@ class HomeTabView extends GetView<HomeTabViewController> {
             return _buildAttendanceCardSkeleton();
           }
 
-          if (resultController.filterScores.isEmpty) {
-            return const Text("No score");
-          }
-
           return CustomScoreCard();
         })
       ],
@@ -301,6 +274,70 @@ class HomeTabView extends GetView<HomeTabViewController> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRecentAttendanceSkeleton() {
+    return Column(
+      children: List.generate(
+        3,
+        (_) => Padding(
+          padding: const EdgeInsets.only(bottom: AppNumbers.spacingMedium),
+          child: Shimmer.fromColors(
+            baseColor: AppColors.skeletonBaseColor,
+            highlightColor: AppColors.skeletonHighlightColor,
+            period: const Duration(milliseconds: 1200),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppNumbers.cardPadding),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(AppNumbers.radiusRounded),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 140,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  const SizedBox(height: AppNumbers.spacingSmall),
+                  Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: AppNumbers.spacingSmall),
+                  Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: AppNumbers.spacingSmall),
+                  Container(
+                    width: 120,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

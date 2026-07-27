@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
@@ -20,7 +21,6 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
       appBar: CustomAppBar(
         title: 'attendance'.tr,
         showBackButton: false,
-        unreadCount: 2,
       ),
       body: RefreshIndicator(
         onRefresh: controller.fetchAttendance,
@@ -28,13 +28,9 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
           if (controller.isLoading.value && controller.attendanceList.isEmpty) {
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              children: const [
-                SizedBox(
-                  height: 520,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
+              padding: const EdgeInsets.all(AppNumbers.screenPadding),
+              children: [
+                _buildAttendanceSkeleton(),
               ],
             );
           }
@@ -84,6 +80,77 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
             ],
           );
         }),
+      ),
+    );
+  }
+
+  Widget _buildAttendanceSkeleton() {
+    return Shimmer.fromColors(
+      baseColor: AppColors.skeletonBaseColor,
+      highlightColor: AppColors.skeletonHighlightColor,
+      period: const Duration(milliseconds: 1200),
+      child: Column(
+        children: List.generate(
+          3,
+          (_) => Padding(
+            padding: const EdgeInsets.only(bottom: AppNumbers.spacingMedium),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppNumbers.cardPadding),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(AppNumbers.radiusRounded),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromRGBO(0, 0, 0, 0.03),
+                    blurRadius: AppNumbers.shadowBlur,
+                    offset: Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 180,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  const SizedBox(height: AppNumbers.spacingSmall),
+                  Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: AppNumbers.spacingSmall),
+                  Container(
+                    width: double.infinity,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  const SizedBox(height: AppNumbers.spacingSmall),
+                  Container(
+                    width: 120,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

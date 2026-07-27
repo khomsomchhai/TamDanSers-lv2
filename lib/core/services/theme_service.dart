@@ -8,21 +8,20 @@ class ThemeService {
   final key = "isDarkMode";
 
   ThemeMode get themeMode {
-    bool isDark = box.read(key) ?? false;
-
-    return isDark
-        ? ThemeMode.dark
-        : ThemeMode.light;
+    final isDark = box.read(key) ?? false;
+    return isDark ? ThemeMode.dark : ThemeMode.light;
   }
 
-  void switchTheme() {
+  bool get isDarkMode => Get.isDarkMode;
 
-    bool isDark = Get.isDarkMode;
-    Get.changeThemeMode(
-      isDark
-          ? ThemeMode.light
-          : ThemeMode.dark,
-    );
-    box.write(key, !isDark);
+  void switchTheme() {
+    final isDark = Get.isDarkMode;
+    setThemeMode(isDark ? ThemeMode.light : ThemeMode.dark);
+  }
+
+  void setThemeMode(ThemeMode mode) {
+    final isDark = mode == ThemeMode.dark;
+    box.write(key, isDark);
+    Get.changeThemeMode(mode);
   }
 }
