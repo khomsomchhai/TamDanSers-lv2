@@ -7,11 +7,11 @@ Map<String, String> kmKh = {
   'hint_parent_student_id': 'បញ្ចូលលេខសម្គាល់សិស្សរបស់កូនអ្នក',
   'hint_password': 'បញ្ចូលពាក្យសម្ងាត់របស់អ្នក',
   'Student ID is required': 'លេខសម្គាល់សិស្សចាំបាច់',
-  "Password is required" : "ពាក្យសម្ងាត់ចាំបាច់",
+  "Password is required": "ពាក្យសម្ងាត់ចាំបាច់",
   'forget_password': 'ភ្លេចពាក្យសម្ងាត់?',
   'sign_in': 'ចូលគណនី',
-  'student' : 'សិស្ស',
-  'parent' : 'ឪពុកម្តាយ',
+  'student': 'សិស្ស',
+  'parent': 'ឪពុកម្តាយ',
   'welcome_back': 'ស្វាគមន៍ត្រឡប់មកវិញ',
   'login_subtitle': 'ចូលដើម្បីបន្តទៅគណនីរបស់អ្នក',
   'please_fill_required': 'សូមបំពេញព័ត៌មានដែលចាំបាច់ទាំងអស់។',
@@ -21,7 +21,8 @@ Map<String, String> kmKh = {
   'unable_to_connect': 'មិនអាចភ្ជាប់បាន។ សូមពិនិត្យអ៊ីនធឺណិតរបស់អ្នក។',
   'connection_unavailable': 'មិនមានការតភ្ជាប់',
   'network_error': 'មានកំហុសបណ្ដាញ',
-  'unable_to_verify_account': 'មិនអាចផ្ទៀងផ្ទាត់គណនីរបស់អ្នកបានទេ។ សូមពិនិត្យអ៊ីនធឺណិតរបស់អ្នក និងព្យាយាមម្តងទៀត។',
+  'unable_to_verify_account':
+      'មិនអាចផ្ទៀងផ្ទាត់គណនីរបស់អ្នកបានទេ។ សូមពិនិត្យអ៊ីនធឺណិតរបស់អ្នក និងព្យាយាមម្តងទៀត។',
   'continue_offline': 'បន្តដោយគ្មានអ៊ីនធឺណិត',
   'retry': 'ព្យាយាមម្តងទៀត',
   'invalid_request': 'ការស្នើរមិនត្រឹមត្រូវ។',
@@ -33,7 +34,8 @@ Map<String, String> kmKh = {
   'request_cancelled': 'ការស្នើរត្រូវបានបោះបង់។',
   'security_certificate_error': 'មានកំហុសវិញ្ញាបនបត្រសុវត្ថិភាព។',
   'forgot_password_title': 'ភ្លេចពាក្យសម្ងាត់?',
-  'forgot_password_subtitle': 'បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក ហើយយើងនឹងផ្ញើលេខកូដបញ្ជាក់ទៅកាន់អ្នកតាម SMS។',
+  'forgot_password_subtitle':
+      'បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក ហើយយើងនឹងផ្ញើលេខកូដបញ្ជាក់ទៅកាន់អ្នកតាម SMS។',
   'phone_number_label': 'លេខទូរស័ព្ទ',
   'enter_phone_number': 'បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក',
   'continue_label': 'បន្ត',
@@ -44,11 +46,13 @@ Map<String, String> kmKh = {
   'unauthorized_login_again': 'មិនមានសិទ្ធិ។ សូមចូលម្ដងទៀត។',
   'not_found_phone': 'រកមិនឃើញ។ សូមពិនិត្យលេខទូរស័ព្ទ។',
   'sms_send_failed': 'មិនអាចផ្ញើ SMS បានទេ។ សូមពិនិត្យលេខទូរស័ព្ទរបស់អ្នក។',
-  'phone_not_linked_telegram': 'លេខទូរស័ព្ទរបស់អ្នកមិនបានភ្ជាប់ទៅ Telegram ទេ។ សូមភ្ជាប់ចំពោះមុន។',
+  'phone_not_linked_telegram':
+      'លេខទូរស័ព្ទរបស់អ្នកមិនបានភ្ជាប់ទៅ Telegram ទេ។ សូមភ្ជាប់ចំពោះមុន។',
   'something_went_wrong': 'មានអ្វីមួយមិនប្រក្រតី។',
   'change_password_title': 'ប្ដូរពាក្យសម្ងាត់',
   'create_new_password': 'បង្កើតពាក្យសម្ងាត់ថ្មី',
-  'otp_instructions': 'បញ្ចូលលេខ 6 ខ្ទង់ដែលបានផ្ញើទៅលេខទូរស័ព្ទរបស់អ្នកតាម SMS ហើយជ្រើសរើសពាក្យសម្ងាត់ថ្មី។',
+  'otp_instructions':
+      'បញ្ចូលលេខ 6 ខ្ទង់ដែលបានផ្ញើទៅលេខទូរស័ព្ទរបស់អ្នកតាម SMS ហើយជ្រើសរើសពាក្យសម្ងាត់ថ្មី។',
   'verification_code_otp': 'លេខកូដផ្ទៀងផ្ទាត់ (OTP)',
   'new_password': 'ពាក្យសម្ងាត់ថ្មី',
   'enter_new_password': 'បញ្ចូលពាក្យសម្ងាត់ថ្មី',
@@ -73,7 +77,8 @@ Map<String, String> kmKh = {
   'create_parent_account': 'បង្កើតគណនីឪពុកម្តាយ',
   'link_account_child': 'ភ្ជាប់គណនីរបស់អ្នកទៅកាន់កុមារដែលមានលេខសម្គាល់សិស្ស។',
   'parent_dashboard': 'ផ្ទាំងព័ត៌មានឪពុកម្តាយ',
-  'parent_dashboard_description': 'តាមដានជីវិតសាលារបស់កូនអ្នក រួមទាំងវិន័យការអវត្តមាន និងព័ត៌មានសាលា។',
+  'parent_dashboard_description':
+      'តាមដានជីវិតសាលារបស់កូនអ្នក រួមទាំងវិន័យការអវត្តមាន និងព័ត៌មានសាលា។',
   'your_child': 'កូនរបស់អ្នក',
   'child_summary': 'សង្ខេបកូន',
   'quick_access': 'ចូលដំណើរការ យ៉ាងលឿន',
@@ -92,8 +97,10 @@ Map<String, String> kmKh = {
   'already_have_account': 'មានគណនីរួចហើយ?',
   'sign_in_prompt': 'ចូល',
   'create_parent_password': 'កំណត់ពាក្យសម្ងាត់ឪពុកម្ដាយរបស់អ្នក',
-  'create_password_description': 'បង្កើតពាក្យសម្ងាត់ដើម្បីអាចចូលប្រើគណនីឪពុកម្ដាយសម្រាប់កូនរបស់អ្នក។',
-  'privacy_notice': 'ព័ត៌មានរបស់អ្នកត្រូវបានប្រើសម្រាប់ផ្ទៀងផ្ទាត់គណនីឪពុកម្តាយតែប៉ុណ្ណោះ។',
+  'create_password_description':
+      'បង្កើតពាក្យសម្ងាត់ដើម្បីអាចចូលប្រើគណនីឪពុកម្ដាយសម្រាប់កូនរបស់អ្នក។',
+  'privacy_notice':
+      'ព័ត៌មានរបស់អ្នកត្រូវបានប្រើសម្រាប់ផ្ទៀងផ្ទាត់គណនីឪពុកម្តាយតែប៉ុណ្ណោះ។',
   'no_account': 'គ្មានគណនី?',
   'register': 'ចុះឈ្មោះ',
   'sign_up': 'ចុះឈ្មោះ',
@@ -166,11 +173,14 @@ Map<String, String> kmKh = {
   'choose_preferred_language': 'ជ្រើសភាសាដែលអ្នកចូលចិត្ត',
   'common_questions_answers': 'សំណួរទូទៅ និងចម្លើយសង្ខេប',
   'how_reset_password': 'តើខ្ញុំកំណត់ពាក្យសម្ងាត់ឡើងវិញដោយរបៀបណា?',
-  'forgot_password_link_login': 'ប្រើតំណ “ភ្លេចពាក្យសម្ងាត់” នៅលើអេក្រង់ចូល ដើម្បីស្នើសុំការកំណត់ឡើងវិញ។',
+  'forgot_password_link_login':
+      'ប្រើតំណ “ភ្លេចពាក្យសម្ងាត់” នៅលើអេក្រង់ចូល ដើម្បីស្នើសុំការកំណត់ឡើងវិញ។',
   'how_change_language': 'តើខ្ញុំផ្លាស់ប្តូរភាសារបស់ខ្ញុំដោយរបៀបណា?',
-  'open_language_option': 'បើកជម្រើសភាសានៅក្នុងប្រវត្តិរូបរបស់អ្នក ហើយជ្រើសភាសាដែលអ្នកចូលចិត្ត។',
+  'open_language_option':
+      'បើកជម្រើសភាសានៅក្នុងប្រវត្តិរូបរបស់អ្នក ហើយជ្រើសភាសាដែលអ្នកចូលចិត្ត។',
   'who_contact_support': 'តើខ្ញុំគួរទាក់ទងនរណាដើម្បីទទួលជំនួយ?',
-  'contact_school_administrator': 'ទាក់ទងអ្នកគ្រប់គ្រងសាលា ឬក្រុមគាំទ្ររបស់អ្នក។',
+  'contact_school_administrator':
+      'ទាក់ទងអ្នកគ្រប់គ្រងសាលា ឬក្រុមគាំទ្ររបស់អ្នក។',
   'are_sure_logout': 'តើអ្នកពិតជាចង់ចាកចេញពីគណនីនេះមែនទេ?',
   'no': 'ទេ',
   'yes': 'បាទ',
@@ -247,8 +257,7 @@ Map<String, String> kmKh = {
   'ask_permission_submit_request': 'ដាក់សំណើ',
   'ask_permission_please_select_request_type': 'សូមជ្រើសប្រភេទសំណើ',
   'ask_permission_please_select_subject': 'សូមជ្រើសមុខវិជ្ជា',
-  'ask_permission_please_select_permission_type':
-      'សូមជ្រើសប្រភេទសុំច្បាប់',
+  'ask_permission_please_select_permission_type': 'សូមជ្រើសប្រភេទសុំច្បាប់',
   'ask_permission_please_enter_reason': 'សូមបញ្ចូលមូលហេតុ',
   'ask_permission_submitted': 'បានដាក់សំណើសុំច្បាប់រួចរាល់',
   'ask_permission_failed_submit': 'មិនអាចដាក់សំណើសុំច្បាប់បានទេ',
@@ -259,4 +268,3 @@ Map<String, String> kmKh = {
   'ask_permission_request_type_by_subject': 'តាមមុខវិជ្ជា',
   'ask_permission_request_type_full_day': 'ពេញមួយថ្ងៃ',
 };
->>>>>>> a42d283b1e46dd29a41f1d09a0a372b4a5dae5e5
