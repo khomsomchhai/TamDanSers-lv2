@@ -12,13 +12,27 @@ class UserController extends GetxController {
   ProfileModel? profile;
 
   var isLoading = false.obs;
-
+  
+  void clearUser() {
+    user = null;
+    profile = null;
+    update();
+  }
   Future<void> getProfile() async {
     isLoading.value = true;
     try {
-      var response = await userService.fechProfile();
-      user = UserModel.fromJson(response["user"]);
-      profile = ProfileModel.fromJson(response["profile"]);
+      final response = await userService.fechProfile();
+      final data = Map<String, dynamic>.from(response);
+
+      final userJson = data['user'];
+      final profileJson = data['profile'];
+
+      user = UserModel.fromJson(
+        userJson is Map ? Map<String, dynamic>.from(userJson) : null,
+      );
+      profile = profileJson is Map
+          ? ProfileModel.fromJson(Map<String, dynamic>.from(profileJson))
+          : null;
     } finally {
       isLoading.value = false;
     }

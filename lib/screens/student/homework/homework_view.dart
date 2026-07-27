@@ -50,7 +50,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withValues(alpha: 0.04),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           )
@@ -94,7 +94,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
+                                color: Colors.black.withValues(alpha: 0.04),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               )
@@ -161,7 +161,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                               boxShadow: controller.selectedTabIndex.value == 0
                                   ? [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
+                                        color: Colors.black.withValues(alpha: 0.05),
                                         blurRadius: 6,
                                         offset: const Offset(0, 2),
                                       )
@@ -200,7 +200,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                               boxShadow: controller.selectedTabIndex.value == 1
                                   ? [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
+                                        color: Colors.black.withValues(alpha: 0.05),
                                         blurRadius: 6,
                                         offset: const Offset(0, 2),
                                       )
@@ -309,7 +309,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 12,
             offset: const Offset(0, 6),
           )

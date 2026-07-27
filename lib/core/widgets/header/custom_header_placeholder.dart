@@ -8,8 +8,8 @@ class CustomHeaderPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade400,
-      highlightColor: Colors.grey.shade200,
+      baseColor: AppColors.skeletonBaseColor,
+      highlightColor: AppColors.skeletonHighlightColor,
       child: Row(
         children: [
           Container(

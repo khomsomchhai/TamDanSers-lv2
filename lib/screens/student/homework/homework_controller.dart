@@ -66,8 +66,6 @@ class HomeworkViewController extends GetxController {
 
   Future<void> fetchHomework() async {
     isLoading.value = true;
-    final logFile =
-        File('d:/StudioProjects/Code_Ant/TamDanSers-lv2/fetch_log.txt');
     final logBuffer = StringBuffer();
     logBuffer.writeln("=== FETCH HOMEWORK LOG at ${DateTime.now()} ===");
     try {
@@ -298,9 +296,6 @@ class HomeworkViewController extends GetxController {
       final logStr = logBuffer.toString();
       try {
         GetStorage().write("fetch_log", logStr);
-      } catch (_) {}
-      try {
-        logFile.writeAsStringSync(logStr, mode: FileMode.write);
       } catch (_) {}
     }
   }

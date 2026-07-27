@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -15,21 +16,33 @@ class SplashScreenView extends GetView<SplashScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Splash view build");
+    final size = MediaQuery.of(context).size;
+    final logoSize = (size.width * 0.4).clamp(120.0, 160.0);
+
     return Scaffold(
       backgroundColor: AppColors.primary,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.2,
-              child: SvgPicture.asset(
-                AppIcons.appIconWhite,
+      body: Center(
+        child: AnimatedBuilder(
+          animation: controller.animationController,
+          builder: (context, child) {
+            return Opacity(
+              opacity: controller.logoFade.value,
+              child: Transform.scale(
+                scale: controller.logoScale.value,
+                child: Hero(
+                  tag: 'app_logo',
+                  child: SizedBox(
+                    width: logoSize,
+                    height: logoSize,
+                    child: SvgPicture.asset(
+                      AppIcons.appIconWhite,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }

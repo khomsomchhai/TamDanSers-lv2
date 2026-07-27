@@ -3,74 +3,172 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
+import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
-import 'package:tamdansers_lv2/core/widgets/card/custom_attendance_card.dart';
+import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
+import 'package:tamdansers_lv2/core/widgets/card/attendance_card.dart';
 import 'package:tamdansers_lv2/core/widgets/card/custom_function_card.dart';
+import 'package:tamdansers_lv2/core/widgets/card/custom_score_card.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_action.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_placeholder.dart';
+import 'package:tamdansers_lv2/data/model/attendance_model.dart';
+import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
+import 'package:tamdansers_lv2/screens/student/result_screen/result_screen_view.dart';
+import 'package:tamdansers_lv2/screens/student/student_dashboard/student_dashboard_view.dart';
 
 part 'home_tab_binding.dart';
 part 'home_tab_controller.dart';
 
 class HomeTabView extends GetView<HomeTabViewController> {
-  const HomeTabView({super.key});
+  HomeTabView({super.key});
+  final resultController = Get.put(ResultScreenViewController());
+
+  final NotificationController notificationController =
+      Get.isRegistered<NotificationController>()
+          ? Get.find<NotificationController>()
+          : Get.put(NotificationController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Obx(() => controller.userController.isLoading.value
-                      ? CustomHeaderPlaceholder()
-                      : CustomHeader(controller: controller.userController),),
-                    ),
-                    const SizedBox(width: 10,),
-                    CustomHeaderAction(
-                      onTapNotification: () {
-                      
-                      },
-                      unreadCount: 2,
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20,),
-                Text(
-                  controller.getCurrentDate(),
-                  style: Get.textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 10,),
-                Obx(() => controller.userController.isLoading.value
-                ? _buildAttendanceCardSkeleton()
-                : _buildAttendanceCard()
-                ),
-                const SizedBox(height: 20,),
-                _buildFunction(),
-                const SizedBox(height: 20,),
-                Row(
-                  children: [
-                    Text(
-                      "attendance".tr,
-                      style: Get.textTheme.titleSmall,
-                    ),
-                    Spacer(),
-                    Text(
-                      "see all".tr,
-                      style: Get.textTheme.bodyMedium!.copyWith(color: AppColors.info),
-                    ),
-                  ],
-                )
-              ],
+        child: RefreshIndicator(
+          onRefresh: controller.refreshHome,
+          color: AppColors.primary,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Obx(
+                          () => controller.userController.isLoading.value
+                              ? CustomHeaderPlaceholder()
+                              : CustomHeader(
+                                  controller: controller.userController),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Obx(
+                        () => CustomHeaderAction(
+                          unreadCount: notificationController.unreadCount.value,
+                          onTapNotification: () {
+                            notificationController.markAllRead();
+
+                            Get.toNamed(AppRoutes.notificationScreen);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    controller.getCurrentDate(),
+                    style: Get.textTheme.bodyLarge,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Obx(() => controller.userController.isLoading.value
+                      ? _buildAttendanceCardSkeleton()
+                      : _buildAttendanceCard()),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  _buildFunction(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        "attendance".tr,
+                        style: Get.textTheme.titleSmall,
+                      ),
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          Get.find<StudentDashboardViewController>()
+                              .changeTab(2);
+                        },
+                        child: Text(
+                          "see all".tr,
+                          style: Get.textTheme.bodyMedium!
+                              .copyWith(color: AppColors.info),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppNumbers.spacingMedium),
+                  Obx(() {
+                    if (controller.isLoadingAttendance.value) {
+                      // Show loading skeletons
+                      return Column(
+                        children: List.generate(
+                          3,
+                          (_) => Padding(
+                            padding: const EdgeInsets.only(
+                                bottom: AppNumbers.spacingMedium),
+                            child: Shimmer.fromColors(
+                              baseColor:
+                                  Get.theme.cardColor.withValues(alpha: 0.5),
+                              highlightColor:
+                                  Get.theme.cardColor.withValues(alpha: 1.0),
+                              child: Container(
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color: Get.theme.cardColor,
+                                  borderRadius: BorderRadius.circular(
+                                      AppNumbers.radiusRounded),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
+                    if (controller.recentAttendance.isEmpty) {
+                      return SizedBox(
+                        height: 120,
+                        child: Center(
+                          child: Text(
+                            'attendance_no_records'.tr,
+                            style: Get.textTheme.bodyMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return Column(
+                      children: controller.recentAttendance
+                          .map(
+                            (item) => AttendanceCard(
+                              item: item,
+                              mapStatus: controller.mapStatus,
+                              statusColor: controller.mapStatusColor,
+                              formatDate: controller.formatDate,
+                              formatTimeRange: controller.formatTimeRange,
+                            ),
+                          )
+                          .toList(),
+                    );
+                  })
+                ],
+              ),
             ),
           ),
         ),
@@ -81,48 +179,52 @@ class HomeTabView extends GetView<HomeTabViewController> {
   Widget _buildFunction() {
     return Row(
       children: [
-        Expanded(child: Bounceable(
+        Expanded(
+            child: Bounceable(
           onTap: () {
             Get.toNamed(AppRoutes.askPermissionScreen);
           },
           child: CustomFunctionCard(
             title: "ask_permission".tr,
-            icon: Icon(
-              Icons.fact_check_rounded,
-              size: 24,
-              color: AppColors.primary,
+            icon: Image.asset(
+              AppIcons.permissionIcon,
+              width: 50,
+              height: 50,
             ),
-            iconBackColor: AppColors.secondary,
           ),
         )),
-        const SizedBox(width: 20,),
-        Expanded(child: Bounceable(
+        const SizedBox(
+          width: 20,
+        ),
+        Expanded(
+            child: Bounceable(
           onTap: () {
             Get.toNamed(AppRoutes.scheduleScreen);
           },
           child: CustomFunctionCard(
             title: "schedule".tr,
-            icon: Icon(
-              Icons.calendar_month_rounded,
-              size: 24,
-              color: AppColors.purple,
+            icon: Image.asset(
+              AppIcons.scheduleIcon,
+              width: 50,
+              height: 50,
             ),
-            iconBackColor: AppColors.lightPurple,
           ),
         )),
-        const SizedBox(width: 20,),
-        Expanded(child: Bounceable(
+        const SizedBox(
+          width: 20,
+        ),
+        Expanded(
+            child: Bounceable(
           onTap: () {
             Get.toNamed(AppRoutes.resultScreen);
           },
           child: CustomFunctionCard(
             title: "result".tr,
-            icon: Icon(
-              Icons.assessment_rounded,
-              size: 24,
-              color: AppColors.orange,
+            icon: Image.asset(
+              AppIcons.resultIcon,
+              width: 50,
+              height: 50,
             ),
-            iconBackColor: AppColors.lightOrange,
           ),
         )),
       ],
@@ -144,21 +246,28 @@ class HomeTabView extends GetView<HomeTabViewController> {
             ),
           ],
         ),
-        const SizedBox(height: 10,),
-        CustomAttendanceCard(
-          totalDays: 9, 
-          presentDays: 5, 
-          absentDays: 4, 
-          attendanceRate: 87, 
-          currentMonth: "មិថុនា"
-        )
+        const SizedBox(
+          height: 10,
+        ),
+        Obx(() {
+          if (resultController.isLoading.value) {
+            return _buildAttendanceCardSkeleton();
+          }
+
+          if (resultController.filterScores.isEmpty) {
+            return const Text("No score");
+          }
+
+          return CustomScoreCard();
+        })
       ],
     );
   }
+
   Widget _buildAttendanceCardSkeleton() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppColors.skeletonBaseColor,
+      highlightColor: AppColors.skeletonHighlightColor,
       child: Column(
         children: [
           Row(
@@ -185,7 +294,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
           const SizedBox(height: 10),
           Container(
             width: double.infinity,
-            height: 140, 
+            height: 140,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "472035819317",
+    "project_id": "tamdansers",
+    "storage_bucket": "tamdansers.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472035819317:android:120e584c5c57c168e7d67c",
+        "android_client_info": {
+          "package_name": "tamdansers.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpQrXmBezLXqcX2exedZz6kuoCmwvc2wM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

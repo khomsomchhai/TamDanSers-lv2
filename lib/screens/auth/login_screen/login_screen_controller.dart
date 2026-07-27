@@ -1,97 +1,115 @@
 part of 'login_screen_view.dart';
 
 class LoginScreenViewController extends GetxController {
-  var idCtrl = TextEditingController();
-  var pwdCtrl = TextEditingController();
+  final idCtrl = TextEditingController();
+  final pwdCtrl = TextEditingController();
 
-  var formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
-  var isRemember = false.obs;
-  var isHidePwd = true.obs;
-  var isLoading = false.obs;
+  final selectedTab = 0.obs;
+  final previousTab = 0.obs;
+  final isRemember = false.obs;
+  final isHidePwd = true.obs;
+  final isLoading = false.obs;
 
   var isKeyboardOpen = false.obs;
+  final authService = AuthServices();
+  final box = GetStorage();
 
-  var authService = AuthServices();
-  var box = GetStorage();
+  void changeTab(int index) {
+    if (selectedTab.value == index) return;
+    previousTab.value = selectedTab.value;
+    selectedTab.value = index;
+  }
 
   void updateKeyboard(BuildContext context) {
     isKeyboardOpen.value = MediaQuery.of(context).viewInsets.bottom > 0;
   }
 
-  void togglePwd(){
+  void togglePwd() {
     isHidePwd.value = !isHidePwd.value;
   }
 
-  void login() async{
-    if(!formKey.currentState!.validate()){
-      CustomSnackbar.error("Invalid form");
+  Future<void> login() async {
+    if (!formKey.currentState!.validate()) {
+      CustomSnackbar.error('please_fill_required'.tr);
       return;
     }
-    try{
-      isLoading.value = true;
-      var response = await authService.loginService(
-        loginId: idCtrl.text, 
-        password: pwdCtrl.text
-      );
-      if(response["access_token"] != null){
-        var token = response["access_token"]?.toString().trim();
-        await box.write(
-          "token",
-          token,
-        );
-        await box.write(
-          "role",
-          response["role"],
-        );
-        
-        // Fetch profile immediately after login success
-        await Get.find<UserController>().getProfile();
 
-        // CustomSnackbar.success("Login successful");
-        if(response["role"] == "student"){
-          Get.offAllNamed(
-            AppRoutes.studentDashboard,
-          );
-        }else if(response["role"] == "parent"){
-          Get.offAllNamed(
-            AppRoutes.parentDashboard,
-          );
-        }else{
-          CustomSnackbar.error("Unknown role");
+    try {
+      isLoading.value = true;
+
+      final response = selectedTab.value == 1
+          ? await authService.loginParentService(
+              studentCode: idCtrl.text.trim(),
+              password: pwdCtrl.text,
+            )
+          : await authService.loginService(
+              loginId: idCtrl.text.trim(),
+              password: pwdCtrl.text,
+            );
+
+      final token = response["access_token"]?.toString().trim();
+
+      if (token == null || token.isEmpty) {
+        CustomSnackbar.error('login_failed'.tr);
+        return;
+      }
+
+      await box.write("token", token);
+      await box.write("role", response["role"]);
+
+      // Fetch profile immediately after login success
+      try {
+        await Get.find<UserController>().getProfile();
+      } catch (e) {
+        debugPrint("GetProfile Error: $e");
+      }
+
+      // Save FCM Token (don't block login if it fails)
+      try {
+        await FirebaseMessaging.instance.requestPermission();
+
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+
+        debugPrint("FCM Token: $fcmToken");
+
+        if (fcmToken != null) {
+          await authService.saveFcmToken(fcmToken: fcmToken);
+          debugPrint("FCM token saved successfully");
         }
-      }else{
-        CustomSnackbar.error("Login failed");
+      } catch (e) {
+        debugPrint("Save FCM Token Error: $e");
+      }
+
+      switch (response["role"]) {
+        case "student":
+          Get.offAllNamed(AppRoutes.studentDashboard);
+          break;
+
+        case "parent":
+          Get.offAllNamed(AppRoutes.parentDashboard);
+          break;
+
+        default:
+          CustomSnackbar.error('unknown_user_role'.tr);
       }
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.sendTimeout ||
-          e.type == DioExceptionType.receiveTimeout) {
-        CustomSnackbar.error("Connection timed out. Please check your internet connection.");
-      } else if (e.type == DioExceptionType.unknown) {
-        var errorText = e.error?.toString().toLowerCase() ?? "";
-        if (errorText.contains("socketexception") || errorText.contains("connection") || errorText.contains("network")) {
-          CustomSnackbar.error("Unable to connect. Please check your internet connection.");
-        } else {
-          CustomSnackbar.error(e.message ?? "Login failed");
-        }
-      } else if (e.response?.statusCode == 401) {
-        CustomSnackbar.error("Login credentials are incorrect");
-      } else {
-        CustomSnackbar.error(e.message ?? "Login failed");
-      }
-    } catch (error) {
-      var message = error.toString().replaceFirst('Exception: ', '');
-      if (message.isEmpty || message == 'Failed') {
-        message = 'Login failed';
-      }
-      CustomSnackbar.error(message);
+      CustomSnackbar.error(handleDioException(e));
+    } catch (e) {
+      debugPrint("Login Error: $e");
+      CustomSnackbar.error(
+        'something_went_wrong_retry'.tr,
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
-  
-
-
+  @override
+  void onClose() {
+    idCtrl.dispose();
+    pwdCtrl.dispose();
+    super.onClose();
+  }
 }

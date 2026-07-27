@@ -3,16 +3,67 @@ import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 
 class AuthServices {
   final baseApi = BaseApiService();
-  Future<Map<String, dynamic>> loginService({
-    required String loginId,
-    required String password
+
+  Future<Map<String, dynamic>> loginService(
+      {required String loginId, required String password}) async {
+    var response = await baseApi.post(
+      endpoint: "/auth/login",
+      data: {"login_id": loginId, "password": password},
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> loginParentService(
+      {required String studentCode, required String password}) async {
+    var response = await baseApi.post(
+      endpoint: "/auth/parent/login",
+      data: {"student_code": studentCode, "password": password},
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> requestParentOtp({
+    required String studentCode,
+    required String parentPhone,
   }) async {
     var response = await baseApi.post(
-      endpoint: "/auth/login", 
+      endpoint: "/auth/parent/request-otp",
       data: {
-        "login_id" : loginId,
-        "password" : password
-      }
+        "student_code": studentCode,
+        "parent_phone": parentPhone,
+      },
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> verifyParentOtp({
+    required String studentCode,
+    required String parentPhone,
+    required String otp,
+  }) async {
+    var response = await baseApi.post(
+      endpoint: "/auth/parent/verify-otp",
+      data: {
+        "student_code": studentCode,
+        "parent_phone": parentPhone,
+        "otp": otp,
+      },
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> createParentPassword({
+    required String setupToken,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    var response = await baseApi.post(
+      endpoint: "/auth/parent/create-password",
+      data: {
+        "setup_token": setupToken,
+        "new_password": newPassword,
+        "confirm_password": confirmPassword,
+      },
     );
     return response;
   }
@@ -24,7 +75,7 @@ class AuthServices {
     return response;
   }
 
-  Future<bool> checkTelegramService({
+  Future<bool> checkSmsService({
     required String phone,
   }) async {
     try {
@@ -36,7 +87,6 @@ class AuthServices {
       );
       return response['telegram_linked'] == true;
     } on DioException catch (e) {
-      // If the endpoint doesn't exist on the server, skip the telegram check
       if (e.response?.statusCode == 404) {
         return true;
       }
@@ -67,6 +117,18 @@ class AuthServices {
         "phone": phone,
         "otp": otp,
         "new_password": newPassword,
+      },
+    );
+    return response;
+  }
+
+  Future<Map<String, dynamic>> saveFcmToken({
+    required String fcmToken,
+  }) async {
+    var response = await baseApi.post(
+      endpoint: "/notifications/fcm-token",
+      data: {
+        "token": fcmToken,
       },
     );
     return response;

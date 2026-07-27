@@ -1,10 +1,11 @@
 ﻿import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
@@ -32,9 +33,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
         child: Obx(
           () {
             if (controller.userController.isLoading.value) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return _buildLoadingSkeleton(context);
             }
 
             final user = controller.userController.user;
@@ -43,7 +42,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
             if (user == null || profile == null) {
               return Center(
                 child: Text(
-                  "No profile data available".tr,
+                  'profile_no_data'.tr,
                   style: Get.textTheme.bodyLarge,
                 ),
               );
@@ -54,86 +53,331 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(child: Obx(() => _buildAvatar(user, context))),
-                  const SizedBox(height: 16),
-                  Center(child: _buildUserName(user)),
-                  const SizedBox(height: 32),
-                  _buildSectionTitle("PERSONAL INFORMATION"),
+                  const SizedBox(height: 20),
+                  _buildProfileHero(user, context),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle('personal_information'.tr),
                   const SizedBox(height: 12),
                   _buildCard(
                     children: [
                       _buildOptionItem(
-                        icon: Icons.person_outline,
-                        title: "Student's Information",
-                        subtitle: "Your information",
-                        onTap: () => _showStudentInformationDialog(context, user, profile),
+                        icon: Icon(
+                          PhosphorIconsRegular.student,
+                          color: AppColors.primary,
+                          size: 22,
+                        ),
+                        title: 'students_information'.tr,
+                        subtitle: 'your_information'.tr,
+                        onTap: () => _showStudentInformationDialog(
+                            context, user, profile),
                       ),
                       _buildDivider(),
                       _buildOptionItem(
-                        icon: Icons.person_outline,
-                        title: "Parent's Information",
-                        subtitle: "Your parent's information",
-                        onTap: () => _showParentInformationDialog(context, profile),
+                        icon: Icon(
+                          PhosphorIconsRegular.users,
+                          color: AppColors.primary,
+                          size: 22,
+                        ),
+                        title: 'parents_information'.tr,
+                        subtitle: 'your_parents_information'.tr,
+                        onTap: () =>
+                            _showParentInformationDialog(context, profile),
                       ),
                       _buildDivider(),
                       _buildOptionItem(
-                        icon: Icons.lock_outline,
-                        title: "Change Password",
-                        subtitle: "Change your password",
-                        onTap: () => Get.toNamed(AppRoutes.changePasswordScreen),
+                        icon: Icon(
+                          PhosphorIconsRegular.lockKey,
+                          color: AppColors.primary,
+                          size: 22,
+                        ),
+                        title: 'forget_password_action'.tr,
+                        subtitle: 'reset_your_password'.tr,
+                        onTap: () =>
+                            Get.toNamed(AppRoutes.forgetPasswordScreen),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  _buildSectionTitle("GENERAL"),
+                  _buildSectionTitle('general_section'.tr),
                   const SizedBox(height: 12),
                   _buildCard(
                     children: [
                       _buildOptionItem(
-                        icon: Icons.dark_mode_outlined,
-                        title: "Change Theme",
-                        subtitle: "Toggle app theme",
-                        onTap: () {
-                          ThemeService().switchTheme();
-                        },
+                        icon: Icon(
+                          PhosphorIconsRegular.sun,
+                          color: AppColors.primary,
+                          size: 22,
+                        ),
+                        title: 'change_theme'.tr,
+                        subtitle: 'toggle_app_theme'.tr,
+                        onTap: () => controller.showThemeSheet(context),
                       ),
                       _buildDivider(),
                       _buildOptionItem(
-                        icon: Icons.language_outlined,
-                        title: "Language",
-                        subtitle: "Change app language",
+                        icon: Icon(
+                          PhosphorIconsRegular.translate,
+                          color: AppColors.primary,
+                          size: 22,
+                        ),
+                        title: 'language_khmer'.tr,
+                        subtitle: 'change_app_language'.tr,
                         onTap: () => controller.showLanguageSheet(context),
                       ),
                       _buildDivider(),
                       _buildOptionItem(
-                        icon: Icons.help_outline,
-                        title: "FAQ",
-                        subtitle: "Read frequently asked questions",
+                        icon: Icon(
+                          PhosphorIconsRegular.question,
+                          color: AppColors.primary,
+                          size: 22,
+                        ),
+                        title: 'faq'.tr,
+                        subtitle: 'read_frequently_asked_questions'.tr,
                         onTap: () => controller.showFAQSheet(context),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  _buildSectionTitle("LEGAL"),
+                  _buildSectionTitle('legal_section'.tr),
                   const SizedBox(height: 12),
                   _buildCard(
                     children: [
                       _buildOptionItem(
-                        icon: Icons.logout,
-                        title: "Logout",
-                        subtitle: "Sign out of your account",
+                        icon: Icon(
+                          PhosphorIconsRegular.signOut,
+                          color: AppColors.error,
+                          size: 22,
+                        ),
+                        title: 'logout_action'.tr,
+                        subtitle: 'sign_out_account'.tr,
                         onTap: controller.logout,
                         titleColor: AppColors.error,
                         iconColor: AppColors.error,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(
+                    height: 20,
+                  ),
                 ],
               ),
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingSkeleton(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: AppColors.skeletonBaseColor,
+      highlightColor: AppColors.skeletonHighlightColor,
+      period: const Duration(milliseconds: 1300),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            _buildProfileHeroSkeleton(),
+            const SizedBox(height: 24),
+            _buildSkeletonSectionTitle(),
+            const SizedBox(height: 12),
+            _buildSkeletonCard(itemCount: 3),
+            const SizedBox(height: 24),
+            _buildSkeletonSectionTitle(),
+            const SizedBox(height: 12),
+            _buildSkeletonCard(itemCount: 3),
+            const SizedBox(height: 24),
+            _buildSkeletonSectionTitle(),
+            const SizedBox(height: 12),
+            _buildSkeletonCard(itemCount: 1),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeroSkeleton() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const _SkeletonBlock(width: 64, height: 64, isCircle: true),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    _SkeletonBlock(width: 88, height: 11),
+                    SizedBox(height: 9),
+                    _SkeletonBlock(width: 155, height: 18),
+                    SizedBox(height: 8),
+                    _SkeletonBlock(width: 120, height: 12),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          const _SkeletonBlock(width: 142, height: 34, radius: 999),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonSectionTitle() {
+    return Container(
+      width: 140,
+      height: 16,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonCard({required int itemCount}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: List.generate(
+          itemCount,
+          (index) => Column(
+            children: [
+              _buildSkeletonOption(),
+              if (index < itemCount - 1) ...[
+                const SizedBox(height: 14),
+                Divider(color: AppColors.border, height: 1),
+                const SizedBox(height: 14),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonOption() {
+    return const Row(
+      children: [
+        _SkeletonBlock(width: 44, height: 44, radius: 14),
+        SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SkeletonBlock(width: 128, height: 14),
+              SizedBox(height: 8),
+              _SkeletonBlock(width: 184, height: 11),
+            ],
+          ),
+        ),
+        _SkeletonBlock(width: 16, height: 16, radius: 8),
+      ],
+    );
+  }
+
+  Widget _buildProfileHero(dynamic user, BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF7F77DD), Color(0xFF5DCAA5)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7F77DD).withValues(alpha: 0.18),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Obx(() => _buildAvatar(user, context)),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'student_account'.tr,
+                      style: Get.textTheme.titleLarge?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      user.fullName,
+                      style: Get.textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      user.email,
+                      style: Get.textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  PhosphorIconsRegular.sparkle,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'manage_account_confidence'.tr,
+                  style: Get.textTheme.bodySmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -153,11 +397,10 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: SweepGradient(
-              startAngle: 2.356, // 135°
+              startAngle: 2.356, // 135�
               colors: [Color(0xFF7F77DD), Color(0xFF5DCAA5), Color(0xFF7F77DD)],
             ),
           ),
-          // ── White gap (3px) ─────────────────────────────────
           child: Padding(
             padding: const EdgeInsets.all(3),
             child: Container(
@@ -181,8 +424,6 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
             ),
           ),
         ),
-
-        // ── Camera edit button ───────────────────────────────
         Positioned(
           bottom: 2,
           right: 2,
@@ -200,7 +441,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                 ),
               ),
               child: const Icon(
-                Icons.camera_alt_rounded,
+                PhosphorIconsRegular.camera,
                 size: 16,
                 color: Colors.white,
               ),
@@ -211,14 +452,13 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     );
   }
 
-  /// Fallback: initials if name exists, generic icon if not
   Widget _buildFallback(dynamic user) {
     final name = (user.displayName ?? user.name ?? '').trim();
     if (name.isNotEmpty) {
       final parts = name.split(' ');
       final initials = parts.length >= 2
-      ? '${parts.first[0]}${parts.last[0]}'.toUpperCase()
-      : name.substring(0, name.length >= 2 ? 2 : name.length).toUpperCase();
+          ? '${parts.first[0]}${parts.last[0]}'.toUpperCase()
+          : name.substring(0, name.length >= 2 ? 2 : name.length).toUpperCase();
       return Container(
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
@@ -242,36 +482,22 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
       );
     }
     return const Icon(
-      Icons.person_rounded,
+      PhosphorIconsRegular.userCircle,
       size: 44,
       color: Color(0xFFAFA9EC),
     );
   }
 
-  Widget _buildUserName(dynamic user) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          user.fullName,
-          style: Get.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          user.email,
-          style: Get.textTheme.bodySmall,
-        )
-      ],
-    );
-  }
-
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: Get.textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.bold,
-        letterSpacing: 0.5,
-        color: AppColors.hintColor,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: Get.textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.1,
+          color: AppColors.primary,
+        ),
       ),
     );
   }
@@ -280,12 +506,13 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFE9EAF2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -296,7 +523,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
   }
 
   Widget _buildOptionItem({
-    required IconData icon,
+    required Widget icon,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
@@ -305,20 +532,21 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
   }) {
     return Material(
       color: Colors.transparent,
-      child: Bounceable(
+      child: InkWell(
         onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
           child: Row(
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
-                  color: AppColors.lightGrey,
-                  borderRadius: BorderRadius.circular(14),
+                  color: iconColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(icon, color: iconColor, size: 20),
+                child: icon,
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -342,9 +570,9 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                   ],
                 ),
               ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
+              Icon(
+                PhosphorIconsRegular.caretRight,
+                size: 18,
                 color: AppColors.hintColor,
               ),
             ],
@@ -364,35 +592,104 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     );
   }
 
-  void _showStudentInformationDialog(BuildContext context, dynamic user, dynamic profile) {
+  void _showStudentInformationDialog(
+      BuildContext context, dynamic user, dynamic profile) {
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          title: Text("Student's Information".tr),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInfoRow("Full Name".tr, user.fullName ?? ''),
-              const SizedBox(height: 8),
-              _buildInfoRow("Email".tr, user.email ?? ''),
-              const SizedBox(height: 8),
-              _buildInfoRow("Student Code".tr, profile.studentCode ?? ''),
-              const SizedBox(height: 8),
-              _buildInfoRow("Class".tr, profile.className ?? ''),
-              const SizedBox(height: 8),
-              _buildInfoRow("Gender".tr, profile.gender ?? ''),
-              const SizedBox(height: 8),
-              _buildInfoRow("Guardian Phone".tr, profile.guardianPhone ?? ''),
-            ],
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text('Close'.tr),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(
+                        PhosphorIconsRegular.student,
+                        color: AppColors.primary,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'students_information'.tr,
+                            style: Get.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'academic_profile_details'.tr,
+                            style: Get.textTheme.bodySmall?.copyWith(
+                              color: AppColors.hintColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.lightBackground,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildInfoRow('full_name'.tr, user.fullName ?? ''),
+                      const SizedBox(height: 10),
+                      _buildInfoRow('email'.tr, user.email ?? ''),
+                      const SizedBox(height: 10),
+                      _buildInfoRow('student_code'.tr, profile.studentCode ?? ''),
+                      const SizedBox(height: 10),
+                      _buildInfoRow('class_label'.tr, profile.className ?? ''),
+                      const SizedBox(height: 10),
+                      _buildInfoRow('gender'.tr, profile.gender ?? ''),
+                      const SizedBox(height: 10),
+                      _buildInfoRow('guardian_phone'.tr, profile.guardianPhone ?? ''),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                    child: Text(
+                      'close_button'.tr,
+                      style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.white),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -428,29 +725,121 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          title: Text("Parent's Information".tr),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInfoRow("Guardian Name".tr, profile.guardianName ?? ''),
-              const SizedBox(height: 8),
-              _buildInfoRow("Guardian Phone".tr, profile.guardianPhone ?? ''),
-              const SizedBox(height: 8),
-              _buildInfoRow("Address".tr, profile.address ?? ''),
-            ],
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text('Close'.tr),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(
+                        PhosphorIconsRegular.users,
+                        color: AppColors.primary,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'parents_information'.tr,
+                            style: Get.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'guardian_contact_details'.tr,
+                            style: Get.textTheme.bodySmall?.copyWith(
+                              color: AppColors.hintColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.lightBackground,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildInfoRow('guardian_name'.tr, profile.guardianName ?? ''),
+                      const SizedBox(height: 10),
+                      _buildInfoRow('guardian_phone'.tr, profile.guardianPhone ?? ''),
+                      const SizedBox(height: 10),
+                      _buildInfoRow('address'.tr, profile.address ?? ''),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                    child: Text('close_button'.tr,
+                    style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.white),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
   }
-
 }
 
+class _SkeletonBlock extends StatelessWidget {
+  const _SkeletonBlock({
+    required this.width,
+    required this.height,
+    this.radius = 8,
+    this.isCircle = false,
+  });
+
+  final double width;
+  final double height;
+  final double radius;
+  final bool isCircle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
+        borderRadius: isCircle ? null : BorderRadius.circular(radius),
+      ),
+    );
+  }
+}

@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
+import 'package:tamdansers_lv2/app/constants/app_images.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
-import 'package:tamdansers_lv2/core/api/services/telegram_service.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
@@ -19,135 +19,103 @@ class ForgetPasswordScreenView extends GetView<ForgetPasswordScreenViewControlle
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(
-        title: "Forget Password",
+        title: "",
         showNotification: false,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
-              const SizedBox(height: 8),
-              Text(
-                'Enter your phone number and we will send you a verification code via Telegram.',
-                style: Get.textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
+              Expanded(
+                child: SingleChildScrollView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // const SizedBox(height: 32),
 
-              Form(
-                key: controller.formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    PhoneTextField(
-                      controller: controller.phoneCtrl,
-                      hintText: 'Enter your phone number'.tr,
-                      countryCode: '+855',
-                      flagAsset: AppIcons.khmerIcon,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Required".tr;
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 24),
-
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.15)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.dark.withOpacity(0.05),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
+                      Center(
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: SvgPicture.asset(
+                            AppImages.forgetPassword,
+                            fit: BoxFit.contain,
                           ),
-                        ],
+                        ),
                       ),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                height: 52,
-                                width: 52,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.12),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.telegram,
-                                  color: AppColors.primary,
-                                  size: 28,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Text(
-                                  'Telegram Not Connected',
-                                  style: Get.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
+                      const SizedBox(height: 24),
+
+                      // Headline
+                      Center(
+                        child: Text(
+                          'forgot_password_title'.tr,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.titleLarge
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Subtitle
+                      Center(
+                        child: Text(
+                          'forgot_password_subtitle'.tr,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7) ??
+                                Colors.grey[600],
+                            height: 1.4,
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'To receive OTP verification codes for password recovery, please connect your Telegram account.',
-                            style: Get.textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: 18),
-                          Obx(
-                            () => SizedBox(
-                              width: double.infinity,
-                              child: OutlinedButton.icon(
-                                onPressed: controller.isTelegramLoading.value ? null : controller.connectTelegram,
-                                icon: controller.isTelegramLoading.value
-                                    ? const SizedBox(
-                                        height: 18,
-                                        width: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation(AppColors.primary),
-                                        ),
-                                      )
-                                    : const Icon(Icons.telegram, color: AppColors.primary),
-                                label: controller.isTelegramLoading.value
-                                    ? Text(
-                                        'Connecting...'.tr,
-                                        style: Get.textTheme.bodyMedium?.copyWith(color: AppColors.primary),
-                                      )
-                                    : Text(
-                                        'Connect Telegram',
-                                        style: Get.textTheme.bodyMedium?.copyWith(color: AppColors.primary),
-                                      ),
-                                style: OutlinedButton.styleFrom(
-                                  side: BorderSide(color: AppColors.primary),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                ),
-                              ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      Form(
+                        key: controller.formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            
+                            PhoneTextField(
+                              controller: controller.phoneCtrl,
+                              hintText: 'enter_phone_number'.tr,
+                              countryCode: '+855',
+                              flagAsset: AppIcons.khmerIcon,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Required'.tr;
+                                }
+                                if (!RegExp(r'^[0-9]{8,10}$').hasMatch(value)) {
+                                  return 'invalid_phone_number'.tr;
+                                }
+                                return null;
+                              },
                             ),
-                          ),
-                        ]
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ),
 
+              // Bottom-anchored CTA
+              Padding(
+                padding: const EdgeInsets.only(bottom: 24, top: 12),
+                child: Column(
+                  children: [
                     SizedBox(
-                      height: 50,
+                      height: 52,
                       width: double.infinity,
                       child: Obx(
                         () => CustomButton(
-                          text: "Continue",
+                          text: 'continue_label'.tr,
                           onPressed: () {
                             Get.focusScope?.unfocus();
                             controller.submitPhone();
@@ -155,14 +123,6 @@ class ForgetPasswordScreenView extends GetView<ForgetPasswordScreenViewControlle
                           variant: ButtonVariant.primary,
                           isLoading: controller.isLoading.value,
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Text(
-                        'By continuing, you agree to our Terms of Service and Privacy Policy.',
-                        textAlign: TextAlign.center,
-                        style: Get.textTheme.bodySmall,
                       ),
                     ),
                   ],
@@ -174,5 +134,4 @@ class ForgetPasswordScreenView extends GetView<ForgetPasswordScreenViewControlle
       ),
     );
   }
-
 }
