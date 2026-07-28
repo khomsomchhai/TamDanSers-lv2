@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 
 class PhoneTextField extends StatelessWidget {
@@ -21,6 +19,8 @@ class PhoneTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -33,11 +33,11 @@ class PhoneTextField extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.white,
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
+                        color: Colors.black.withOpacity(0.03),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -58,13 +58,13 @@ class PhoneTextField extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               countryCode,
-                              style: Get.textTheme.bodyLarge,
+                              style: theme.textTheme.bodyLarge,
                             ),
                             const SizedBox(width: 8),
                             Container(
                               width: 1,
                               height: 24,
-                              color: AppColors.lightGrey,
+                              color: theme.dividerColor,
                             ),
                           ],
                         ),
@@ -74,14 +74,14 @@ class PhoneTextField extends StatelessWidget {
                           controller: controller,
                           keyboardType: TextInputType.phone,
                           onChanged: state.didChange,
-                          cursorColor: AppColors.dark,
+                          cursorColor: theme.textTheme.bodyLarge?.color,
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
                             hintText: hintText,
-                            hintStyle: Get.textTheme.bodyLarge!.copyWith(color: AppColors.hintColor),
+                            hintStyle: theme.textTheme.bodyLarge?.copyWith(color: theme.hintColor),
                             border: InputBorder.none,
                           ),
-                          style: Get.textTheme.bodyLarge,
+                          style: theme.textTheme.bodyLarge,
                         ),
                       ),
                     ],
@@ -92,8 +92,8 @@ class PhoneTextField extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 8, left: 12),
                     child: Text(
                       state.errorText ?? '',
-                      style: Get.textTheme.bodySmall?.copyWith(
-                        color: AppColors.error,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.error,
                       ),
                     ),
                   ),

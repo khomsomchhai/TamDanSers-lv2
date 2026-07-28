@@ -7,7 +7,6 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
@@ -24,8 +23,10 @@ class ResetPasswordScreenView
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       appBar: CustomAppBar(
         title: '',
@@ -38,9 +39,9 @@ class ResetPasswordScreenView
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             children: [
-              _buildHeader(),
+              _buildHeader(theme),
               const SizedBox(height: 28),
-              _buildForm(context),
+              _buildForm(context, theme),
             ],
           ),
         ),
@@ -48,7 +49,7 @@ class ResetPasswordScreenView
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme) {
     return Column(
       children: [
         Container(
@@ -56,16 +57,16 @@ class ResetPasswordScreenView
           height: 76,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.22),
+                color: theme.colorScheme.primary.withOpacity(0.22),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: const Icon(Icons.lock_reset_rounded, color: AppColors.white, size: 36),
+          child: Icon(Icons.lock_reset_rounded, color: theme.colorScheme.onPrimary, size: 36),
         ),
         const SizedBox(height: 18),
         Text(
@@ -77,7 +78,7 @@ class ResetPasswordScreenView
           'otp_instructions'.tr,
           textAlign: TextAlign.center,
           style: Get.textTheme.bodyMedium?.copyWith(
-            color: AppColors.hintColor,
+            color: theme.hintColor,
             height: 1.45,
           ),
         ),
@@ -85,7 +86,7 @@ class ResetPasswordScreenView
     );
   }
 
-  Widget _buildForm(BuildContext context) {
+  Widget _buildForm(BuildContext context, ThemeData theme) {
     return Form(
       key: controller.formKey,
       child: AutofillGroup(
@@ -101,7 +102,7 @@ class ResetPasswordScreenView
           Row(
             children: List.generate(
               6,
-              (index) => _buildOtpBox(context, index),
+              (index) => _buildOtpBox(context, index, theme),
             ),
           ),
           const SizedBox(height: 22),
@@ -126,7 +127,7 @@ class ResetPasswordScreenView
                   controller.isHideNewPwd.value
                       ? PhosphorIconsRegular.eyeSlash
                       : PhosphorIconsRegular.eye,
-                  color: AppColors.dark,
+                  color: theme.iconTheme.color,
                 ),
               ),
               validator: (value) {
@@ -158,11 +159,11 @@ class ResetPasswordScreenView
                 onTap: () {
                   controller.toggleCfPwd();
                 },
-                child: Icon(
+                  child: Icon(
                   controller.isHideCfPwd.value
                       ? PhosphorIconsRegular.eyeSlash
                       : PhosphorIconsRegular.eye,
-                  color: AppColors.dark,
+                  color: theme.iconTheme.color,
                 ),
               ),
               validator: (value) {
@@ -216,7 +217,7 @@ class ResetPasswordScreenView
     );
   }
 
-  Widget _buildOtpBox(BuildContext context, int index) {
+  Widget _buildOtpBox(BuildContext context, int index, ThemeData theme) {
     return Expanded(
       child: Padding(
         padding: EdgeInsets.only(right: index < 5 ? 8 : 0),
@@ -233,18 +234,18 @@ class ResetPasswordScreenView
             decoration: InputDecoration(
               counterText: '',
               filled: true,
-              fillColor: AppColors.white,
+              fillColor: theme.cardColor,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.25)),
+                borderSide: BorderSide(color: theme.colorScheme.primary.withOpacity(0.25)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.25)),
+                borderSide: BorderSide(color: theme.colorScheme.primary.withOpacity(0.25)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
               ),
             ),
             onChanged: (value) => controller.handleOtpChanged(context, index, value),
