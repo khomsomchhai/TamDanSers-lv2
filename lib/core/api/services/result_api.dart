@@ -1,4 +1,5 @@
 import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
+import 'package:tamdansers_lv2/data/model/parent_model.dart';
 import 'package:tamdansers_lv2/data/model/score_model.dart';
 
 class ResultApi {
@@ -22,4 +23,14 @@ class ResultApi {
 
     return ScoreModel.fromMap(response);
   }
+
+  Future<ParentDashboardModel> getParentDashboard({
+  required int studentId,
+}) async {
+  final response = await baseApiService.get(
+    endpoint: '/parents/dashboard/$studentId',
+  );
+
+  return ParentDashboardModel.fromMap(response);
+}
 }

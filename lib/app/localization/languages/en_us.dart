@@ -212,6 +212,7 @@ Map<String, String> enUs = {
   'semester 1': 'Semester 1',
   'semester 2': 'Semester 2',
   'ranking_for_month': 'The ranking result of ',
+  'rank': 'Rank',
   'average': 'Average',
   'total_score': 'Total Score',
 
@@ -277,8 +278,6 @@ Map<String, String> enUs = {
   'ask_permission_request_type_by_subject': 'By Subject',
   'ask_permission_request_type_full_day': 'Full Day',
 
-
   //parent
-  'hello_parent': 'Hello guardian of\n student',
+  'hello_parent': 'Hello, Guardian!',
 };
-
