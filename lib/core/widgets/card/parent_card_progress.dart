@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_home_tab/parent_home_tab_view.dart';
@@ -14,15 +15,8 @@ class ParentCardProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return const SizedBox(
-          height: 115,
-          child: Center(
-            child: CircularProgressIndicator(
-              color: Colors.white,
-            ),
-          ),
-        );
-      }
+  return _buildShimmerCards();
+}
 
       final dashboard = controller.dashboard.value;
       final rankData = dashboard?.rank;
@@ -70,7 +64,70 @@ class ParentCardProgress extends StatelessWidget {
       );
     });
   }
+Widget _buildShimmerCards() {
+  return Row(
+    children: [
+      Expanded(child: _buildShimmerCard()),
+      const SizedBox(width: 10),
+      Expanded(child: _buildShimmerCard()),
+      const SizedBox(width: 10),
+      Expanded(child: _buildShimmerCard()),
+    ],
+  );
+}
 
+Widget _buildShimmerCard() {
+  return Shimmer.fromColors(
+    baseColor: Colors.white.withOpacity(0.15),
+    highlightColor: Colors.white.withOpacity(0.35),
+    child: Container(
+      height: 118,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 6,
+        vertical: 12,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          Container(
+            width: 60,
+            height: 12,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Container(
+            width: 40,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
   Widget _buildCard({
     required String title,
     required String value,

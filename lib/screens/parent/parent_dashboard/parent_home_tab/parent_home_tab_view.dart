@@ -14,8 +14,7 @@ import 'package:tamdansers_lv2/data/model/parent_model.dart';
 part 'parent_home_tab_binding.dart';
 part 'parent_home_tab_controller.dart';
 
-class ParentHomeTabView
-    extends GetView<ParentHomeTabViewController> {
+class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
   const ParentHomeTabView({super.key});
 
   @override
@@ -31,7 +30,7 @@ class ParentHomeTabView
               automaticallyImplyLeading: false,
               toolbarHeight: 88,
               expandedHeight: screenHeight * 0.43,
-              backgroundColor: AppColors.info,
+              backgroundColor: AppColors.primary,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(24),
@@ -42,10 +41,22 @@ class ParentHomeTabView
                 background: _buildHeader(),
               ),
             ),
-
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 24),
-            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'attendance'.tr,
+                        style: AppTextStyles.titleSmall
+                            .copyWith(color: AppColors.dark),
+                      ),
+                      const SizedBox(height: 14),
+                    ]),
+              ),
+            )
           ],
         ),
       ),
@@ -62,7 +73,7 @@ class ParentHomeTabView
         22,
       ),
       decoration: BoxDecoration(
-        color: AppColors.info,
+        color: AppColors.primary,
         borderRadius: const BorderRadius.vertical(
           bottom: Radius.circular(24),
         ),
@@ -71,22 +82,16 @@ class ParentHomeTabView
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTopHeader(),
-
           const SizedBox(height: 14),
-
           Text(
             controller.getCurrentDate(),
             style: Get.textTheme.bodyLarge?.copyWith(
               color: AppColors.white.withValues(alpha: 0.85),
             ),
           ),
-
           const SizedBox(height: 18),
-
           _buildChildSection(),
-
           const SizedBox(height: 20),
-
           ParentCardProgress(),
         ],
       ),
@@ -151,9 +156,7 @@ class ParentHomeTabView
                   ),
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -227,27 +230,22 @@ class ParentHomeTabView
   Widget _buildSelectedChild(
     Map<String, dynamic> student,
   ) {
-    final name =
-        student['student_name']?.toString() ?? '-';
+    final name = student['student_name']?.toString() ?? '-';
 
-    final code =
-        student['student_code']?.toString() ?? '-';
+    final code = student['student_code']?.toString() ?? '-';
 
     return Row(
       children: [
         CircleAvatar(
           radius: 18,
-          backgroundColor:
-              AppColors.info.withValues(alpha: 0.12),
+          backgroundColor: AppColors.info.withValues(alpha: 0.12),
           child: Icon(
             Icons.person_outline_rounded,
             color: AppColors.info,
             size: 21,
           ),
         ),
-
         const SizedBox(width: 10),
-
         Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -280,18 +278,13 @@ class ParentHomeTabView
   Widget _buildDropdownChild(
     Map<String, dynamic> student,
   ) {
-    final name =
-        student['student_name']?.toString() ?? '-';
+    final name = student['student_name']?.toString() ?? '-';
 
-    final code =
-        student['student_code']?.toString() ?? '-';
+    final code = student['student_code']?.toString() ?? '-';
 
-    final selectedId =
-        controller.selectedChild.value?['id'];
+    final selectedId = controller.selectedChild.value?['id'];
 
-    final isSelected =
-        selectedId?.toString() ==
-        student['id']?.toString();
+    final isSelected = selectedId?.toString() == student['id']?.toString();
 
     return SizedBox(
       height: 58,
@@ -304,15 +297,11 @@ class ParentHomeTabView
                 : AppColors.info.withValues(alpha: 0.12),
             child: Icon(
               Icons.person_outline_rounded,
-              color: isSelected
-                  ? AppColors.white
-                  : AppColors.info,
+              color: isSelected ? AppColors.white : AppColors.info,
               size: 21,
             ),
           ),
-
           const SizedBox(width: 12),
-
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -323,9 +312,7 @@ class ParentHomeTabView
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: isSelected
-                        ? AppColors.info
-                        : Colors.black87,
+                    color: isSelected ? AppColors.info : Colors.black87,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -340,7 +327,6 @@ class ParentHomeTabView
               ],
             ),
           ),
-
           if (isSelected)
             Icon(
               Icons.check_circle_rounded,
