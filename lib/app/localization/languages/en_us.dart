@@ -211,7 +211,7 @@ Map<String, String> enUs = {
   'result': 'Result',
   'semester 1': 'Semester 1',
   'semester 2': 'Semester 2',
-  'ranking_for_month': 'The ranking result of ',
+  'ranking_for_month': 'Ranking for',
   'average': 'Average',
   'total_score': 'Total Score',
 

@@ -10,6 +10,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
+import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
@@ -137,7 +138,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: AppColors.dark.withOpacity(0.04),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -183,12 +184,12 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                   children: [
                     Expanded(
                       child: Material(
-                        color: Colors.transparent,
+                        color: AppColors.transparent,
                         child: InkWell(
                           onTap: () => controller.changeTab(0),
                           borderRadius: BorderRadius.circular(26),
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
+                          splashColor: AppColors.transparent,
+                          highlightColor: AppColors.transparent,
                           child: Container(
                             alignment: Alignment.center,
                             child: Row(
@@ -201,7 +202,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                                     PhosphorIconsRegular.student,
                                     size: 20,
                                     color: controller.selectedTab.value == 0
-                                      ? Colors.white
+                                      ? AppColors.white
                                       : theme.hintColor,
                                   ),
                                 ),
@@ -211,7 +212,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                                   style: Get.textTheme.bodyLarge!.copyWith(
                                     fontWeight: FontWeight.w700,
                                     color: controller.selectedTab.value == 0
-                                      ? Colors.white
+                                      ? AppColors.white
                                       : theme.textTheme.bodyLarge?.color,
                                   ),
                                   child: Text('student'.tr),
@@ -224,12 +225,12 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                     ),
                     Expanded(
                       child: Material(
-                        color: Colors.transparent,
+                        color: AppColors.transparent,
                         child: InkWell(
                           onTap: () => controller.changeTab(1),
                           borderRadius: BorderRadius.circular(26),
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
+                          splashColor: AppColors.transparent,
+                          highlightColor: AppColors.transparent,
                           child: Container(
                             alignment: Alignment.center,
                             child: Row(
@@ -242,7 +243,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                                     PhosphorIconsRegular.users,
                                     size: 20,
                                     color: controller.selectedTab.value == 1
-                                      ? Colors.white
+                                      ? AppColors.white
                                       : theme.hintColor,
                                   ),
                                 ),
@@ -252,7 +253,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                                   style: Get.textTheme.bodyLarge!.copyWith(
                                     fontWeight: FontWeight.w700,
                                     color: controller.selectedTab.value == 1
-                                      ? Colors.white
+                                      ? AppColors.white
                                       : theme.textTheme.bodyLarge?.color,
                                   ),
                                   child: Text('parent'.tr),
@@ -309,7 +310,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           border: Border.all(color: theme.dividerColor),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppColors.dark.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -432,7 +433,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                     },
                       child: Text(
                       'forget_password'.tr,
-                      style: Get.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.secondary),
+                      style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.info),
                     ),
                   ),
                 ],
@@ -504,7 +505,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                       child: Text(
                         'sign_up'.tr,
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.secondary,
+                          color: AppColors.info,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -520,7 +521,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
   //   showModalBottomSheet(
   //     context: context,
   //     isScrollControlled: true,
-  //     backgroundColor: Colors.transparent,
+  //     backgroundColor: AppColors.transparent,
   //     builder: (sheetContext) {
   //       return Container(
   //         decoration: BoxDecoration(
@@ -626,3 +627,5 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
   //   );
   // }
 }
+
+
