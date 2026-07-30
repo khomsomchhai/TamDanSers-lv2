@@ -106,15 +106,22 @@ class HomeTabViewController extends GetxController {
   Future<void> fetchTodaySchedules() async {
     isLoadingSchedule.value = true;
     try {
-      final schedules = await scheduleServices.fetchSchedules();
+      final classId = userController.profile?.classId;
+      final schedules = await scheduleServices.fetchSchedules(
+        classId: classId != null && classId > 0 ? classId : null,
+      );
       final todayFull = _getTodayDayName();
       final todayShort = _getTodayShortDayName();
 
-      final filtered = schedules.where((item) {
+      var filtered = schedules.where((item) {
         final dayLower = item.day.toLowerCase();
         return dayLower == todayFull.toLowerCase() ||
             dayLower == todayShort.toLowerCase();
       }).toList();
+
+      if (classId != null && classId > 0) {
+        filtered = filtered.where((item) => item.classId == classId).toList();
+      }
 
       filtered.sort((a, b) => a.startTime.compareTo(b.startTime));
       todaySchedules.assignAll(filtered);
