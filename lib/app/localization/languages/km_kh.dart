@@ -168,8 +168,8 @@ Map<String, String> kmKh = {
   'choose_from_gallery': 'ជ្រើសពីបណ្ណាល័យរូបភាព',
   'theme': 'រចនាប័ទ្ម',
   'choose_look_fits_style': 'ជ្រើសរចនាប័ទ្មដែលអ្នកចង់',
-  'light_mode': 'របៀបភ្លឺ',
-  'dark_mode': 'របៀបងងឹត',
+  'light_mode': 'ភ្លឺ',
+  'dark_mode': 'ងងឹត',
   'language': 'ភាសា',
   'choose_preferred_language': 'ជ្រើសភាសាដែលអ្នកចូលចិត្ត',
   'common_questions_answers': 'សំណួរទូទៅ និងចម្លើយសង្ខេប',
@@ -192,7 +192,7 @@ Map<String, String> kmKh = {
   'physics': 'រូបវិទ្យា',
   'history': 'ប្រវត្តិវិទ្យា',
   'geography': 'ភូមិវិទ្យា',
-  'no_schedule_for': 'មិនមានកាលវិភាគសម្រាប់ {day}',
+  'no_schedule_for': 'មិនមានកាលវិភាគ',
   'check_back_later': 'សូមពិនិត្យម្តងទៀតពេលក្រោយ។',
   'deadline_prefix': 'ថ្ងៃកំណត់៖ ',
   'submitted_prefix': 'បានប្រគល់៖ ',
@@ -214,6 +214,7 @@ Map<String, String> kmKh = {
   'semester 1': 'ឆមាស 1',
   'semester 2': 'ឆមាស 2',
   'ranking_for_month': 'ចំណាត់ថ្នាក់ប្រចាំខែ',
+  'rank': 'ចំណាត់ថ្នាក់',
   'average': 'មធ្យមភាគ',
   'total_score': 'ពិន្ទុសរុប',
 
@@ -277,4 +278,8 @@ Map<String, String> kmKh = {
       'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
   'ask_permission_request_type_by_subject': 'តាមមុខវិជ្ជា',
   'ask_permission_request_type_full_day': 'ពេញមួយថ្ងៃ',
+
+
+  //prent
+  'hello_parent': 'សួស្ដីអាណាព្យាបាល\n សិស្ស',
 };

@@ -23,7 +23,6 @@ class NotificationView extends GetView<NotificationController> {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
-
         if (controller.notifications.isEmpty) {
           return Center(
             child: Column(

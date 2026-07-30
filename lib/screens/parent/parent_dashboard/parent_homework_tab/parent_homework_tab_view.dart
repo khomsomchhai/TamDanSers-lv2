@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 
 part 'parent_homework_tab_binding.dart';
 part 'parent_homework_tab_controller.dart';
@@ -9,6 +10,8 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(
+      
+    );
   }
 }

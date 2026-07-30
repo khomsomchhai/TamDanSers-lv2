@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/api/services/result_api.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
@@ -18,6 +17,8 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: CustomAppBar(title: 'result'.tr,showNotification: false,),
       body: Padding(
@@ -28,24 +29,24 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.secondary,
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TabBar(
                   onTap: (index) {
                     controller.selectedSemester.value = index + 1;
                     controller.selectedMonth.value = null;
-                    controller.selectFisrtMonth();
+                    controller.selectLatestSemesterAndMonth();
                     controller.getRank();
                   },
                   indicator: BoxDecoration(
-                    color: AppColors.primary,
+                    color: theme.colorScheme.primary,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.black,
+                  labelColor: theme.colorScheme.onPrimary,
+                  unselectedLabelColor: theme.textTheme.bodyLarge?.color?.withOpacity(0.75),
                   indicatorSize: TabBarIndicatorSize.tab,
-                  dividerColor: Colors.transparent,
+                  dividerColor: theme.colorScheme.surface.withOpacity(0.0),
                   tabs: [
                     Tab(child: Text('semester 1'.tr)),
                     Tab(child: Text('semester 2'.tr))
@@ -80,31 +81,31 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
   }
 
   Widget skeletonLoading() {
+    final theme = Get.theme;
     return Column(
-      spacing: 16,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 5),
         Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
+          baseColor: theme.dividerColor.withOpacity(0.25),
+          highlightColor: theme.dividerColor.withOpacity(0.10),
           child: Container(
             width: 100,
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
         ),
         Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
+          baseColor: theme.dividerColor.withOpacity(0.25),
+          highlightColor: theme.dividerColor.withOpacity(0.10),
           child: Container(
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -114,12 +115,13 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
   }
 
   Widget monthList() {
+    final theme = Get.theme;
     return Obx(() {
       if (controller.semesterMonths.isEmpty) {
         return Center(
             child: Text('No months',
-                style: AppTextStyles.titleSmall
-                    .copyWith(color: AppColors.neutral500)));
+                style: AppTextStyles.titleSmall.copyWith(
+                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.75))));
       }
 
       return SizedBox(
@@ -144,13 +146,15 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                       width: 120,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : AppColors.white,
+                        color: isSelected ? theme.colorScheme.primary : theme.cardColor,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         (controller.months[month] ?? '').tr,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black,
+                          color: isSelected
+                              ? theme.colorScheme.onPrimary
+                              : theme.textTheme.bodyLarge?.color,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -166,6 +170,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
 
 
   Widget scoreList() {
+    final theme = Get.theme;
     return Obx(() {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -176,53 +181,65 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final score = controller.filterScores[index];
-                final subject = score.subjectName ?? '';
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.neutral500, width: 1),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: SubjectUi.bgColor(subject),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              SubjectUi.icon(subject),
-                              color: SubjectUi.color(subject),
-                            ),
-                          ),
-                          SizedBox(width: 16),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                score.subjectName.tr,
-                                style: AppTextStyles.titleMedium
-                                    .copyWith(fontWeight: FontWeight.bold),
+                final subject = score.subjectName;
+                return SizedBox(
+                  height: 150,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: theme.dividerColor, width: 1),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: SubjectUi.bgColor(subject),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              Text(
-                                '${'teacher'.tr}: ${score.teacherName ?? ''}',
-                                style: AppTextStyles.bodyLarge
-                                    .copyWith(color: AppColors.neutral500),
+                              child: Icon(
+                                SubjectUi.icon(subject),
+                                color: SubjectUi.color(subject),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      ScoreBar(
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    score.subjectName.tr,
+                                    style: AppTextStyles.titleMedium
+                                        .copyWith(fontWeight: FontWeight.bold),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${'teacher'.tr}: ${score.teacherName}',
+                                    style: AppTextStyles.bodyLarge.copyWith(
+                                        color: theme.textTheme.bodyLarge?.color?.withOpacity(0.75)),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        ScoreBar(
                           score: score.score.toDouble(),
                           maxScore: score.maxScore.toDouble(),
-                          color: SubjectUi.color(subject)),
-                    ],
+                          color: SubjectUi.color(subject),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

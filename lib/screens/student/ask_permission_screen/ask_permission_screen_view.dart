@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/services/permission_services.dart';
 import 'package:tamdansers_lv2/core/api/services/schedule_services.dart';
@@ -21,7 +20,10 @@ class AskPermissionScreenView
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: 'ask_permission'.tr,
         showNotification: false,
@@ -46,17 +48,17 @@ class AskPermissionScreenView
                       width: double.infinity,
                       padding: const EdgeInsets.all(AppNumbers.cardPadding),
                       decoration: BoxDecoration(
-                        color: Get.theme.cardColor,
+                        color: theme.cardColor,
                         borderRadius:
                             BorderRadius.circular(AppNumbers.radiusLarge),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: theme.dividerColor),
                       ),
                       child: Column(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.fact_check_outlined,
                             size: AppNumbers.iconLarge,
-                            color: AppColors.grey,
+                            color: theme.iconTheme.color?.withOpacity(0.7),
                           ),
                           const SizedBox(height: AppNumbers.spacingSmall),
                           Text(
@@ -89,7 +91,7 @@ class AskPermissionScreenView
                           vertical: AppNumbers.cardPadding,
                         ),
                         decoration: BoxDecoration(
-                          color: Get.theme.cardColor,
+                          color: theme.cardColor,
                           borderRadius:
                               BorderRadius.circular(AppNumbers.radiusRounded),
                           boxShadow: const [
@@ -110,13 +112,13 @@ class AskPermissionScreenView
                                   width: AppNumbers.avatarMedium,
                                   height: AppNumbers.avatarMedium,
                                   decoration: BoxDecoration(
-                                    color: AppColors.secondary,
+                                    color: theme.colorScheme.primaryContainer,
                                     borderRadius: BorderRadius.circular(
                                         AppNumbers.radiusMedium),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.fact_check_outlined,
-                                    color: AppColors.primary,
+                                    color: theme.colorScheme.onPrimaryContainer,
                                     size: AppNumbers.iconSmall,
                                   ),
                                 ),
@@ -154,15 +156,15 @@ class AskPermissionScreenView
                               ],
                             ),
                             const SizedBox(height: AppNumbers.spacingMedium),
-                            const Divider(height: 1, color: AppColors.border),
+                            Divider(height: 1, color: theme.dividerColor),
                             const SizedBox(height: AppNumbers.spacingSmall),
                             if (subjectLine != '-') ...[
                               Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.menu_book_rounded,
                                     size: AppNumbers.icon16,
-                                    color: AppColors.grey,
+                                    color: theme.iconTheme.color?.withOpacity(0.7),
                                   ),
                                   const SizedBox(
                                       width: AppNumbers.spacingSmall),
@@ -170,7 +172,7 @@ class AskPermissionScreenView
                                     child: Text(
                                       '${'ask_permission_subject'.tr}: $subjectLine',
                                       style: Get.textTheme.bodySmall?.copyWith(
-                                        color: AppColors.grey,
+                                        color: theme.textTheme.bodySmall?.color?.withOpacity(0.75),
                                       ),
                                     ),
                                   ),
@@ -180,17 +182,17 @@ class AskPermissionScreenView
                             ],
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.label_outline_rounded,
                                   size: AppNumbers.icon16,
-                                  color: AppColors.grey,
+                                  color: theme.iconTheme.color?.withOpacity(0.7),
                                 ),
                                 const SizedBox(width: AppNumbers.spacingSmall),
                                 Expanded(
                                   child: Text(
                                     '${'ask_permission_permission_type'.tr}: ${request.type}',
                                     style: Get.textTheme.bodySmall?.copyWith(
-                                      color: AppColors.grey,
+                                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.75),
                                     ),
                                   ),
                                 ),
@@ -199,17 +201,17 @@ class AskPermissionScreenView
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.notes_outlined,
                                   size: AppNumbers.icon16,
-                                  color: AppColors.grey,
+                                  color: theme.iconTheme.color?.withOpacity(0.7),
                                 ),
                                 const SizedBox(width: AppNumbers.spacingSmall),
                                 Expanded(
                                   child: Text(
                                     '${'ask_permission_reason'.tr}: ${request.reason}',
                                     style: Get.textTheme.bodySmall?.copyWith(
-                                      color: AppColors.grey,
+                                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.75),
                                     ),
                                   ),
                                 ),
@@ -218,16 +220,16 @@ class AskPermissionScreenView
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.schedule_rounded,
                                   size: AppNumbers.icon16,
-                                  color: AppColors.grey,
+                                  color: theme.iconTheme.color?.withOpacity(0.7),
                                 ),
                                 const SizedBox(width: AppNumbers.spacingSmall),
                                 Text(
                                   '${'ask_permission_created'.tr}: ${controller.formatCreatedDate(request.createdAt)}',
                                   style: Get.textTheme.bodySmall?.copyWith(
-                                    color: AppColors.grey,
+                                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.75),
                                   ),
                                 ),
                               ],
@@ -247,6 +249,8 @@ class AskPermissionScreenView
   }
 
   Widget _buildFormCard(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
@@ -254,7 +258,7 @@ class AskPermissionScreenView
         vertical: AppNumbers.cardPadding,
       ),
       decoration: BoxDecoration(
-        color: Get.theme.cardColor,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(AppNumbers.radiusRounded),
         boxShadow: const [
           BoxShadow(
@@ -275,13 +279,13 @@ class AskPermissionScreenView
                   width: AppNumbers.buttonHeight,
                   height: AppNumbers.buttonHeight,
                   decoration: BoxDecoration(
-                    color: AppColors.secondary,
+                    color: theme.colorScheme.primaryContainer,
                     borderRadius:
                         BorderRadius.circular(AppNumbers.radiusMedium),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.assignment_rounded,
-                    color: AppColors.primary,
+                    color: theme.colorScheme.onPrimaryContainer,
                     size: AppNumbers.iconMedium,
                   ),
                 ),
@@ -297,7 +301,7 @@ class AskPermissionScreenView
               ],
             ),
             const SizedBox(height: AppNumbers.spacingMedium),
-            const Divider(height: 1, color: AppColors.border),
+            Divider(height: 1, color: theme.dividerColor),
             const SizedBox(height: AppNumbers.spacingLarge),
             Text(
               'ask_permission_request_type'.tr,
@@ -314,7 +318,7 @@ class AskPermissionScreenView
                         value: item,
                         child: Text(
                           controller.requestTypeLabel(item),
-                          style: Get.textTheme.bodyMedium,
+                          style: theme.textTheme.bodyMedium,
                         ),
                       ),
                     )
@@ -326,7 +330,7 @@ class AskPermissionScreenView
                 },
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: AppColors.white,
+                  fillColor: theme.cardColor,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppNumbers.spacingMedium,
                     vertical: AppNumbers.spacingMedium,
@@ -337,9 +341,12 @@ class AskPermissionScreenView
                         BorderRadius.circular(AppNumbers.radiusMedium),
                   ),
                 ),
-                dropdownColor: AppColors.white,
+                dropdownColor: theme.cardColor,
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                icon: Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: theme.iconTheme.color,
+                ),
               ),
             ),
             const SizedBox(height: AppNumbers.spacingLarge),
@@ -365,8 +372,8 @@ class AskPermissionScreenView
                         : null,
                     hint: Text(
                       'ask_permission_select_subject'.tr,
-                      style: Get.textTheme.bodyMedium
-                          ?.copyWith(color: AppColors.hintColor),
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(color: theme.hintColor),
                     ),
                     items: controller.schedules
                         .map(
@@ -385,7 +392,7 @@ class AskPermissionScreenView
                     isExpanded: true,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: AppColors.white,
+                      fillColor: theme.cardColor,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppNumbers.spacingMedium,
                         vertical: AppNumbers.spacingMedium,
@@ -396,7 +403,7 @@ class AskPermissionScreenView
                             BorderRadius.circular(AppNumbers.radiusMedium),
                       ),
                     ),
-                    dropdownColor: AppColors.white,
+                    dropdownColor: theme.cardColor,
                     borderRadius:
                         BorderRadius.circular(AppNumbers.radiusMedium),
                     icon: const Icon(Icons.keyboard_arrow_down_rounded),
@@ -419,8 +426,8 @@ class AskPermissionScreenView
                     : null,
                 hint: Text(
                   'ask_permission_select_permission_type'.tr,
-                  style: Get.textTheme.bodyMedium
-                      ?.copyWith(color: AppColors.hintColor),
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: theme.hintColor),
                 ),
                 items: controller.permissionTypes
                     .map(
@@ -434,7 +441,7 @@ class AskPermissionScreenView
                     controller.selectedPermissionType.value = value ?? '',
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: AppColors.white,
+                  fillColor: theme.cardColor,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppNumbers.spacingMedium,
                     vertical: AppNumbers.spacingMedium,
@@ -445,7 +452,7 @@ class AskPermissionScreenView
                         BorderRadius.circular(AppNumbers.radiusMedium),
                   ),
                 ),
-                dropdownColor: AppColors.white,
+                dropdownColor: theme.cardColor,
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                 icon: const Icon(Icons.keyboard_arrow_down_rounded),
               ),
@@ -482,13 +489,13 @@ class AskPermissionScreenView
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return AppColors.warning;
+        return const Color(0xFFF59E0B); // amber/warning
       case 'approved':
-        return AppColors.success;
+        return const Color(0xFF22C55E); // green/success
       case 'rejected':
-        return AppColors.error;
+        return const Color(0xFFEF4444); // red/error
       default:
-        return AppColors.grey;
+        return const Color(0xFF6B7280); // grey
     }
   }
 

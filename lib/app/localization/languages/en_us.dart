@@ -140,7 +140,7 @@ Map<String, String> enUs = {
   'history': 'History',
   'geography': 'Geography',
   'teacher_prefix': 'Teacher: ',
-  'no_schedule_for': 'No schedule for {day}',
+  'no_schedule_for': 'No schedule',
   'check_back_later': 'Please check back later.',
   'not_done': 'Not done yet',
   'preparing': 'Preparing',
@@ -219,6 +219,7 @@ Map<String, String> enUs = {
   'semester 1': 'Semester 1',
   'semester 2': 'Semester 2',
   'ranking_for_month': 'The ranking result of ',
+  'rank': 'Rank',
   'average': 'Average',
   'total_score': 'Total Score',
 
@@ -283,4 +284,7 @@ Map<String, String> enUs = {
       'You already requested permission for today.',
   'ask_permission_request_type_by_subject': 'By Subject',
   'ask_permission_request_type_full_day': 'Full Day',
+
+  //parent
+  'hello_parent': 'Hello, Guardian!',
 };

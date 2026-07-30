@@ -1,6 +1,5 @@
 import 'package:get/route_manager.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/screens/auth/change_password_screen/change_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/create_password_parent/create_password_parent_view.dart';
 import 'package:tamdansers_lv2/screens/auth/forget_password_screen/forget_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/login_screen/login_screen_view.dart';
@@ -14,6 +13,7 @@ import 'package:tamdansers_lv2/screens/student/ask_permission_screen/ask_permiss
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
 import 'package:tamdansers_lv2/screens/student/result_screen/result_screen_view.dart';
 import 'package:tamdansers_lv2/screens/student/schedule_screen/schedule_screen_view.dart';
+import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/student_dashboard_view.dart';
 
 class AppPages {
@@ -41,13 +41,6 @@ class AppPages {
       name: AppRoutes.resetPasswordScreen,
       page: () => const ResetPasswordScreenView(),
       binding: ResetPasswordScreenViewBinding(),
-      transition: Transition.rightToLeft,
-    ),
-
-    GetPage(
-      name: AppRoutes.changePasswordScreen,
-      page: () => const ChangePasswordScreenView(),
-      binding: ChangePasswordScreenViewBinding(),
       transition: Transition.rightToLeft,
     ),
     GetPage(
@@ -104,6 +97,12 @@ class AppPages {
         page: () => ParentDashboardView(),
         binding: ParentDashboardViewBinding(),
         transition: Transition.fadeIn),
+    GetPage(
+      name: AppRoutes.homeTab,
+      page: () => HomeTabView(),
+      binding: HomeTabViewBinding(),
+      transition: Transition.rightToLeft,
+    ),
 
     //Notification
     GetPage(

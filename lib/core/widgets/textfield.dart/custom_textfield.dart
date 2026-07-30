@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -30,6 +28,7 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return TextFormField(
       focusNode: nameFoucs,
       controller: controller,
@@ -38,21 +37,21 @@ class CustomTextField extends StatelessWidget {
       obscureText: isPwd && isHide,
       minLines: isMultiline ? 5 : 1,
       maxLines: isMultiline ? 10 : 1,
-      cursorColor: AppColors.dark,
-      style: Get.textTheme.bodyLarge,
+      cursorColor: theme.textSelectionTheme.cursorColor ?? theme.colorScheme.onSurface,
+      style: theme.textTheme.bodyLarge,
       decoration: InputDecoration(
-        labelStyle: Get.textTheme.bodyLarge,
+        labelStyle: theme.textTheme.bodyLarge,
         hintText: hintText,
-        hintStyle: Get.textTheme.bodyLarge!.copyWith(color: AppColors.hintColor),
+        hintStyle: theme.textTheme.bodyLarge!.copyWith(color: theme.hintColor),
         prefixIcon: prefixIcon,
         suffixIcon: isPwd ? suffixIcon : null,
-        errorStyle: Get.textTheme.bodySmall!.copyWith(color: AppColors.error),
+        errorStyle: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.error),
         border:  OutlineInputBorder(
           borderSide: BorderSide.none,
           borderRadius: BorderRadius.circular(AppNumbers.radiusMedium)
         ),
         filled: true,
-        fillColor: AppColors.white
+        fillColor: theme.cardColor,
       ),
       
     );

@@ -32,7 +32,7 @@ class ResultScreenViewController extends GetxController {
       final response = await resultApi.getResult();
       result.assignAll(response);
 
-      selectFisrtMonth();
+      selectLatestSemesterAndMonth();
       await getRank();
     } catch (e) {
       Get.snackbar('Error', e.toString());
@@ -69,14 +69,28 @@ class ResultScreenViewController extends GetxController {
     }).toList();
   }
 
-  void selectFisrtMonth() {
-    if (semesterMonths.isNotEmpty) {
-      selectedMonth.value = semesterMonths.first;
-    } else {
-      selectedMonth.value = null;
-      rank.value = null;
-    }
+void selectLatestSemesterAndMonth() {
+  final semesters = result
+      .map((e) => e.semester)
+      .toSet()
+      .toList()
+    ..sort();
+
+  if (semesters.isEmpty) {
+    selectedMonth.value = null;
+    rank.value = null;
+    return;
   }
+
+  selectedSemester.value = semesters.last;
+
+  if (semesterMonths.isNotEmpty) {
+    selectedMonth.value = semesterMonths.last;
+  } else {
+    selectedMonth.value = null;
+    rank.value = null;
+  }
+}
 
   @override
   void onInit() {

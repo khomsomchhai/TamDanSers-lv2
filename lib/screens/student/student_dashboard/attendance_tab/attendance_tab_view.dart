@@ -19,7 +19,7 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'attendance'.tr,
+        title: "attendance".tr,
         showBackButton: false,
       ),
       body: RefreshIndicator(
