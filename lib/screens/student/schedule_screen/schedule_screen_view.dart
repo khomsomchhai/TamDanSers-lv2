@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/api/services/schedule_api.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
@@ -16,8 +15,10 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(title: 'schedule'.tr, showNotification: false),
       body: Column(
         children: [
@@ -49,7 +50,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                               Icon(
                                 Icons.schedule_outlined,
                                 size: 72,
-                                color: AppColors.primary.withValues(alpha: 0.14),
+                                color: theme.colorScheme.primary.withOpacity(0.14),
                               ),
                               const SizedBox(height: 18),
                               Text(
@@ -58,7 +59,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                                 }),
                                 textAlign: TextAlign.center,
                                 style: AppTextStyles.titleSmall.copyWith(
-                                  color: AppColors.dark,
+                                  color: theme.textTheme.titleSmall?.color,
                                 ),
                               ),
                               const SizedBox(height: 10),
@@ -66,7 +67,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                                 'check_back_later'.tr,
                                 textAlign: TextAlign.center,
                                 style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.neutral500,
+                                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.75),
                                 ),
                               ),
                             ],
@@ -94,7 +95,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                           Text(
                             'morning'.tr,
                             style: AppTextStyles.titleSmall.copyWith(
-                              color: AppColors.dark,
+                              color: theme.textTheme.titleSmall?.color,
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -104,7 +105,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                           Text(
                             'afternoon'.tr,
                             style: AppTextStyles.titleSmall.copyWith(
-                              color: AppColors.dark,
+                              color: theme.textTheme.titleSmall?.color,
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -124,16 +125,18 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
   }
 
   Widget _buildDayTabBar() {
+    final theme = Get.theme;
+
     return Container(
       height: 54,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: theme.dividerColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -161,7 +164,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                       width: 54,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: AppColors.secondary,
+                        color: theme.colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
@@ -188,7 +191,9 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                                   duration: const Duration(milliseconds: 180),
                                   style: Get.textTheme.bodyLarge!.copyWith(
                                     fontWeight: FontWeight.w700,
-                                    color: selected ? AppColors.primary : AppColors.neutral500,
+                                    color: selected
+                                        ? theme.colorScheme.onPrimaryContainer
+                                        : theme.textTheme.bodyLarge?.color?.withOpacity(0.75),
                                   ),
                                   child: Text(
                                     controller.days[index],
@@ -212,24 +217,28 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
   }
 
   Widget scheduleCard(dynamic item) {
+    final theme = Get.theme;
     final subject = item['subject_name'] ?? '';
     final teacher = item['teacher_name'] ?? '-';
     final isMorning = controller.isMorning(item['start_time'] ?? '00:00');
     final accentBackground = isMorning
-        ? AppColors.lightPurple
-        : AppColors.lightOrange;
+        ? theme.colorScheme.primaryContainer
+        : theme.colorScheme.secondaryContainer;
+    final accentTextColor = isMorning
+        ? theme.colorScheme.onPrimaryContainer
+        : theme.colorScheme.onSecondaryContainer;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.03),
+            color: theme.shadowColor.withOpacity(0.05),
             blurRadius: 12,
-            offset: Offset(0, 6),
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -260,7 +269,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                     Text(
                       subject,
                       style: AppTextStyles.titleSmall.copyWith(
-                        color: AppColors.dark,
+                        color: theme.textTheme.titleSmall?.color,
                         fontWeight: FontWeight.w700,
                       ),
                       maxLines: 1,
@@ -270,7 +279,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                     Text(
                       '${'teacher_prefix'.tr}$teacher',
                       style: AppTextStyles.bodySmall.copyWith(
-                        // color: AppColors.neutral500,
+                        color: theme.textTheme.bodySmall?.color?.withOpacity(0.75),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -281,7 +290,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
             ],
           ),
           const SizedBox(height: 14),
-          const Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: theme.dividerColor),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -297,17 +306,17 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.access_time,
                         size: 18,
-                        color: AppColors.primary,
+                        color: accentTextColor,
                       ),
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
                           "${controller.formatTime(item['start_time'] ?? '')} - ${controller.formatTime(item['end_time'] ?? '')}",
                           style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.primary,
+                            color: accentTextColor,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -323,13 +332,13 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.secondary,
+                  color: theme.colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   isMorning ? 'morning'.tr : 'afternoon'.tr,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primary,
+                    color: theme.colorScheme.onPrimaryContainer,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -342,24 +351,32 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
   }
 
   Widget loadingSkeleton() {
+    final theme = Get.theme;
+    final baseColor = theme.brightness == Brightness.dark
+        ? theme.dividerColor.withOpacity(0.65)
+        : theme.dividerColor.withOpacity(0.25);
+    final highlightColor = theme.brightness == Brightness.dark
+        ? theme.dividerColor.withOpacity(0.45)
+        : theme.dividerColor.withOpacity(0.15);
+
     return ListView.builder(
       itemCount: 3,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
+          baseColor: baseColor,
+          highlightColor: highlightColor,
           child: Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, 0.03),
+                  color: theme.shadowColor.withOpacity(0.05),
                   blurRadius: 12,
-                  offset: Offset(0, 6),
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
@@ -373,7 +390,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: theme.dividerColor.withOpacity(0.65),
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
@@ -386,7 +403,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                             width: double.infinity,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: Colors.grey[300],
+                              color: theme.dividerColor.withOpacity(0.65),
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
@@ -395,7 +412,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                             width: 140,
                             height: 14,
                             decoration: BoxDecoration(
-                              color: Colors.grey[300],
+                              color: theme.dividerColor.withOpacity(0.65),
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
@@ -407,7 +424,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                 const SizedBox(height: 14),
                 Container(
                   height: 1,
-                  color: Colors.grey[300],
+                  color: theme.dividerColor.withOpacity(0.25),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -416,7 +433,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                       child: Container(
                         height: 38,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: theme.dividerColor.withOpacity(0.65),
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
@@ -426,7 +443,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                       width: 80,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: theme.dividerColor.withOpacity(0.65),
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),

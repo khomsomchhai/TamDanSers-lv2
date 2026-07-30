@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
 import 'package:tamdansers_lv2/core/utils/dio_exception_handler.dart';
@@ -22,8 +21,10 @@ class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       appBar: const CustomAppBar(title: '', showNotification: false),
       body: SafeArea(
@@ -33,9 +34,9 @@ class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
             children: [
-              _buildHeader(),
+              _buildHeader(theme),
               const SizedBox(height: 28),
-              _buildForm(context),
+              _buildForm(context, theme),
             ],
           ),
         ),
@@ -43,7 +44,7 @@ class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme) {
     return Column(
       children: [
         Container(
@@ -51,16 +52,16 @@ class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
           height: 76,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.22),
+                color: theme.colorScheme.primary.withOpacity(0.22),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: const Icon(PhosphorIconsRegular.shieldCheck, color: AppColors.white, size: 36),
+          child: Icon(PhosphorIconsRegular.shieldCheck, color: theme.colorScheme.onPrimary, size: 36),
         ),
         const SizedBox(height: 18),
         Text(
@@ -72,7 +73,7 @@ class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
           'otp_instructions'.tr,
           textAlign: TextAlign.center,
           style: Get.textTheme.bodyMedium?.copyWith(
-            color: AppColors.hintColor,
+            color: theme.hintColor,
             height: 1.45,
           ),
         ),
@@ -80,7 +81,7 @@ class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
     );
   }
 
-  Widget _buildForm(BuildContext context) {
+  Widget _buildForm(BuildContext context, ThemeData theme) {
     return Form(
       key: controller.formKey,
       child: Column(
@@ -90,7 +91,7 @@ class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
           Row(
             children: List.generate(
               6,
-              (index) => _buildOtpBox(context, index),
+              (index) => _buildOtpBox(context, index, theme),
             ),
           ),
           const SizedBox(height: 22),
@@ -124,13 +125,13 @@ class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
     );
   }
 
-  Widget _buildOtpBox(BuildContext context, int index) {
+  Widget _buildOtpBox(BuildContext context, int index, ThemeData theme) {
     return Expanded(
       child: Padding(
         padding: EdgeInsets.only(right: index < 5 ? 8 : 0),
         child: SizedBox(
           height: 56,
-          child: TextFormField(
+              child: TextFormField(
             controller: controller.otpControllers[index],
             focusNode: controller.otpFocusNodes[index],
             textAlign: TextAlign.center,
@@ -141,18 +142,18 @@ class ParentVerifyOtpView extends GetView<ParentVerifyOtpViewController> {
             decoration: InputDecoration(
               counterText: '',
               filled: true,
-              fillColor: AppColors.white,
+              fillColor: theme.cardColor,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.25)),
+                borderSide: BorderSide(color: theme.colorScheme.primary.withOpacity(0.25)),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.25)),
+                borderSide: BorderSide(color: theme.colorScheme.primary.withOpacity(0.25)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
               ),
             ),
             onChanged: (value) => controller.handleOtpChanged(context, index, value),

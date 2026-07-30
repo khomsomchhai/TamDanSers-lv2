@@ -35,9 +35,7 @@ Future<void> firebaseMessagingBackgroundHandler(
 }
 
 Future<void> setupLocalNotifications() async {
-  const androidSettings = AndroidInitializationSettings(
-    '@drawable/ic_notification',
-  );
+  const androidSettings = AndroidInitializationSettings('ic_launcher_foreground');
 
   const iosSettings = DarwinInitializationSettings(
     requestAlertPermission: true,
@@ -250,6 +248,68 @@ Future<void> _handleNotificationTap(
   // if (Get.currentRoute != '/notification') {
   //   Get.toNamed('/notification');
   // }
+  if (token != null) {
+    print("FCM Token: $token");
+    await saveFcmTokenToBackend(token);
+  }
+
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    print("New FCM Token: $newToken");
+    await saveFcmTokenToBackend(newToken);
+  });
+
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+
+  if (initialMessage != null) {
+    if (Get.isRegistered<NotificationController>()) {
+      await Get.find<NotificationController>().loadNotifications();
+    }
+  }
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    if (Get.isRegistered<NotificationController>()) {
+      await Get.find<NotificationController>().loadNotifications();
+    }
+
+    final title =
+        message.notification?.title ?? message.data["title"] ?? "Notification";
+
+    final body = message.notification?.body ??
+        message.data["body"] ??
+        message.data["message"] ??
+        "";
+
+    await flutterLocalNotificationsPlugin.show(
+      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          importance: Importance.max,
+          priority: Priority.max,
+          playSound: true,
+          enableVibration: true,
+          icon: 'ic_launcher_foreground',
+        ),
+        iOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+    );
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    if (Get.isRegistered<NotificationController>()) {
+      await Get.find<NotificationController>().loadNotifications();
+    }
+
+    print("User tapped notification");
+  });
 }
 
 Future<void> _refreshNotificationList() async {

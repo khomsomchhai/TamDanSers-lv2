@@ -133,7 +133,7 @@ Map<String, String> enUs = {
   'history': 'History',
   'geography': 'Geography',
   'teacher_prefix': 'Teacher: ',
-  'no_schedule_for': 'No schedule for {day}',
+  'no_schedule_for': 'No schedule',
   'check_back_later': 'Please check back later.',
   'not_done': 'Not done yet',
   'preparing': 'Preparing',

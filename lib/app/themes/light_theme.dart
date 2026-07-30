@@ -7,7 +7,7 @@ ThemeData get lightTheme => ThemeData(
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.lightBackground,
   cardColor: AppColors.white,
-  dividerColor: AppColors.grey,
+  dividerColor: AppColors.lightGrey,
   hintColor: AppColors.hintColor,
   colorScheme: const ColorScheme.light(
     primary: AppColors.primary,

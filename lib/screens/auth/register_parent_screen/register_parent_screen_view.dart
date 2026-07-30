@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
 import 'package:tamdansers_lv2/core/utils/dio_exception_handler.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
@@ -23,8 +22,10 @@ class RegisterParentScreenView
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: const CustomAppBar(title: '', showNotification: false),
       body: SafeArea(
         top: false,
@@ -36,16 +37,16 @@ class RegisterParentScreenView
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
                 child: Column(
                   children: [
-                    _buildHeader(),
+                    _buildHeader(theme),
                     const SizedBox(height: 28),
-                    _buildRegistrationForm(),
+                    _buildRegistrationForm(theme),
                     const SizedBox(height: 20),
                     
                   ],
                 ),
               ),
             ),
-            _buildLoginPrompt(),
+            _buildLoginPrompt(theme),
             const SizedBox(height: 20),
           ],
         ),
@@ -53,7 +54,7 @@ class RegisterParentScreenView
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ThemeData theme) {
     return Column(
       children: [
         Container(
@@ -61,10 +62,10 @@ class RegisterParentScreenView
           height: 80,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppColors.primary,
+            color: theme.colorScheme.primary,
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.22),
+                color: theme.colorScheme.primary.withOpacity(0.22),
                 blurRadius: 22,
                 offset: const Offset(0, 8),
               ),
@@ -72,7 +73,7 @@ class RegisterParentScreenView
           ),
           child: Icon(
             PhosphorIconsRegular.users,
-            color: AppColors.white,
+            color: theme.colorScheme.onPrimary,
             size: 38,
           ),
         ),
@@ -89,7 +90,7 @@ class RegisterParentScreenView
           'link_account_child'.tr,
           textAlign: TextAlign.center,
           style: Get.textTheme.bodyMedium?.copyWith(
-            color: AppColors.hintColor,
+            color: theme.hintColor,
             height: 1.45,
           ),
         ),
@@ -97,7 +98,7 @@ class RegisterParentScreenView
     );
   }
 
-  Widget _buildRegistrationForm() {
+  Widget _buildRegistrationForm(ThemeData theme) {
     return Form(
       key: controller.formKey,
       child: Column(
@@ -113,7 +114,7 @@ class RegisterParentScreenView
             Text(
               'account_details_hint'.tr,
               style: Get.textTheme.bodySmall?.copyWith(
-                color: AppColors.hintColor,
+                color: theme.hintColor,
               ),
             ),
             const SizedBox(height: 24),
@@ -167,13 +168,13 @@ class RegisterParentScreenView
     );
   }
 
-  Widget _buildLoginPrompt() {
+  Widget _buildLoginPrompt(ThemeData theme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           'already_have_account'.tr,
-          style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.hintColor),
+          style: Get.textTheme.bodyLarge?.copyWith(color: theme.hintColor),
         ),
         const SizedBox(width: 8),
         Bounceable(
@@ -181,7 +182,7 @@ class RegisterParentScreenView
           child: Text(
             'sign_in'.tr,
             style: Get.textTheme.bodyLarge?.copyWith(
-              color: AppColors.info,
+              color: theme.colorScheme.secondary,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -207,7 +208,6 @@ class _FieldLabel extends StatelessWidget {
           // if (required)
           //   const TextSpan(
           //     text: ' *',
-          //     style: TextStyle(color: AppColors.error),
           //   ),
         ],
       ),
@@ -218,12 +218,13 @@ class _FieldLabel extends StatelessWidget {
 class _PrivacyNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(
           PhosphorIconsRegular.shieldCheck,
-          color: AppColors.primary,
+          color: theme.colorScheme.primary,
           size: 19,
         ),
         const SizedBox(width: 10),
@@ -231,7 +232,7 @@ class _PrivacyNotice extends StatelessWidget {
           child: Text(
             'privacy_notice'.tr,
             style: Get.textTheme.bodySmall?.copyWith(
-              color: AppColors.hintColor,
+              color: theme.hintColor,
               height: 1.4,
             ),
           ),
