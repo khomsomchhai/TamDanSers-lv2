@@ -80,10 +80,12 @@ class HomeworkViewController extends GetxController {
       logBuffer.writeln("Logged in classId: $studentClassId");
 
       List<dynamic> responseList = [];
+      bool isFromStudentEndpoint = false;
       if (studentId != null) {
         try {
           responseList =
               await homeworkServices.fetchStudentHomeworkList(studentId);
+          isFromStudentEndpoint = responseList.isNotEmpty;
           logBuffer.writeln(
               "Fetched homework list using studentId: ${responseList.length}");
         } catch (e) {
@@ -179,7 +181,11 @@ class HomeworkViewController extends GetxController {
         logBuffer.writeln(
             "Homework from API: ID=${homework.id}, title=${homework.title}, classId=${homework.classId}, subjectName=${homework.subjectName}");
 
-        if (studentClassId != null && homework.classId != studentClassId) {
+        // Only filter by classId if fetched from global fallback list AND classId is not 0
+        if (!isFromStudentEndpoint &&
+            studentClassId != null &&
+            homework.classId != 0 &&
+            homework.classId != studentClassId) {
           logBuffer.writeln(
               "  -> Skipped (Class mismatch: homework class is ${homework.classId}, student is $studentClassId)");
           continue;
@@ -260,7 +266,7 @@ class HomeworkViewController extends GetxController {
           date: displayDate,
           icon: icon,
           iconColor: iconColor,
-          iconBgColor: iconColor.withOpacity(0.12),
+          iconBgColor: iconColor.withValues(alpha: 0.12),
         );
 
         if (status == HomeworkStatus.checked) {
@@ -270,22 +276,9 @@ class HomeworkViewController extends GetxController {
         }
       }
 
-      if (completed.isEmpty && ongoing.isNotEmpty) {
-        final mockItem = ongoing.removeLast();
-        completed.add(HomeworkItem(
-          id: mockItem.id,
-          title: mockItem.title,
-          description: mockItem.description,
-          filePath: mockItem.filePath,
-          subjectName: mockItem.subjectName,
-          teacherName: mockItem.teacherName,
-          status: HomeworkStatus.checked,
-          date: mockItem.date,
-          icon: mockItem.icon,
-          iconColor: mockItem.iconColor,
-          iconBgColor: mockItem.iconBgColor,
-        ));
-      }
+      // Sort newest homework to top
+      ongoing.sort((a, b) => b.id.compareTo(a.id));
+      completed.sort((a, b) => b.id.compareTo(a.id));
 
       ongoingList.assignAll(ongoing);
       completedList.assignAll(completed);
@@ -347,7 +340,7 @@ class HomeworkViewController extends GetxController {
         Get.locale?.languageCode == 'km'
             ? 'កិច្ចការផ្ទះត្រូវបានប្រគល់ដោយជោគជ័យ!'
             : 'Homework submitted successfully!',
-        backgroundColor: AppColors.success.withOpacity(0.1),
+        backgroundColor: AppColors.success.withValues(alpha: 0.1),
         colorText: AppColors.success,
       );
 
@@ -360,7 +353,7 @@ class HomeworkViewController extends GetxController {
         Get.locale?.languageCode == 'km'
             ? 'មិនអាចប្រគល់កិច្ចការផ្ទះបានទេ៖ $e'
             : 'Failed to submit homework: $e',
-        backgroundColor: AppColors.error.withOpacity(0.1),
+        backgroundColor: AppColors.error.withValues(alpha: 0.1),
         colorText: AppColors.error,
       );
     }

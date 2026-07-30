@@ -123,6 +123,13 @@ Map<String, String> enUs = {
   'class': 'Class ',
   'ask_permission': 'Permission',
   'schedule': 'Schedule',
+  'today_schedule': 'Today\'s Schedule',
+  'see_all': 'See All',
+  'see_less': 'See Less',
+  'today_header': 'TODAY',
+  'yesterday_header': 'YESTERDAY',
+  'earlier_header': 'EARLIER',
+  'due_date_prefix': 'Due date: ',
   'result': 'Result',
   'teacher': 'Teacher',
   'ongoing': 'Pending',
@@ -212,6 +219,7 @@ Map<String, String> enUs = {
   'semester 1': 'Semester 1',
   'semester 2': 'Semester 2',
   'ranking_for_month': 'Ranking for',
+  'rank': 'Rank',
   'average': 'Average',
   'total_score': 'Total Score',
 
@@ -277,8 +285,6 @@ Map<String, String> enUs = {
   'ask_permission_request_type_by_subject': 'By Subject',
   'ask_permission_request_type_full_day': 'Full Day',
 
-
   //parent
-  'hello_parent': 'Hello guardian of\n student',
+  'hello_parent': 'Hello, Guardian!',
 };
-
