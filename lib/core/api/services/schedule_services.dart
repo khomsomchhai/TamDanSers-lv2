@@ -4,8 +4,11 @@ import 'package:tamdansers_lv2/data/model/schedule_model.dart';
 class ScheduleServices {
   final baseApi = BaseApiService();
 
-  Future<List<ScheduleModel>> fetchSchedules() async {
-    final response = await baseApi.get(endpoint: '/schedules');
+  Future<List<ScheduleModel>> fetchSchedules({int? classId}) async {
+    final response = await baseApi.get(
+      endpoint: '/schedules',
+      queryParameters: classId != null ? {'class_id': classId} : null,
+    );
     final data = response is List
         ? response
         : (response['data'] ?? response['schedules'] ?? []);
