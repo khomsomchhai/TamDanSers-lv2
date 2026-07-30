@@ -201,6 +201,13 @@ Map<String, String> kmKh = {
   'class': 'ថ្នាក់ទី​ ',
   'ask_permission': 'សុំច្បាប់',
   'schedule': 'កាលវិភាគ',
+  'today_schedule': 'កាលវិភាគថ្ងៃនេះ',
+  'see_all': 'មើលទាំងអស់',
+  'see_less': 'មើលតិច',
+  'today_header': 'ថ្ងៃនេះ',
+  'yesterday_header': 'ម្សិលមិញ',
+  'earlier_header': 'មុនៗ',
+  'due_date_prefix': 'ថ្ងៃកំណត់៖ ',
   'result': 'លទ្ធផល',
 
   // Result

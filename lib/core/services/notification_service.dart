@@ -6,6 +6,8 @@ import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 import 'package:tamdansers_lv2/firebase_options.dart';
 import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
 
+import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -101,6 +103,9 @@ Future<void> setupFCM() async {
     if (Get.isRegistered<NotificationController>()) {
       await Get.find<NotificationController>().loadNotifications();
     }
+    if (Get.isRegistered<HomeworkViewController>()) {
+      Get.find<HomeworkViewController>().fetchHomework();
+    }
 
     final title =
         message.notification?.title ?? message.data["title"] ?? "Notification";
@@ -137,6 +142,9 @@ Future<void> setupFCM() async {
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
     if (Get.isRegistered<NotificationController>()) {
       await Get.find<NotificationController>().loadNotifications();
+    }
+    if (Get.isRegistered<HomeworkViewController>()) {
+      Get.find<HomeworkViewController>().fetchHomework();
     }
 
     print("User tapped notification");

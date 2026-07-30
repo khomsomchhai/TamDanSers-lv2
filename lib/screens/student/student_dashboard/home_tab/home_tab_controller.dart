@@ -3,8 +3,25 @@ part of 'home_tab_view.dart';
 class HomeTabViewController extends GetxController {
   var userController = Get.find<UserController>();
   final AttendanceService attendanceService = AttendanceService();
+  final ScheduleServices scheduleServices = ScheduleServices();
+
   final recentAttendance = <AttendanceModel>[].obs;
   final isLoadingAttendance = true.obs;
+
+  final todaySchedules = <ScheduleModel>[].obs;
+  final isLoadingSchedule = true.obs;
+  final isExpandedSchedule = false.obs;
+
+  void toggleScheduleExpand() {
+    isExpandedSchedule.value = !isExpandedSchedule.value;
+  }
+
+  List<ScheduleModel> get visibleSchedules {
+    if (isExpandedSchedule.value || todaySchedules.length <= 2) {
+      return todaySchedules;
+    }
+    return todaySchedules.take(2).toList();
+  }
 
   String getKhmerDate() {
     DateTime now = DateTime.now();
@@ -83,6 +100,86 @@ class HomeTabViewController extends GetxController {
   void onReady() {
     super.onReady();
     fetchRecentAttendance();
+    fetchTodaySchedules();
+  }
+
+  Future<void> fetchTodaySchedules() async {
+    isLoadingSchedule.value = true;
+    try {
+      final schedules = await scheduleServices.fetchSchedules();
+      final todayFull = _getTodayDayName();
+      final todayShort = _getTodayShortDayName();
+
+      final filtered = schedules.where((item) {
+        final dayLower = item.day.toLowerCase();
+        return dayLower == todayFull.toLowerCase() ||
+            dayLower == todayShort.toLowerCase();
+      }).toList();
+
+      filtered.sort((a, b) => a.startTime.compareTo(b.startTime));
+      todaySchedules.assignAll(filtered);
+    } catch (_) {
+      todaySchedules.clear();
+    } finally {
+      isLoadingSchedule.value = false;
+    }
+  }
+
+  String _getTodayDayName() {
+    switch (DateTime.now().weekday) {
+      case DateTime.monday:
+        return 'Monday';
+      case DateTime.tuesday:
+        return 'Tuesday';
+      case DateTime.wednesday:
+        return 'Wednesday';
+      case DateTime.thursday:
+        return 'Thursday';
+      case DateTime.friday:
+        return 'Friday';
+      case DateTime.saturday:
+        return 'Saturday';
+      case DateTime.sunday:
+        return 'Sunday';
+      default:
+        return '';
+    }
+  }
+
+  String _getTodayShortDayName() {
+    switch (DateTime.now().weekday) {
+      case DateTime.monday:
+        return 'Mon';
+      case DateTime.tuesday:
+        return 'Tue';
+      case DateTime.wednesday:
+        return 'Wed';
+      case DateTime.thursday:
+        return 'Thu';
+      case DateTime.friday:
+        return 'Fri';
+      case DateTime.saturday:
+        return 'Sat';
+      case DateTime.sunday:
+        return 'Sun';
+      default:
+        return '';
+    }
+  }
+
+  Map<String, String> parseTimePill(String rawTime) {
+    if (rawTime.isEmpty) return {'time': '--:--', 'period': ''};
+    try {
+      final parts = rawTime.split(':');
+      final hour = int.parse(parts[0]);
+      final minute = parts.length > 1 ? parts[1] : '00';
+      final period = hour >= 12 ? 'PM' : 'AM';
+      final formattedHour = hour % 12 == 0 ? 12 : hour % 12;
+      final timeStr = '${formattedHour.toString().padLeft(2, '0')}:$minute';
+      return {'time': timeStr, 'period': period};
+    } catch (_) {
+      return {'time': rawTime, 'period': ''};
+    }
   }
 
   Future<void> fetchRecentAttendance() async {
@@ -190,6 +287,7 @@ class HomeTabViewController extends GetxController {
     await Future.wait([
       userController.getProfile(),
       fetchRecentAttendance(),
+      fetchTodaySchedules(),
     ]);
   }
 }

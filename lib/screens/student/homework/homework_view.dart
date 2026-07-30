@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide MultipartFile;
 import 'package:get_storage/get_storage.dart';
@@ -34,98 +33,14 @@ class HomeworkView extends GetView<HomeworkViewController> {
             // 1. Top Custom App Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Circular Back Button
-                  Bounceable(
-                    onTap: controller.goBackToHome,
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? AppColors.white
-                            : Colors.grey[900],
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          )
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        size: 18,
-                        color: Theme.of(context).brightness == Brightness.light
-                            ? AppColors.dark
-                            : AppColors.white,
-                      ),
-                    ),
+              child: Center(
+                child: Text(
+                  'homework'.tr,
+                  style: Get.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
                   ),
-
-                  // Screen Title
-                  Text(
-                    'homework'.tr,
-                    style: Get.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
-                    ),
-                  ),
-
-                  // Circular Notification Button with Red Badge
-                  Bounceable(
-                    onTap: () {
-                      // Notification handler
-                    },
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                    ? AppColors.white
-                                    : Colors.grey[900],
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              )
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.notifications_rounded,
-                            size: 22,
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                    ? AppColors.dark
-                                    : AppColors.white,
-                          ),
-                        ),
-                        // Red Notification Badge Dot
-                        Positioned(
-                          top: 12,
-                          right: 12,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.error,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
 
@@ -292,7 +207,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
     } else if (item.status == HomeworkStatus.checked) {
       badgeText = isKm ? 'ពិនិត្យ' : 'Check';
       badgeTextColor = AppColors.success;
-      badgeBgColor = AppColors.success.withOpacity(0.12);
+      badgeBgColor = AppColors.success.withValues(alpha: 0.12);
       showBadge = true;
     }
 
