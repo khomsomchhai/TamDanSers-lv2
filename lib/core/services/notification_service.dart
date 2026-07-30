@@ -248,10 +248,10 @@ Future<void> _handleNotificationTap(
   // if (Get.currentRoute != '/notification') {
   //   Get.toNamed('/notification');
   // }
-  if (token != null) {
-    print("FCM Token: $token");
-    await saveFcmTokenToBackend(token);
-  }
+  // if (token != null) {
+  //   print("FCM Token: $token");
+  //   await saveFcmTokenToBackend(token);
+  // }
 
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
     print("New FCM Token: $newToken");
