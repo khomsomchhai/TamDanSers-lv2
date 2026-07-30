@@ -159,18 +159,18 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                     width: tabWidth,
                     height: 42,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Color(0xFF5B5FEF),
-                          Color(0xFF7B61FF),
+                          theme.colorScheme.primary,
+                          theme.colorScheme.primary.withOpacity(0.9),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(26),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF5B5FEF).withValues(alpha: 0.2),
+                          color: theme.colorScheme.primary.withOpacity(0.2),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -386,7 +386,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                 hintText: controller.selectedTab.value == 1
                     ? 'hint_parent_student_id'.tr
                     : 'hint_id'.tr,
-                controller: controller.idCtrl,
+                controller: controller.currentIdCtrl,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'student_id_required'.tr;
@@ -399,7 +399,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               Obx(
                 () => CustomTextField(
                   hintText: 'hint_password'.tr,
-                  controller: controller.pwdCtrl,
+                  controller: controller.currentPwdCtrl,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Password is required'.tr;
