@@ -300,7 +300,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
               padding: const EdgeInsets.all(AppNumbers.cardPadding),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(AppNumbers.radiusRounded),
+                borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -392,7 +392,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                 boxShadow: const [
                   BoxShadow(
                     color: Color.fromRGBO(0, 0, 0, 0.03),
@@ -458,7 +458,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
                     color: subjectBg,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                     border: Border.all(
                       color: const Color(0xFFE2E8F0),
                     ),
@@ -510,7 +510,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
               margin: EdgeInsets.only(bottom: isLast ? 0 : 14),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                 border: Border.all(color: const Color(0xFFF1F5F9)),
                 boxShadow: const [
                   BoxShadow(
@@ -521,7 +521,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                 child: IntrinsicHeight(
                   child: Row(
                     children: [
@@ -675,7 +675,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                   height: 58,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -684,7 +684,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                     height: 64,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                     ),
                   ),
                 ),
