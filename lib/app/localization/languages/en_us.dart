@@ -256,6 +256,18 @@ Map<String, String> enUs = {
   'attendance_status_absent': 'Absent',
   'attendance_status_late': 'Late',
   'attendance_status_permission': 'Permission',
+  'attendance': 'Attendance',
+  'attendance_summary': 'Attendance Summary',
+  'attendance_history': 'Attendance History',
+
+  'present_days': 'Present Days',
+  'absent_days': 'Absent Days',
+  'permission_days': 'Permission Days',
+  'attendance_total_days': 'Total Days',
+  'subjects': 'subjects',
+  'days': 'days',
+
+  'no_attendance': 'No attendance data',
 
   // Ask permission
   'ask_permission_my_requests': 'My Permission Requests',

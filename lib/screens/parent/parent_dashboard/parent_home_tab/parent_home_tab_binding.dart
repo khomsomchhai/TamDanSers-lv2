@@ -5,5 +5,6 @@ class ParentHomeTabViewBinding extends Bindings {
    @override
    void dependencies() {
        Get.lazyPut(() => ParentHomeTabViewController());
+       Get.lazyPut(() => ParentAttendanceTabViewController());
    }
 }

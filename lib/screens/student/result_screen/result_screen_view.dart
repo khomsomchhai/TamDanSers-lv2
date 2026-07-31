@@ -12,67 +12,157 @@ import 'package:tamdansers_lv2/data/model/score_model.dart';
 part 'result_screen_binding.dart';
 part 'result_screen_controller.dart';
 
-class ResultScreenView extends GetView<ResultScreenViewController> {
-  const ResultScreenView({super.key});
+class ResultScreenView
+    extends GetView<ResultScreenViewController> {
+  const ResultScreenView({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme =
+        Theme.of(context);
 
     return Scaffold(
-      appBar: CustomAppBar(title: 'result'.tr,showNotification: false,),
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-        child: DefaultTabController(
-          length: 2,
+      appBar: CustomAppBar(
+        title: 'result'.tr,
+        showNotification: false,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+          ),
           child: Column(
             children: [
+              const SizedBox(
+                height: 8,
+              ),
+
               Container(
+                height: 52,
+                padding: const EdgeInsets.all(
+                  4,
+                ),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(10),
+                  color: theme
+                      .colorScheme
+                      .surfaceContainerHighest,
+                  borderRadius:
+                      BorderRadius.circular(
+                    12,
+                  ),
                 ),
                 child: TabBar(
-                  onTap: (index) {
-                    controller.selectedSemester.value = index + 1;
-                    controller.selectedMonth.value = null;
-                    controller.selectLatestSemesterAndMonth();
-                    controller.getRank();
+                  controller:
+                      controller.tabController,
+                  onTap: (index) async {
+                    await controller
+                        .changeSemester(
+                      index + 1,
+                    );
                   },
+                  indicatorSize:
+                      TabBarIndicatorSize.tab,
+                  dividerColor:
+                      Colors.transparent,
+                  labelPadding:
+                      EdgeInsets.zero,
                   indicator: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(10),
+                    color: theme
+                        .colorScheme.primary,
+                    borderRadius:
+                        BorderRadius.circular(
+                      9,
+                    ),
                   ),
-                  labelColor: theme.colorScheme.onPrimary,
-                  unselectedLabelColor: theme.textTheme.bodyLarge?.color?.withOpacity(0.75),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  dividerColor: theme.colorScheme.surface.withOpacity(0.0),
+                  labelColor:
+                      theme.colorScheme.onPrimary,
+                  unselectedLabelColor: theme
+                      .textTheme
+                      .bodyLarge
+                      ?.color
+                      ?.withOpacity(
+                    0.65,
+                  ),
+                  labelStyle:
+                      AppTextStyles.titleSmall
+                          .copyWith(
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                  unselectedLabelStyle:
+                      AppTextStyles.titleSmall
+                          .copyWith(
+                    fontWeight:
+                        FontWeight.w500,
+                  ),
                   tabs: [
-                    Tab(child: Text('semester 1'.tr)),
-                    Tab(child: Text('semester 2'.tr))
+                    Tab(
+                      child: Center(
+                        child: Text(
+                          'semester 1'.tr,
+                        ),
+                      ),
+                    ),
+                    Tab(
+                      child: Center(
+                        child: Text(
+                          'semester 2'.tr,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-              Obx(
-                () => controller.isLoading.value
-                    ? Center(child: skeletonLoading())
-                    : Expanded(
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 80,
-                              child: monthList(),
-                            ),
-                            SizedBox(height: 16),
-                            CustomScoreCard(),
-                            SizedBox(height: 16),
-                            Expanded(
-                              child: scoreList(),
-                            ),
-                          ],
+
+              const SizedBox(
+                height: 12,
+              ),
+
+              Expanded(
+                child: Obx(
+                  () {
+                    if (controller
+                        .isLoading.value) {
+                      return skeletonLoading();
+                    }
+
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: 56,
+                          child: monthList(),
                         ),
-                      ),
-              )
+
+                        const SizedBox(
+                          height: 16,
+                        ),
+
+                        Obx(
+                          () {
+                            if (controller
+                                .isRankLoading
+                                .value) {
+                              return rankSkeleton();
+                            }
+
+                            return CustomScoreCard();
+                          },
+                        ),
+
+                        const SizedBox(
+                          height: 16,
+                        ),
+
+                        Expanded(
+                          child: scoreList(),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -81,172 +171,404 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
   }
 
   Widget skeletonLoading() {
-    final theme = Get.theme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 5),
-        Shimmer.fromColors(
-          baseColor: theme.dividerColor.withOpacity(0.25),
-          highlightColor: theme.dividerColor.withOpacity(0.10),
-          child: Container(
-            width: 100,
-            height: 50,
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-        Shimmer.fromColors(
-          baseColor: theme.dividerColor.withOpacity(0.25),
-          highlightColor: theme.dividerColor.withOpacity(0.10),
-          child: Container(
-            width: double.infinity,
-            height: 150,
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+    final ThemeData theme =
+        Get.theme;
 
-  Widget monthList() {
-    final theme = Get.theme;
-    return Obx(() {
-      if (controller.semesterMonths.isEmpty) {
-        return Center(
-            child: Text('No months',
-                style: AppTextStyles.titleSmall.copyWith(
-                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.75))));
-      }
-
-      return SizedBox(
-        height: 60,
-        child: Obx(() => ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              scrollDirection: Axis.horizontal,
-              itemCount: controller.semesterMonths.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (context, index) {
-                final month = controller.semesterMonths[index];
-                return Obx(() {
-                  final isSelected = controller.selectedMonth.value == month;
-
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(10),
-                    onTap: () {
-                      controller.selectedMonth.value = month;
-                      controller.getRank();
-                    },
-                    child: Container(
-                      width: 120,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isSelected ? theme.colorScheme.primary : theme.cardColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        (controller.months[month] ?? '').tr,
-                        style: TextStyle(
-                          color: isSelected
-                              ? theme.colorScheme.onPrimary
-                              : theme.textTheme.bodyLarge?.color,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  );
-                });
-              },
-            )),
-      );
-    });
-  }
-
-
-
-  Widget scoreList() {
-    final theme = Get.theme;
-    return Obx(() {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: ListView.separated(
-              itemCount: controller.filterScores.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final score = controller.filterScores[index];
-                final subject = score.subjectName;
-                return SizedBox(
-                  height: 150,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: theme.dividerColor, width: 1),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: SubjectUi.bgColor(subject),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                SubjectUi.icon(subject),
-                                color: SubjectUi.color(subject),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    score.subjectName.tr,
-                                    style: AppTextStyles.titleMedium
-                                        .copyWith(fontWeight: FontWeight.bold),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${'teacher'.tr}: ${score.teacherName}',
-                                    style: AppTextStyles.bodyLarge.copyWith(
-                                        color: theme.textTheme.bodyLarge?.color?.withOpacity(0.75)),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        ScoreBar(
-                          score: score.score.toDouble(),
-                          maxScore: score.maxScore.toDouble(),
-                          color: SubjectUi.color(subject),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+          Shimmer.fromColors(
+            baseColor: theme.dividerColor
+                .withOpacity(
+              0.25,
+            ),
+            highlightColor:
+                theme.dividerColor
+                    .withOpacity(
+              0.10,
+            ),
+            child: Container(
+              width: double.infinity,
+              height: 56,
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius:
+                    BorderRadius.circular(
+                  10,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(
+            height: 16,
+          ),
+
+          Shimmer.fromColors(
+            baseColor: theme.dividerColor
+                .withOpacity(
+              0.25,
+            ),
+            highlightColor:
+                theme.dividerColor
+                    .withOpacity(
+              0.10,
+            ),
+            child: Container(
+              width: double.infinity,
+              height: 150,
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius:
+                    BorderRadius.circular(
+                  10,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(
+            height: 16,
+          ),
+
+          Shimmer.fromColors(
+            baseColor: theme.dividerColor
+                .withOpacity(
+              0.25,
+            ),
+            highlightColor:
+                theme.dividerColor
+                    .withOpacity(
+              0.10,
+            ),
+            child: Container(
+              width: double.infinity,
+              height: 150,
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius:
+                    BorderRadius.circular(
+                  16,
+                ),
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget rankSkeleton() {
+    final ThemeData theme =
+        Get.theme;
+
+    return Shimmer.fromColors(
+      baseColor: theme.dividerColor
+          .withOpacity(
+        0.25,
+      ),
+      highlightColor:
+          theme.dividerColor.withOpacity(
+        0.10,
+      ),
+      child: Container(
+        width: double.infinity,
+        height: 150,
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius:
+              BorderRadius.circular(
+            16,
+          ),
+        ),
+      ),
+    );
+  }
+
+Widget monthList() {
+  final ThemeData theme = Get.theme;
+
+  return Obx(() {
+    final List<int> semesterMonths =
+        controller.semesterMonths;
+
+    final int? selectedMonth =
+        controller.selectedMonth.value;
+
+    if (semesterMonths.isEmpty) {
+      return Center(
+        child: Text(
+          'No months',
+          style: AppTextStyles.titleSmall.copyWith(
+            color: theme.textTheme.bodySmall?.color?.withOpacity(
+              0.75,
+            ),
+          ),
+        ),
       );
-    });
+    }
+
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      itemCount: semesterMonths.length,
+      separatorBuilder: (context, index) {
+        return const SizedBox(width: 12);
+      },
+      itemBuilder: (context, index) {
+        final int month = semesterMonths[index];
+
+        final bool isSelected =
+            selectedMonth == month;
+
+        return GestureDetector(
+          key: ValueKey(
+            'month_${controller.selectedSemester.value}_$month',
+          ),
+          behavior: HitTestBehavior.opaque,
+         onTap: () {
+  controller.changeMonth(month);
+},
+          child: AnimatedContainer(
+            duration: const Duration(
+              milliseconds: 200,
+            ),
+            curve: Curves.easeInOut,
+            width: 120,
+            height: 56,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.cardColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.dividerColor,
+                width: 1,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: theme.colorScheme.primary.withOpacity(
+                          0.20,
+                        ),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Text(
+              (controller.months[month] ?? '').tr,
+              style: AppTextStyles.titleSmall.copyWith(
+                color: isSelected
+                    ? theme.colorScheme.onPrimary
+                    : theme.textTheme.bodyLarge?.color,
+                fontWeight: isSelected
+                    ? FontWeight.bold
+                    : FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  });
+}
+  Widget scoreList() {
+    final ThemeData theme =
+        Get.theme;
+
+    return Obx(
+      () {
+        final List<ScoreModel> scores =
+            controller.filterScores;
+
+        if (scores.isEmpty) {
+          return RefreshIndicator(
+            onRefresh:
+                controller.refreshResult,
+            child: ListView(
+              physics:
+                  const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: 250,
+                  child: Center(
+                    child: Text(
+                      'no_result'.tr,
+                      style: AppTextStyles
+                          .titleMedium
+                          .copyWith(
+                        color: theme
+                            .textTheme
+                            .bodyMedium
+                            ?.color
+                            ?.withOpacity(
+                          0.70,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh:
+              controller.refreshResult,
+          child: ListView.separated(
+            physics:
+                const AlwaysScrollableScrollPhysics(),
+            itemCount: scores.length,
+            separatorBuilder:
+                (context, index) {
+              return const SizedBox(
+                height: 12,
+              );
+            },
+            itemBuilder:
+                (context, index) {
+              final ScoreModel score =
+                  scores[index];
+
+              final String subject =
+                  score.subjectName;
+
+              return Container(
+                height: 150,
+                padding:
+                    const EdgeInsets.all(
+                  16,
+                ),
+                decoration:
+                    BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius:
+                      BorderRadius.circular(
+                    16,
+                  ),
+                  border: Border.all(
+                    color: theme
+                        .dividerColor,
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration:
+                              BoxDecoration(
+                            color:
+                                SubjectUi
+                                    .bgColor(
+                              subject,
+                            ),
+                            borderRadius:
+                                BorderRadius
+                                    .circular(
+                              8,
+                            ),
+                          ),
+                          child: Icon(
+                            SubjectUi.icon(
+                              subject,
+                            ),
+                            color:
+                                SubjectUi
+                                    .color(
+                              subject,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(
+                          width: 16,
+                        ),
+
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment
+                                    .start,
+                            children: [
+                              Text(
+                                score
+                                    .subjectName
+                                    .tr,
+                                style:
+                                    AppTextStyles
+                                        .titleMedium
+                                        .copyWith(
+                                  fontWeight:
+                                      FontWeight
+                                          .bold,
+                                ),
+                                maxLines: 1,
+                                overflow:
+                                    TextOverflow
+                                        .ellipsis,
+                              ),
+
+                              const SizedBox(
+                                height: 4,
+                              ),
+
+                              Text(
+                                '${'teacher'.tr}: ${score.teacherName}',
+                                style:
+                                    AppTextStyles
+                                        .bodyLarge
+                                        .copyWith(
+                                  color: theme
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color
+                                      ?.withOpacity(
+                                    0.75,
+                                  ),
+                                ),
+                                maxLines: 1,
+                                overflow:
+                                    TextOverflow
+                                        .ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const Spacer(),
+
+                    ScoreBar(
+                      score: score.score
+                          .toDouble(),
+                      maxScore: score
+                          .maxScore
+                          .toDouble(),
+                      color:
+                          SubjectUi.color(
+                        subject,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 }

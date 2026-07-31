@@ -297,8 +297,8 @@ class HomeworkViewController extends GetxController {
     Get.to(() => HomeworkDetailView(item: item, controller: this));
   }
 
-  Future<void> executeSubmitHomework(
-      BuildContext context, int homeworkId, String answerText, List<XFile> selectedFiles) async {
+  Future<void> executeSubmitHomework(BuildContext context, int homeworkId,
+      String answerText, List<XFile> selectedFiles) async {
     try {
       Get.dialog(
         const Center(child: CircularProgressIndicator()),
@@ -318,11 +318,21 @@ class HomeworkViewController extends GetxController {
       }
 
       final List<MultipartFile> fileParts = [];
-      for (var file in selectedFiles) {
-        fileParts.add(await MultipartFile.fromFile(
-          file.path,
-          filename: file.name,
-        ));
+
+      for (int index = 0; index < selectedFiles.length; index++) {
+        final file = selectedFiles[index];
+
+        final uploadFileName = _buildUploadFileName(file);
+
+        fileParts.add(
+          await MultipartFile.fromFile(
+            file.path,
+            filename: uploadFileName,
+          ),
+        );
+
+        debugPrint('Original file name: ${file.name}');
+        debugPrint('Upload file name: $uploadFileName');
       }
 
       await homeworkServices.submitHomework(
@@ -357,5 +367,46 @@ class HomeworkViewController extends GetxController {
         colorText: AppColors.error,
       );
     }
+  }
+
+  String _buildUploadFileName(XFile file) {
+    final originalName = file.name.trim();
+    final lowerName = originalName.toLowerCase();
+
+    // File already has a valid extension
+    if (lowerName.endsWith('.jpg') ||
+        lowerName.endsWith('.jpeg') ||
+        lowerName.endsWith('.png') ||
+        lowerName.endsWith('.webp') ||
+        lowerName.endsWith('.pdf')) {
+      return originalName;
+    }
+
+    // Check MIME type
+    final mimeType = file.mimeType?.toLowerCase();
+
+    String extension;
+
+    switch (mimeType) {
+      case 'image/png':
+        extension = '.png';
+        break;
+
+      case 'image/webp':
+        extension = '.webp';
+        break;
+
+      case 'application/pdf':
+        extension = '.pdf';
+        break;
+
+      case 'image/jpeg':
+      case 'image/jpg':
+      default:
+        extension = '.jpg';
+        break;
+    }
+
+    return 'homework_${DateTime.now().millisecondsSinceEpoch}$extension';
   }
 }
