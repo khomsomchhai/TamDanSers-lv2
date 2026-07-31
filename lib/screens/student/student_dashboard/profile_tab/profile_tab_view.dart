@@ -23,10 +23,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: CustomAppBar(
-        title: "profile".tr,
-        showBackButton: false
-      ),
+      appBar: CustomAppBar(title: "profile".tr, showBackButton: false),
       body: SafeArea(
         child: Obx(
           () {
@@ -295,14 +292,14 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF7F77DD), Color(0xFF5DCAA5)],
+        gradient: LinearGradient(
+          colors: [Theme.of(context).colorScheme.primary, const Color(0xFF5DCAA5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7F77DD).withValues(alpha: 0.18),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.18),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -386,11 +383,15 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
           child: Container(
             width: 120,
             height: 120,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: SweepGradient(
-                startAngle: 2.356, // 135�
-                colors: [Color(0xFF7F77DD), Color(0xFF5DCAA5), Color(0xFF7F77DD)],
+                startAngle: 2.356, // 135°
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  const Color(0xFF5DCAA5),
+                  Theme.of(context).colorScheme.primary,
+                ],
               ),
             ),
             child: Padding(
@@ -410,7 +411,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                         : (user.avatarUrl != null && user.avatarUrl!.isNotEmpty
                             ? NetworkImage(user.avatarUrl!)
                             : null),
-                    child: !hasImage ? _buildFallback(user) : null,
+                    child: !hasImage ? _buildFallback(user, context) : null,
                   ),
                 ),
               ),
@@ -426,7 +427,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: const Color(0xFF7F77DD),
+                color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: Theme.of(context).colorScheme.surface,
@@ -473,7 +474,7 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     );
   }
 
-  Widget _buildFallback(dynamic user) {
+  Widget _buildFallback(dynamic user, BuildContext context) {
     final name = (user.displayName ?? user.name ?? '').trim();
     if (name.isNotEmpty) {
       final parts = name.split(' ');
@@ -481,10 +482,13 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
           ? '${parts.first[0]}${parts.last[0]}'.toUpperCase()
           : name.substring(0, name.length >= 2 ? 2 : name.length).toUpperCase();
       return Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: LinearGradient(
-            colors: [Color(0xFFAFA9EC), Color(0xFF7F77DD)],
+            colors: [
+              const Color(0xFFAFA9EC),
+              Theme.of(context).colorScheme.primary,
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -554,7 +558,9 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     Color? iconColor,
   }) {
     final theme = Get.theme;
-    final effectiveTitleColor = titleColor ?? theme.textTheme.bodyMedium?.color ?? theme.colorScheme.onSurface;
+    final effectiveTitleColor = titleColor ??
+        theme.textTheme.bodyMedium?.color ??
+        theme.colorScheme.onSurface;
     final effectiveIconColor = iconColor ?? theme.colorScheme.primary;
     return Material(
       color: Colors.transparent,
@@ -590,7 +596,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                     Text(
                       subtitle,
                       style: Get.textTheme.bodySmall?.copyWith(
-                        color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                        color:
+                            theme.textTheme.bodySmall?.color?.withOpacity(0.7),
                       ),
                     ),
                   ],
@@ -663,7 +670,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                           Text(
                             'academic_profile_details'.tr,
                             style: Get.textTheme.bodySmall?.copyWith(
-                              color: Get.theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                              color: Get.theme.textTheme.bodySmall?.color
+                                  ?.withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -684,13 +692,15 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       const SizedBox(height: 10),
                       _buildInfoRow('email'.tr, user.email ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow('student_code'.tr, profile.studentCode ?? ''),
+                      _buildInfoRow(
+                          'student_code'.tr, profile.studentCode ?? ''),
                       const SizedBox(height: 10),
                       _buildInfoRow('class_label'.tr, profile.className ?? ''),
                       const SizedBox(height: 10),
                       _buildInfoRow('gender'.tr, profile.gender ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow('guardian_phone'.tr, profile.guardianPhone ?? ''),
+                      _buildInfoRow(
+                          'guardian_phone'.tr, profile.guardianPhone ?? ''),
                     ],
                   ),
                 ),
@@ -705,11 +715,13 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
                     ),
                     child: Text(
                       'close_button'.tr,
-                      style: Get.textTheme.bodyLarge?.copyWith(color: Get.theme.colorScheme.onPrimary),
+                      style: Get.textTheme.bodyLarge
+                          ?.copyWith(color: Get.theme.colorScheme.onPrimary),
                     ),
                   ),
                 ),
@@ -792,7 +804,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                           Text(
                             'guardian_contact_details'.tr,
                             style: Get.textTheme.bodySmall?.copyWith(
-                              color: Get.theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                              color: Get.theme.textTheme.bodySmall?.color
+                                  ?.withOpacity(0.7),
                             ),
                           ),
                         ],
@@ -809,9 +822,11 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                   ),
                   child: Column(
                     children: [
-                      _buildInfoRow('guardian_name'.tr, profile.guardianName ?? ''),
+                      _buildInfoRow(
+                          'guardian_name'.tr, profile.guardianName ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow('guardian_phone'.tr, profile.guardianPhone ?? ''),
+                      _buildInfoRow(
+                          'guardian_phone'.tr, profile.guardianPhone ?? ''),
                       const SizedBox(height: 10),
                       _buildInfoRow('address'.tr, profile.address ?? ''),
                     ],
@@ -828,10 +843,13 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
                     ),
-                    child: Text('close_button'.tr,
-                    style: Get.textTheme.bodyLarge?.copyWith(color: Get.theme.colorScheme.onPrimary),
+                    child: Text(
+                      'close_button'.tr,
+                      style: Get.textTheme.bodyLarge
+                          ?.copyWith(color: Get.theme.colorScheme.onPrimary),
                     ),
                   ),
                 ),

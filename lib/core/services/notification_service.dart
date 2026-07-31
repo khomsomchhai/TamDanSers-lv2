@@ -8,7 +8,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 import 'package:tamdansers_lv2/firebase_options.dart';
 import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
-
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -37,7 +36,8 @@ Future<void> firebaseMessagingBackgroundHandler(
 }
 
 Future<void> setupLocalNotifications() async {
-  const androidSettings = AndroidInitializationSettings('ic_launcher_foreground');
+  const androidSettings =
+      AndroidInitializationSettings('ic_launcher_foreground');
 
   const iosSettings = DarwinInitializationSettings(
     requestAlertPermission: true,

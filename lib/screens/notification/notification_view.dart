@@ -16,7 +16,7 @@ class NotificationView extends GetView<NotificationController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: CustomAppBar(
-        title: 'notification'.tr,
+        title: 'notifications'.tr,
         showNotification: false,
       ),
       body: Obx(() {

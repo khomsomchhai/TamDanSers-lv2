@@ -1,8 +1,16 @@
 part of 'login_screen_view.dart';
 
 class LoginScreenViewController extends GetxController {
-  final TextEditingController idCtrl = TextEditingController();
-  final TextEditingController pwdCtrl = TextEditingController();
+  final studentIdCtrl = TextEditingController();
+  final parentIdCtrl = TextEditingController();
+  final studentPwdCtrl = TextEditingController();
+  final parentPwdCtrl = TextEditingController();
+
+  TextEditingController get currentIdCtrl =>
+      selectedTab.value == 1 ? parentIdCtrl : studentIdCtrl;
+
+  TextEditingController get currentPwdCtrl =>
+      selectedTab.value == 1 ? parentPwdCtrl : studentPwdCtrl;
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -43,19 +51,15 @@ class LoginScreenViewController extends GetxController {
     try {
       isLoading.value = true;
 
-      final Map<String, dynamic> response;
-
-      if (selectedTab.value == 1) {
-        response = await authService.loginParentService(
-          studentCode: idCtrl.text.trim(),
-          password: pwdCtrl.text,
-        );
-      } else {
-        response = await authService.loginService(
-          loginId: idCtrl.text.trim(),
-          password: pwdCtrl.text,
-        );
-      }
+      final response = selectedTab.value == 1
+          ? await authService.loginParentService(
+              studentCode: currentIdCtrl.text.trim(),
+              password: currentPwdCtrl.text,
+            )
+          : await authService.loginService(
+              loginId: currentIdCtrl.text.trim(),
+              password: currentPwdCtrl.text,
+            );
 
       debugPrint(
         'LOGIN RESPONSE: $response',
@@ -278,9 +282,10 @@ class LoginScreenViewController extends GetxController {
 
   @override
   void onClose() {
-    idCtrl.dispose();
-    pwdCtrl.dispose();
-
+    studentIdCtrl.dispose();
+    parentIdCtrl.dispose();
+    studentPwdCtrl.dispose();
+    parentPwdCtrl.dispose();
     super.onClose();
   }
 }

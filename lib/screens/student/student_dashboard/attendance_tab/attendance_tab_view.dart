@@ -161,7 +161,7 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
 
       return InkWell(
         onTap: () => controller.pickDate(context),
-        borderRadius: BorderRadius.circular(AppNumbers.radiusRounded),
+        borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppNumbers.spacingMedium,
@@ -169,7 +169,7 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
           ),
           decoration: BoxDecoration(
             color: Get.theme.cardColor,
-            borderRadius: BorderRadius.circular(AppNumbers.radiusRounded),
+            borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
             boxShadow: const [
               BoxShadow(
                 color: Color.fromRGBO(0, 0, 0, 0.03),
@@ -180,18 +180,10 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
           ),
           child: Row(
             children: [
-              Container(
-                width: AppNumbers.avatarMedium,
-                height: AppNumbers.avatarMedium,
-                decoration: BoxDecoration(
-                  color: AppColors.secondary,
-                  borderRadius: BorderRadius.circular(AppNumbers.radiusSmall),
-                ),
-                child: const Icon(
-                  Icons.calendar_month_outlined,
-                  size: AppNumbers.icon16,
-                  color: AppColors.primary,
-                ),
+              const Icon(
+                Icons.calendar_month_outlined,
+                size: AppNumbers.iconLarge,
+                color: AppColors.primary,
               ),
               const SizedBox(width: AppNumbers.spacingSmall),
               Expanded(
