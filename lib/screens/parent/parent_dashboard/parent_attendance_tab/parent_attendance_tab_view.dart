@@ -5,7 +5,8 @@ import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/widgets/card/custom_attendance_card.dart';
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
-import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_attendance_tab/parent_attendance_tab_controller.dart';
+import 'package:tamdansers_lv2/screens/parent/parent_dashboard/'
+    'parent_attendance_tab/parent_attendance_tab_controller.dart';
 
 class ParentAttendanceTabView
     extends GetView<ParentAttendanceTabViewController> {
@@ -42,7 +43,7 @@ class ParentAttendanceTabView
               ),
               children: [
                 Text(
-                  'អត្តមាន',
+                  'វត្តមាន',
                   style: AppTextStyles.headlineSmall.copyWith(
                     color: AppColors.dark,
                     fontWeight: FontWeight.bold,
@@ -51,9 +52,12 @@ class ParentAttendanceTabView
                 const SizedBox(height: 20),
                 CustomAttendanceCard(
                   totalDays: controller.totalDays,
-                  presentDays: controller.presentCount.value,
-                  absentDays: controller.absentCount.value,
-                  permissionDays: controller.permissionCount.value,
+                  presentDays: controller.presentDays.value,
+                  absentDays: controller.absentDays.value,
+                  permissionDays: controller.permissionDays.value,
+                  presentSubjects: controller.presentSubjects.value,
+                  absentSubjects: controller.absentSubjects.value,
+                  permissionSubjects: controller.permissionSubjects.value,
                   attendanceRate: controller.attendanceRate,
                   currentMonth: controller.currentMonthName,
                 ),
@@ -62,7 +66,7 @@ class ParentAttendanceTabView
                   children: [
                     Expanded(
                       child: Text(
-                        'ប្រវត្តិអត្តមាន',
+                        'ប្រវត្តិវត្តមាន',
                         style: AppTextStyles.titleLarge.copyWith(
                           color: AppColors.dark,
                           fontWeight: FontWeight.bold,
@@ -82,11 +86,7 @@ class ParentAttendanceTabView
                   _buildEmptyState()
                 else
                   ...monthlyAttendance.map(
-                    (attendance) {
-                      return _buildAttendanceItem(
-                        attendance,
-                      );
-                    },
+                    (attendance) => _buildAttendanceItem(attendance),
                   ),
               ],
             ),
@@ -102,6 +102,8 @@ class ParentAttendanceTabView
     final statusColor = controller.getStatusColor(
       attendance.status,
     );
+
+    final remark = attendance.remark.toString().trim() ?? '';
 
     return Container(
       margin: const EdgeInsets.only(
@@ -124,10 +126,7 @@ class ParentAttendanceTabView
               alpha: 0.05,
             ),
             blurRadius: 12,
-            offset: const Offset(
-              0,
-              5,
-            ),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -189,15 +188,28 @@ class ParentAttendanceTabView
                     ),
                   ],
                 ),
-                if (attendance.remark.toString().trim().isNotEmpty) ...[
+                if (remark.isNotEmpty) ...[
                   const SizedBox(height: 6),
-                  Text(
-                    attendance.remark.toString(),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.grey,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.notes_rounded,
+                        size: 15,
+                        color: AppColors.grey,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          remark,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.grey,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ],
@@ -213,9 +225,7 @@ class ParentAttendanceTabView
               color: statusColor.withValues(
                 alpha: 0.12,
               ),
-              borderRadius: BorderRadius.circular(
-                30,
-              ),
+              borderRadius: BorderRadius.circular(30),
             ),
             child: Text(
               _getShortStatus(
@@ -267,7 +277,7 @@ class ParentAttendanceTabView
           ),
           const SizedBox(height: 18),
           Text(
-            'មិនមានទិន្នន័យអត្តមាន',
+            'មិនមានទិន្នន័យវត្តមាន',
             style: AppTextStyles.titleMedium.copyWith(
               color: AppColors.dark,
               fontWeight: FontWeight.bold,
@@ -275,7 +285,7 @@ class ParentAttendanceTabView
           ),
           const SizedBox(height: 7),
           Text(
-            'ទិន្នន័យអត្តមានរបស់សិស្សនឹងបង្ហាញនៅទីនេះ',
+            'ទិន្នន័យវត្តមានរបស់សិស្សនឹងបង្ហាញនៅទីនេះ',
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.hintColor,
@@ -289,7 +299,9 @@ class ParentAttendanceTabView
   String _getShortStatus(
     dynamic status,
   ) {
-    final value = status?.toString().trim().toLowerCase() ?? '';
+    final value = controller.normalizeStatus(
+      status,
+    );
 
     switch (value) {
       case 'p':

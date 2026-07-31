@@ -1,91 +1,105 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/services/parent_attendance_service.dart';
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
-
 
 class ParentAttendanceTabViewController extends GetxController {
   final ParentAttendanceService attendanceService =
       ParentAttendanceService();
 
   final attendanceList = <AttendanceModel>[].obs;
-
   final isLoading = false.obs;
 
-  final presentCount = 0.obs;
-  final absentCount = 0.obs;
-  final permissionCount = 0.obs;
+  final selectedStudentId = RxnInt();
 
-  final selectedMonth = DateTime.now().month.obs;
-  final selectedYear = DateTime.now().year.obs;
+  // រាប់ចំនួនថ្ងៃមិនស្ទួន
+  final presentDays = 0.obs;
+  final absentDays = 0.obs;
+  final permissionDays = 0.obs;
 
-  int? studentId;
-
-  final Map<int, String> khmerMonths = {
-    1: 'មករា',
-    2: 'កុម្ភៈ',
-    3: 'មីនា',
-    4: 'មេសា',
-    5: 'ឧសភា',
-    6: 'មិថុនា',
-    7: 'កក្កដា',
-    8: 'សីហា',
-    9: 'កញ្ញា',
-    10: 'តុលា',
-    11: 'វិច្ឆិកា',
-    12: 'ធ្នូ',
-  };
+  // រាប់ចំនួន records / subjects
+  final presentSubjects = 0.obs;
+  final absentSubjects = 0.obs;
+  final permissionSubjects = 0.obs;
 
   @override
   void onInit() {
     super.onInit();
 
-    _getStudentId();
-
-    if (studentId != null) {
-      getParentAttendance();
-    } else {
-      debugPrint('PARENT ATTENDANCE: Student ID is null');
-    }
-  }
-
-  void _getStudentId() {
     final arguments = Get.arguments;
 
     if (arguments is Map) {
-      studentId = int.tryParse(
+      final studentId = int.tryParse(
         arguments['student_id']?.toString() ??
             arguments['studentId']?.toString() ??
             '',
       );
-    } else if (arguments is int) {
-      studentId = arguments;
-    } else if (arguments is String) {
-      studentId = int.tryParse(arguments);
-    }
 
-    // សម្រាប់សាកល្បងបណ្ដោះអាសន្ន
-    studentId ??= 6;
+      if (studentId != null) {
+        loadAttendanceByStudent(studentId);
+      }
+    }
+  }
+
+  Future<void> loadAttendanceByStudent(
+    int studentId,
+  ) async {
+    selectedStudentId.value = studentId;
+
+    await getParentAttendance();
   }
 
   Future<void> getParentAttendance() async {
+    final studentId = selectedStudentId.value;
+
     if (studentId == null) {
+      attendanceList.clear();
+      resetCount();
+
+      debugPrint(
+        'PARENT ATTENDANCE: studentId is null',
+      );
+
       return;
     }
 
     try {
       isLoading.value = true;
 
-      final result = await attendanceService.getChildAttendance(
-        studentId: studentId!,
+      final result =
+          await attendanceService.getChildAttendance(
+        studentId: studentId,
       );
 
       attendanceList.assignAll(result);
 
       countAttendance();
+
+      debugPrint(
+        'ATTENDANCE STUDENT ID: $studentId',
+      );
+      debugPrint(
+        'ATTENDANCE RECORDS: ${attendanceList.length}',
+      );
+      debugPrint(
+        'PRESENT DAYS: ${presentDays.value}',
+      );
+      debugPrint(
+        'PRESENT SUBJECTS: ${presentSubjects.value}',
+      );
+      debugPrint(
+        'ABSENT DAYS: ${absentDays.value}',
+      );
+      debugPrint(
+        'PERMISSION DAYS: ${permissionDays.value}',
+      );
+      debugPrint(
+        'TOTAL UNIQUE DAYS: $totalDays',
+      );
+      debugPrint(
+        'ATTENDANCE RATE: $attendanceRate',
+      );
     } catch (error, stackTrace) {
       attendanceList.clear();
       resetCount();
@@ -102,85 +116,182 @@ class ParentAttendanceTabViewController extends GetxController {
     }
   }
 
-  List<AttendanceModel> get filteredAttendance {
-    return attendanceList.where((attendance) {
-      final parsedDate = DateTime.tryParse(
-        attendance.date?.toString() ?? '',
-      );
-
-      if (parsedDate == null) {
-        return false;
-      }
-
-      return parsedDate.month == selectedMonth.value &&
-          parsedDate.year == selectedYear.value;
-    }).toList();
-  }
-
   void countAttendance() {
-    final monthlyList = filteredAttendance;
+    /*
+      API example:
+      date: 2026-07-30, status: P, subject_id: 1
+      date: 2026-07-30, status: P, subject_id: 2
 
-    presentCount.value = monthlyList.where((attendance) {
-      final status = normalizeStatus(attendance.status);
+      Result:
+      presentSubjects = 2
+      presentDays = 1
+    */
 
-      return status == 'p' || status == 'present';
-    }).length;
+    final presentRecords = attendanceList.where((item) {
+      final status = normalizeStatus(item.status);
 
-    absentCount.value = monthlyList.where((attendance) {
-      final status = normalizeStatus(attendance.status);
+      return status == 'p' ||
+          status == 'present';
+    }).toList();
 
-      return status == 'a' || status == 'absent';
-    }).length;
+    final absentRecords = attendanceList.where((item) {
+      final status = normalizeStatus(item.status);
 
-    permissionCount.value = monthlyList.where((attendance) {
-      final status = normalizeStatus(attendance.status);
+      return status == 'a' ||
+          status == 'absent';
+    }).toList();
+
+    final permissionRecords =
+        attendanceList.where((item) {
+      final status = normalizeStatus(item.status);
 
       return status == 'l' ||
           status == 'leave' ||
           status == 'permission' ||
           status == 'permitted';
-    }).length;
+    }).toList();
+
+    // ចំនួន records / subjects
+    presentSubjects.value =
+        presentRecords.length;
+
+    absentSubjects.value =
+        absentRecords.length;
+
+    permissionSubjects.value =
+        permissionRecords.length;
+
+    // ចំនួនថ្ងៃមិនស្ទួន
+    presentDays.value =
+        _countUniqueDates(presentRecords);
+
+    absentDays.value =
+        _countUniqueDates(absentRecords);
+
+    permissionDays.value =
+        _countUniqueDates(permissionRecords);
   }
 
-  int get totalDays {
-    return presentCount.value +
-        absentCount.value +
-        permissionCount.value;
-  }
+  int _countUniqueDates(
+    List<AttendanceModel> records,
+  ) {
+    final dates = <String>{};
 
-  double get attendanceRate {
-    final total = totalDays;
+    for (final attendance in records) {
+      final dateKey = normalizeDate(
+        attendance.date,
+      );
 
-    if (total == 0) {
-      return 0;
+      if (dateKey.isNotEmpty) {
+        dates.add(dateKey);
+      }
     }
 
-    return presentCount.value / total * 100;
+    return dates.length;
   }
 
-  String get currentMonthName {
-    return khmerMonths[selectedMonth.value] ?? '';
+  String normalizeDate(dynamic value) {
+    if (value == null) {
+      return '';
+    }
+
+    final text = value.toString().trim();
+
+    if (text.isEmpty) {
+      return '';
+    }
+
+    final date = DateTime.tryParse(text);
+
+    if (date == null) {
+      return text;
+    }
+
+    final month = date.month
+        .toString()
+        .padLeft(2, '0');
+
+    final day = date.day
+        .toString()
+        .padLeft(2, '0');
+
+    return '${date.year}-$month-$day';
   }
 
   String normalizeStatus(dynamic status) {
-    return status?.toString().trim().toLowerCase() ?? '';
+    return status
+            ?.toString()
+            .trim()
+            .toLowerCase() ??
+        '';
   }
+
+  List<AttendanceModel> get filteredAttendance {
+    final now = DateTime.now();
+
+    return attendanceList.where((attendance) {
+      final date = DateTime.tryParse(
+        attendance.date?.toString() ?? '',
+      );
+
+      if (date == null) {
+        return false;
+      }
+
+      return date.year == now.year &&
+          date.month == now.month;
+    }).toList();
+  }
+
+  int get totalDays {
+    final dates = <String>{};
+
+    for (final attendance in attendanceList) {
+      final dateKey = normalizeDate(
+        attendance.date,
+      );
+
+      if (dateKey.isNotEmpty) {
+        dates.add(dateKey);
+      }
+    }
+
+    return dates.length;
+  }
+
+  int get totalSubjects {
+    return attendanceList.length;
+  }
+
+  double get attendanceRate {
+    if (totalDays == 0) {
+      return 0;
+    }
+
+    return presentDays.value /
+        totalDays *
+        100;
+  }
+
+  String get currentMonthName {
+  return 'month_${DateTime.now().month}';
+}
 
   String getStatusText(dynamic status) {
     switch (normalizeStatus(status)) {
       case 'p':
       case 'present':
-        return 'វត្តមាន';
+        return 'attendance_status_present'.tr;
 
       case 'a':
       case 'absent':
-        return 'អវត្តមាន';
+        return 'attendance_status_absent'.tr;
 
       case 'l':
       case 'leave':
       case 'permission':
       case 'permitted':
-        return 'សុំច្បាប់';
+        return 'attendance_status_permission'.tr;
 
       default:
         return 'មិនស្គាល់';
@@ -222,10 +333,10 @@ class ParentAttendanceTabViewController extends GetxController {
       case 'leave':
       case 'permission':
       case 'permitted':
-        return Colors.orange;
+        return AppColors.warning;
 
       default:
-        return Colors.grey;
+        return AppColors.grey;
     }
   }
 
@@ -234,22 +345,33 @@ class ParentAttendanceTabViewController extends GetxController {
       return '-';
     }
 
-    final date = DateTime.tryParse(value.toString());
+    final date = DateTime.tryParse(
+      value.toString(),
+    );
 
     if (date == null) {
       return value.toString();
     }
 
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day
+        .toString()
+        .padLeft(2, '0');
+
+    final month = date.month
+        .toString()
+        .padLeft(2, '0');
 
     return '$day/$month/${date.year}';
   }
 
   void resetCount() {
-    presentCount.value = 0;
-    absentCount.value = 0;
-    permissionCount.value = 0;
+    presentDays.value = 0;
+    absentDays.value = 0;
+    permissionDays.value = 0;
+
+    presentSubjects.value = 0;
+    absentSubjects.value = 0;
+    permissionSubjects.value = 0;
   }
 
   Future<void> refreshAttendance() async {

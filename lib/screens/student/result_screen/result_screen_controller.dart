@@ -1,7 +1,10 @@
 part of 'result_screen_view.dart';
 
-class ResultScreenViewController extends GetxController {
+class ResultScreenViewController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   final ResultApi resultApi = ResultApi();
+
+  late final TabController tabController;
 
   final selectedSemester = 1.obs;
   final selectedMonth = RxnInt();
@@ -31,12 +34,28 @@ class ResultScreenViewController extends GetxController {
   void onInit() {
     super.onInit();
 
+    tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: 0,
+    );
+
+    tabController.addListener(_handleTabChange);
+
     getResult();
   }
 
-  // ============================================================
-  // GET ALL SCORES
-  // ============================================================
+  void _handleTabChange() {
+    if (tabController.indexIsChanging) {
+      return;
+    }
+
+    final int semester = tabController.index + 1;
+
+    if (selectedSemester.value != semester) {
+      changeSemester(semester);
+    }
+  }
 
   Future<void> getResult() async {
     try {
@@ -51,18 +70,9 @@ class ResultScreenViewController extends GetxController {
         'TOTAL SCORE RECORDS: ${result.length}',
       );
 
-      for (final score in result) {
-        debugPrint(
-          'SCORE: '
-          'semester=${score.semester}, '
-          'month=${score.month}, '
-          'subject=${score.subjectName}, '
-          'score=${score.score}, '
-          'max=${score.maxScore}',
-        );
-      }
+      _selectInitialSemesterAndMonth();
 
-      selectLatestSemesterAndMonth();
+      _syncTabWithSemester();
 
       await getRank();
     } catch (e, stackTrace) {
@@ -88,10 +98,6 @@ class ResultScreenViewController extends GetxController {
     }
   }
 
-  // ============================================================
-  // AVAILABLE SEMESTERS
-  // ============================================================
-
   List<int> get availableSemesters {
     final List<int> semesters = result
         .map(
@@ -105,9 +111,9 @@ class ResultScreenViewController extends GetxController {
     return semesters;
   }
 
-  // ============================================================
-  // AVAILABLE MONTHS OF CURRENT SEMESTER
-  // ============================================================
+  bool hasSemester(int semester) {
+    return availableSemesters.contains(semester);
+  }
 
   List<int> get semesterMonths {
     final List<int> availableMonths = result
@@ -127,32 +133,37 @@ class ResultScreenViewController extends GetxController {
     return availableMonths;
   }
 
-  // ============================================================
-  // FILTER SCORES
-  // ============================================================
-
   List<ScoreModel> get filterScores {
     final int? month =
         selectedMonth.value;
 
-    return result.where((score) {
-      final bool sameSemester =
-          score.semester ==
-          selectedSemester.value;
+    if (month == null) {
+      return [];
+    }
 
-      final bool sameMonth =
-          month == null ||
-          score.month == month;
+    final List<ScoreModel> scores = result.where(
+      (score) {
+        final bool sameSemester =
+            score.semester ==
+            selectedSemester.value;
 
-      return sameSemester && sameMonth;
-    }).toList();
+        final bool sameMonth =
+            score.month == month;
+
+        return sameSemester && sameMonth;
+      },
+    ).toList();
+
+    scores.sort(
+      (a, b) => a.subjectName.compareTo(
+        b.subjectName,
+      ),
+    );
+
+    return scores;
   }
 
-  // ============================================================
-  // SELECT INITIAL LATEST SEMESTER AND MONTH
-  // ============================================================
-
-  void selectLatestSemesterAndMonth() {
+  void _selectInitialSemesterAndMonth() {
     final List<int> semesters =
         availableSemesters;
 
@@ -166,10 +177,10 @@ class ResultScreenViewController extends GetxController {
     selectedSemester.value =
         semesters.last;
 
-    selectLatestMonthForCurrentSemester();
+    _selectLatestMonthForCurrentSemester();
   }
 
-  void selectLatestMonthForCurrentSemester() {
+  void _selectLatestMonthForCurrentSemester() {
     final List<int> availableMonths =
         semesterMonths;
 
@@ -183,40 +194,64 @@ class ResultScreenViewController extends GetxController {
         availableMonths.last;
   }
 
-  // ============================================================
-  // CHANGE SEMESTER
-  // ============================================================
+  void _syncTabWithSemester() {
+    final int targetIndex =
+        (selectedSemester.value - 1).clamp(0, 1);
 
-  Future<void> changeSemester(
-    int semester,
-  ) async {
-    if (selectedSemester.value == semester) {
-      return;
+    if (tabController.index != targetIndex) {
+      tabController.animateTo(
+        targetIndex,
+      );
     }
-
-    selectedSemester.value = semester;
-
-    rank.value = null;
-
-    selectLatestMonthForCurrentSemester();
-
-    await getRank();
   }
 
-  // ============================================================
-  // CHANGE MONTH
-  // ============================================================
+  Future<void> changeSemester(int semester) async {
+  if (semester < 1 || semester > 2) {
+    return;
+  }
 
- Future<void> changeMonth(int month) async {
-  selectedMonth.value = month;
+  if (selectedSemester.value == semester) {
+    return;
+  }
+
+  selectedSemester.value = semester;
+  selectedMonth.value = null;
   rank.value = null;
+
+  // ជ្រើសខែចុងក្រោយតែម្តង នៅពេលប្ដូរ semester
+  _selectLatestMonthForCurrentSemester();
+
+  final int targetIndex = semester - 1;
+
+  if (tabController.index != targetIndex) {
+    tabController.animateTo(targetIndex);
+  }
 
   await getRank();
 }
 
-  // ============================================================
-  // GET RANK
-  // ============================================================
+  Future<void> changeMonth(int month) async {
+  if (!semesterMonths.contains(month)) {
+    debugPrint(
+      'MONTH $month NOT FOUND IN '
+      'SEMESTER ${selectedSemester.value}',
+    );
+    return;
+  }
+
+  // ប្ដូរ selected color ភ្លាមៗ
+  selectedMonth.value = month;
+
+  // លុប rank ចាស់
+  rank.value = null;
+
+  debugPrint(
+    'SELECTED MONTH: ${selectedMonth.value}',
+  );
+
+  // បន្ទាប់មកទើប load rank
+  await getRank();
+}
 
   Future<void> getRank() async {
     final int? month =
@@ -261,11 +296,60 @@ class ResultScreenViewController extends GetxController {
     }
   }
 
-  // ============================================================
-  // REFRESH
-  // ============================================================
-
   Future<void> refreshResult() async {
-    await getResult();
+    final int oldSemester =
+        selectedSemester.value;
+
+    final int? oldMonth =
+        selectedMonth.value;
+
+    try {
+      isLoading.value = true;
+
+      final List<ScoreModel> response =
+          await resultApi.getResult();
+
+      result.assignAll(response);
+
+      if (hasSemester(oldSemester)) {
+        selectedSemester.value =
+            oldSemester;
+
+        if (oldMonth != null &&
+            semesterMonths.contains(oldMonth)) {
+          selectedMonth.value =
+              oldMonth;
+        } else {
+          _selectLatestMonthForCurrentSemester();
+        }
+      } else {
+        _selectInitialSemesterAndMonth();
+      }
+
+      _syncTabWithSemester();
+
+      await getRank();
+    } catch (e, stackTrace) {
+      debugPrint(
+        'REFRESH RESULT ERROR: $e',
+      );
+
+      debugPrint(
+        'REFRESH RESULT STACK TRACE: $stackTrace',
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  @override
+  void onClose() {
+    tabController.removeListener(
+      _handleTabChange,
+    );
+
+    tabController.dispose();
+
+    super.onClose();
   }
 }
