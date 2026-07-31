@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
@@ -48,8 +49,8 @@ class CustomHeaderAction extends StatelessWidget {
               clipBehavior: Clip.none,
               alignment: Alignment.center,
               children: [
-                const Icon(
-                  Icons.notifications_none_rounded,
+                Icon(
+                  PhosphorIconsRegular.bell,
                   size: 28,
                 ),
                 if (unreadCount > 0)

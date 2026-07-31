@@ -5,6 +5,7 @@ class AskPermissionScreenViewController extends GetxController {
   final reasonController = TextEditingController();
   final PermissionServices permissionServices = PermissionServices();
   final ScheduleServices scheduleServices = ScheduleServices();
+  final userController = Get.find<UserController>();
 
   final selectedRequestType = 'By Subject'.obs;
   final selectedScheduleId = RxnInt();
@@ -50,16 +51,32 @@ class AskPermissionScreenViewController extends GetxController {
   Future<void> fetchTodaySchedules() async {
     isScheduleLoading.value = true;
     try {
-      final result = await scheduleServices.fetchSchedules();
+      await _ensureProfileLoaded();
+      final classId = userController.profile?.classId;
+      final result = await scheduleServices.fetchSchedules(
+        classId: classId != null && classId > 0 ? classId : null,
+      );
       final today = _todayDayName().toLowerCase();
-      final todaySchedules = result
+      var todaySchedules = result
           .where((item) => item.day.trim().toLowerCase() == today)
           .toList();
+
+      if (classId != null && classId > 0) {
+        todaySchedules =
+            todaySchedules.where((item) => item.classId == classId).toList();
+      }
+
       schedules.assignAll(todaySchedules);
     } catch (_) {
       schedules.clear();
     } finally {
       isScheduleLoading.value = false;
+    }
+  }
+
+  Future<void> _ensureProfileLoaded() async {
+    if (userController.profile == null) {
+      await userController.getProfile();
     }
   }
 

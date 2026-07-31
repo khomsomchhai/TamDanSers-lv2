@@ -36,6 +36,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
         child: Column(
           children: [
 
+
             // 2. Custom Segmented Tab Bar Control
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -199,7 +200,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
     } else if (item.status == HomeworkStatus.checked) {
       badgeText = isKm ? 'ពិនិត្យ' : 'Check';
       badgeTextColor = AppColors.success;
-      badgeBgColor = AppColors.success.withOpacity(0.12);
+      badgeBgColor = AppColors.success.withValues(alpha: 0.12);
       showBadge = true;
     }
 

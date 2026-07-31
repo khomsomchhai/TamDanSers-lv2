@@ -54,9 +54,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                               ),
                               const SizedBox(height: 18),
                               Text(
-                                'no_schedule_for'.trParams({
-                                  'day': controller.days[index].tr,
-                                }),
+                                'no_schedule_for'.tr,
                                 textAlign: TextAlign.center,
                                 style: AppTextStyles.titleSmall.copyWith(
                                   color: theme.textTheme.titleSmall?.color,

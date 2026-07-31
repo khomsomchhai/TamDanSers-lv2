@@ -1,8 +1,16 @@
 part of 'login_screen_view.dart';
 
 class LoginScreenViewController extends GetxController {
-  final idCtrl = TextEditingController();
-  final pwdCtrl = TextEditingController();
+  final studentIdCtrl = TextEditingController();
+  final parentIdCtrl = TextEditingController();
+  final studentPwdCtrl = TextEditingController();
+  final parentPwdCtrl = TextEditingController();
+
+  TextEditingController get currentIdCtrl =>
+      selectedTab.value == 1 ? parentIdCtrl : studentIdCtrl;
+
+  TextEditingController get currentPwdCtrl =>
+      selectedTab.value == 1 ? parentPwdCtrl : studentPwdCtrl;
 
   final formKey = GlobalKey<FormState>();
 
@@ -41,12 +49,12 @@ class LoginScreenViewController extends GetxController {
 
       final response = selectedTab.value == 1
           ? await authService.loginParentService(
-              studentCode: idCtrl.text.trim(),
-              password: pwdCtrl.text,
+              studentCode: currentIdCtrl.text.trim(),
+              password: currentPwdCtrl.text,
             )
           : await authService.loginService(
-              loginId: idCtrl.text.trim(),
-              password: pwdCtrl.text,
+              loginId: currentIdCtrl.text.trim(),
+              password: currentPwdCtrl.text,
             );
 
       final token = response["access_token"]?.toString().trim();
@@ -113,8 +121,10 @@ if (response["role"] == "parent") {
 
   @override
   void onClose() {
-    idCtrl.dispose();
-    pwdCtrl.dispose();
+    studentIdCtrl.dispose();
+    parentIdCtrl.dispose();
+    studentPwdCtrl.dispose();
+    parentPwdCtrl.dispose();
     super.onClose();
   }
 }

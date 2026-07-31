@@ -4,9 +4,20 @@ class NotificationController extends GetxController {
   final NotificationApi api = NotificationApi();
 
   var notifications = <NotificationModel>[].obs;
+  var expandedNotificationIds = <int>{}.obs;
   var unreadCount = 0.obs;
   var isLoading = false.obs;
   final box = GetStorage();
+
+  void toggleExpand(int id) {
+    if (expandedNotificationIds.contains(id)) {
+      expandedNotificationIds.remove(id);
+    } else {
+      expandedNotificationIds.add(id);
+    }
+  }
+
+  bool isExpanded(int id) => expandedNotificationIds.contains(id);
 
   @override
   void onInit() {
@@ -18,18 +29,18 @@ class NotificationController extends GetxController {
     try {
       isLoading.value = true;
 
-      notifications.value = await api.getNotifications();
+      final fetched = await api.getNotifications();
+      fetched.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      notifications.assignAll(fetched);
 
       final lastCount = box.read("notificationsCount") ?? 0;
-
       unreadCount.value = notifications.length - (lastCount as int);
 
-      // កុំឱ្យ unreadCount អវិជ្ជមាន
       if (unreadCount.value < 0) {
         unreadCount.value = 0;
       }
     } catch (e) {
-      print("Load notification error: $e");
+      debugPrint("Load notification error: $e");
     } finally {
       isLoading.value = false;
     }
@@ -44,59 +55,128 @@ class NotificationController extends GetxController {
     );
   }
 
+  Map<String, List<NotificationModel>> get groupedNotifications {
+    final Map<String, List<NotificationModel>> groups = {};
+
+    final now = DateTime.now();
+    final todayDate = DateTime(now.year, now.month, now.day);
+    final yesterdayDate = todayDate.subtract(const Duration(days: 1));
+
+    for (var notification in notifications) {
+      final itemDate = DateTime(
+        notification.createdAt.year,
+        notification.createdAt.month,
+        notification.createdAt.day,
+      );
+
+      String key;
+      if (itemDate.isAtSameMomentAs(todayDate)) {
+        key = 'today_header'.tr;
+      } else if (itemDate.isAtSameMomentAs(yesterdayDate)) {
+        key = 'yesterday_header'.tr;
+      } else {
+        key = 'earlier_header'.tr;
+      }
+
+      if (!groups.containsKey(key)) {
+        groups[key] = [];
+      }
+      groups[key]!.add(notification);
+    }
+
+    return groups;
+  }
+
+  String formatTimeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inSeconds < 60) {
+      return Get.locale?.languageCode == 'km' ? 'អម្បាញ់មិញ' : 'Just now';
+    } else if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}m ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours}h ago';
+    } else {
+      return '${difference.inDays}d ago';
+    }
+  }
+
   IconData getNotificationIcon(String title) {
     final text = title.toLowerCase();
 
     if (text.contains("homework")) {
-      return Icons.menu_book;
+      return Icons.assignment_outlined;
     }
 
     if (text.contains("attendance")) {
-      return Icons.fact_check;
+      return Icons.fact_check_outlined;
     }
 
     if (text.contains("event")) {
-      return Icons.event;
+      return Icons.event_available_rounded;
     }
 
     if (text.contains("score") || text.contains("result")) {
-      return Icons.bar_chart;
+      return Icons.bar_chart_rounded;
     }
 
     if (text.contains("permission")) {
-      return Icons.assignment;
+      return Icons.assignment_turned_in_outlined;
     }
 
-    if (text.contains("exam")) {
-      return Icons.description;
-    }
-
-    return Icons.notifications;
+    return Icons.notifications_none_rounded;
   }
 
   Color getNotificationColor(String title) {
     final text = title.toLowerCase();
 
     if (text.contains("homework")) {
-      return Colors.orange;
+      return const Color(0xFFF97316);
     }
 
     if (text.contains("attendance")) {
-      return Colors.red;
+      return const Color(0xFFEF4444);
     }
 
     if (text.contains("event")) {
-      return Colors.blue;
+      return const Color(0xFF0EA5E9);
     }
 
     if (text.contains("score") || text.contains("result")) {
-      return Colors.green;
+      return const Color(0xFF22C55E);
     }
 
     if (text.contains("permission")) {
-      return Colors.purple;
+      return const Color(0xFFA855F7);
     }
 
-    return Colors.grey;
+    return const Color(0xFF6763EB);
+  }
+
+  Color getNotificationBgColor(String title) {
+    final text = title.toLowerCase();
+
+    if (text.contains("homework")) {
+      return const Color(0xFFFFF7ED);
+    }
+
+    if (text.contains("attendance")) {
+      return const Color(0xFFFEE2E2);
+    }
+
+    if (text.contains("event")) {
+      return const Color(0xFFE0F2FE);
+    }
+
+    if (text.contains("score") || text.contains("result")) {
+      return const Color(0xFFDCFCE7);
+    }
+
+    if (text.contains("permission")) {
+      return const Color(0xFFF3E8FF);
+    }
+
+    return const Color(0xFFEEF2FF);
   }
 }
