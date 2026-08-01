@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
+import 'package:tamdansers_lv2/app/themes/skeleton_theme.dart';
 
 ThemeData get lightTheme => ThemeData(
   brightness: Brightness.light,
@@ -17,6 +18,12 @@ ThemeData get lightTheme => ThemeData(
     error: AppColors.error,
     onError: AppColors.white
   ),
+  extensions: <ThemeExtension<dynamic>>[
+    SkeletonTheme(
+      baseColor: Colors.grey.shade400,
+      highlightColor: Colors.grey.shade200,
+    ),
+  ],
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.lightBackground,
     foregroundColor: AppColors.dark,

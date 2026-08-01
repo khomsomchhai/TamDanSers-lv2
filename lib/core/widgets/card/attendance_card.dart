@@ -56,19 +56,16 @@ class AttendanceCard extends StatelessWidget {
                 width: AppNumbers.avatarLarge,
                 height: AppNumbers.avatarLarge,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.primary.withValues(alpha: 0.8),
-                      AppColors.primary.withValues(alpha: 0.5),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: Get.isDarkMode 
+                    ? AppColors.primary
+                    : AppColors.secondary,
                   borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.menu_book_rounded,
-                  color: AppColors.secondary,
+                  color: Get.isDarkMode 
+                    ? AppColors.white
+                    : AppColors.primary,
                   size: AppNumbers.iconMedium,
                 ),
               ),

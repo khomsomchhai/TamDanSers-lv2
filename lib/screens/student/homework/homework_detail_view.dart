@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'dart:ui';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide MultipartFile;
-import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tamdansers_lv2/screens/student/homework/in_app_pdf_viewer.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
+import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
+import 'package:tamdansers_lv2/screens/student/homework/in_app_pdf_viewer.dart';
 
 class DashedRectPainter extends CustomPainter {
   final Color color;
@@ -281,58 +283,8 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     final primaryThemeColor = _getSubjectColor(item.subjectName);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).brightness == Brightness.light
-          ? const Color(0xffF8FAFC)
-          : const Color(0xff0F0F12),
-      appBar: AppBar(
-        toolbarHeight: 64,
-        title: Text(
-          isKm ? 'ព័ត៌មានកិច្ចការ' : 'Homework Details',
-          style: Get.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Theme.of(context).brightness == Brightness.light
-            ? const Color(0xffF8FAFC)
-            : const Color(0xff0F0F12),
-        foregroundColor: Theme.of(context).brightness == Brightness.light
-            ? AppColors.dark
-            : AppColors.white,
-        leadingWidth: 70,
-        leading: Align(
-          alignment: Alignment.centerRight,
-          child: GestureDetector(
-            onTap: () => Get.back(),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.light
-                    ? AppColors.white
-                    : Colors.grey[900],
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  )
-                ],
-              ),
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                size: 18,
-                color: Theme.of(context).brightness == Brightness.light
-                    ? AppColors.dark
-                    : AppColors.white,
-              ),
-            ),
-          ),
-        ),
-      ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: CustomAppBar(title: "Homework Details".tr),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(

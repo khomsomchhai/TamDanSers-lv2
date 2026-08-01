@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
@@ -28,6 +29,7 @@ class CustomScoreCard extends StatelessWidget {
         builder: (context, constraints) {
           final isNarrow = constraints.maxWidth < 340;
           final circleSize = isNarrow ? 48.0 : 60.0;
+          final trophySize = isNarrow ? 30.0 : 36.0;
 
           return Container(
             padding: const EdgeInsets.all(16),
@@ -54,17 +56,39 @@ class CustomScoreCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          currentRank,
-                          style: AppTextStyles.headlineMedium.copyWith(
-                            color: AppColors.lightBackground,
-                            fontWeight: FontWeight.bold,
+                      const SizedBox(height: 6),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: trophySize,
+                            height: trophySize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.success
+                              
+                            ),
+                            child: Icon(
+                              PhosphorIconsFill.medal,
+                              size: trophySize * 0.62,
+                              color: AppColors.white,
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                currentRank,
+                                style: AppTextStyles.headlineMedium.copyWith(
+                                  color: AppColors.lightBackground,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 8),
                       Row(

@@ -7,6 +7,7 @@ import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
+import 'package:tamdansers_lv2/app/themes/skeleton_theme.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
 import 'package:tamdansers_lv2/core/api/services/schedule_services.dart';
@@ -38,6 +39,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: controller.refreshHome,
@@ -137,18 +139,28 @@ class HomeTabView extends GetView<HomeTabViewController> {
                       );
                     }
 
-                    return Column(
-                      children: controller.recentAttendance
-                          .map(
-                            (item) => AttendanceCard(
-                              item: item,
-                              mapStatus: controller.mapStatus,
-                              statusColor: controller.mapStatusColor,
-                              formatDate: controller.formatDate,
-                              formatTimeRange: controller.formatTimeRange,
-                            ),
-                          )
-                          .toList(),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Column(
+                        children: [
+                          ...controller.recentAttendance.map((item) {
+                            final index = controller.recentAttendance.indexOf(item);
+                            return Column(
+                              children: [
+                                AttendanceCard(
+                                  item: item,
+                                  mapStatus: controller.mapStatus,
+                                  statusColor: controller.mapStatusColor,
+                                  formatDate: controller.formatDate,
+                                  formatTimeRange: controller.formatTimeRange,
+                                ),
+                                if (index < controller.recentAttendance.length - 1)
+                                  const SizedBox(height: 12),
+                              ],
+                            );
+                          }),
+                        ],
+                      ),
                     );
                   })
                 ],
@@ -245,9 +257,10 @@ class HomeTabView extends GetView<HomeTabViewController> {
   }
 
   Widget _buildAttendanceCardSkeleton() {
+    final skeletonTheme = Get.theme.extension<SkeletonTheme>();
     return Shimmer.fromColors(
-      baseColor: AppColors.skeletonBaseColor,
-      highlightColor: AppColors.skeletonHighlightColor,
+      baseColor: skeletonTheme?.baseColor ?? Get.theme.cardColor,
+      highlightColor: skeletonTheme?.highlightColor ?? Colors.grey.shade200,
       child: Column(
         children: [
           Row(
@@ -256,7 +269,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                 width: 50,
                 height: 14,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Get.theme.cardColor,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -265,7 +278,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                 width: 60,
                 height: 14,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Get.theme.cardColor,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -276,7 +289,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
             width: double.infinity,
             height: 140,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Get.theme.cardColor,
               borderRadius: BorderRadius.circular(12),
             ),
           ),
@@ -286,20 +299,21 @@ class HomeTabView extends GetView<HomeTabViewController> {
   }
 
   Widget _buildRecentAttendanceSkeleton() {
+    final skeletonTheme = Get.theme.extension<SkeletonTheme>();
     return Column(
       children: List.generate(
         3,
         (_) => Padding(
           padding: const EdgeInsets.only(bottom: AppNumbers.spacingMedium),
           child: Shimmer.fromColors(
-            baseColor: AppColors.skeletonBaseColor,
-            highlightColor: AppColors.skeletonHighlightColor,
+            baseColor: skeletonTheme?.baseColor ?? Get.theme.cardColor,
+            highlightColor: skeletonTheme?.highlightColor ?? Colors.grey.shade200,
             period: const Duration(milliseconds: 1200),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(AppNumbers.cardPadding),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Get.theme.cardColor,
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
               ),
               child: Column(
@@ -309,7 +323,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                     width: 140,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Get.theme.cardColor,
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
@@ -318,7 +332,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                     width: double.infinity,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Get.theme.cardColor,
                       borderRadius: BorderRadius.circular(6),
                     ),
                   ),
@@ -327,7 +341,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                     width: double.infinity,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Get.theme.cardColor,
                       borderRadius: BorderRadius.circular(6),
                     ),
                   ),
@@ -336,7 +350,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                     width: 120,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Get.theme.cardColor,
                       borderRadius: BorderRadius.circular(6),
                     ),
                   ),
@@ -660,9 +674,10 @@ class HomeTabView extends GetView<HomeTabViewController> {
   }
 
   Widget _buildTodayScheduleSkeleton() {
+    final skeletonTheme = Get.theme.extension<SkeletonTheme>();
     return Shimmer.fromColors(
-      baseColor: AppColors.skeletonBaseColor,
-      highlightColor: AppColors.skeletonHighlightColor,
+      baseColor: skeletonTheme?.baseColor ?? Get.theme.cardColor,
+      highlightColor: skeletonTheme?.highlightColor ?? Colors.grey.shade200,
       child: Column(
         children: List.generate(
           2,
@@ -674,7 +689,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                   width: 58,
                   height: 58,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Get.theme.cardColor,
                     borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                   ),
                 ),
@@ -683,7 +698,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                   child: Container(
                     height: 64,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Get.theme.cardColor,
                       borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                     ),
                   ),

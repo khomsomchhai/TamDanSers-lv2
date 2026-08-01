@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -61,11 +62,11 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
         ),
         filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppNumbers.spacingMedium,
-          vertical: AppNumbers.spacingMedium,
-        ),
+        fillColor: Get.theme.cardColor,
+        // contentPadding: const EdgeInsets.symmetric(
+        //   horizontal: AppNumbers.spacingMedium,
+        //   vertical: AppNumbers.spacingMedium,
+        // ),
       ),
     );
   }
