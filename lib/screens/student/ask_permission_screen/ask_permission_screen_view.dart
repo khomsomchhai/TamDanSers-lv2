@@ -165,7 +165,8 @@ class AskPermissionScreenView
                                   Icon(
                                     Icons.menu_book_rounded,
                                     size: AppNumbers.icon16,
-                                    color: theme.iconTheme.color?.withOpacity(0.7),
+                                    color:
+                                        theme.iconTheme.color?.withOpacity(0.7),
                                   ),
                                   const SizedBox(
                                       width: AppNumbers.spacingSmall),
@@ -173,7 +174,8 @@ class AskPermissionScreenView
                                     child: Text(
                                       '${'ask_permission_subject'.tr}: $subjectLine',
                                       style: Get.textTheme.bodySmall?.copyWith(
-                                        color: theme.textTheme.bodySmall?.color?.withOpacity(0.75),
+                                        color: theme.textTheme.bodySmall?.color
+                                            ?.withOpacity(0.75),
                                       ),
                                     ),
                                   ),
@@ -186,14 +188,16 @@ class AskPermissionScreenView
                                 Icon(
                                   Icons.label_outline_rounded,
                                   size: AppNumbers.icon16,
-                                  color: theme.iconTheme.color?.withOpacity(0.7),
+                                  color:
+                                      theme.iconTheme.color?.withOpacity(0.7),
                                 ),
                                 const SizedBox(width: AppNumbers.spacingSmall),
                                 Expanded(
                                   child: Text(
                                     '${'ask_permission_permission_type'.tr}: ${request.type}',
                                     style: Get.textTheme.bodySmall?.copyWith(
-                                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.75),
+                                      color: theme.textTheme.bodySmall?.color
+                                          ?.withOpacity(0.75),
                                     ),
                                   ),
                                 ),
@@ -205,14 +209,16 @@ class AskPermissionScreenView
                                 Icon(
                                   Icons.notes_outlined,
                                   size: AppNumbers.icon16,
-                                  color: theme.iconTheme.color?.withOpacity(0.7),
+                                  color:
+                                      theme.iconTheme.color?.withOpacity(0.7),
                                 ),
                                 const SizedBox(width: AppNumbers.spacingSmall),
                                 Expanded(
                                   child: Text(
                                     '${'ask_permission_reason'.tr}: ${request.reason}',
                                     style: Get.textTheme.bodySmall?.copyWith(
-                                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.75),
+                                      color: theme.textTheme.bodySmall?.color
+                                          ?.withOpacity(0.75),
                                     ),
                                   ),
                                 ),
@@ -224,13 +230,15 @@ class AskPermissionScreenView
                                 Icon(
                                   Icons.schedule_rounded,
                                   size: AppNumbers.icon16,
-                                  color: theme.iconTheme.color?.withOpacity(0.7),
+                                  color:
+                                      theme.iconTheme.color?.withOpacity(0.7),
                                 ),
                                 const SizedBox(width: AppNumbers.spacingSmall),
                                 Text(
                                   '${'ask_permission_created'.tr}: ${controller.formatCreatedDate(request.createdAt)}',
                                   style: Get.textTheme.bodySmall?.copyWith(
-                                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.75),
+                                    color: theme.textTheme.bodySmall?.color
+                                        ?.withOpacity(0.75),
                                   ),
                                 ),
                               ],
@@ -252,64 +260,42 @@ class AskPermissionScreenView
   Widget _buildFormCard(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppNumbers.cardPadding,
-        vertical: AppNumbers.cardPadding,
-      ),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(AppNumbers.radiusRounded),
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.03),
-            blurRadius: AppNumbers.shadowBlur,
-            offset: Offset(0, 6),
+    return Form(
+      key: controller.formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: AppNumbers.buttonHeight,
+                height: AppNumbers.buttonHeight,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
+                ),
+                child: Icon(
+                  Icons.assignment_rounded,
+                  color: theme.colorScheme.onPrimaryContainer,
+                  size: AppNumbers.iconMedium,
+                ),
+              ),
+              const SizedBox(width: AppNumbers.spacingMedium),
+              Expanded(
+                child: Text(
+                  'ask_permission_request_permission'.tr,
+                  style: Get.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Form(
-        key: controller.formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: AppNumbers.buttonHeight,
-                  height: AppNumbers.buttonHeight,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer,
-                    borderRadius:
-                        BorderRadius.circular(AppNumbers.radiusMedium),
-                  ),
-                  child: Icon(
-                    Icons.assignment_rounded,
-                    color: theme.colorScheme.onPrimaryContainer,
-                    size: AppNumbers.iconMedium,
-                  ),
-                ),
-                const SizedBox(width: AppNumbers.spacingMedium),
-                Expanded(
-                  child: Text(
-                    'ask_permission_request_permission'.tr,
-                    style: Get.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppNumbers.spacingMedium),
-            Divider(height: 1, color: theme.dividerColor),
-            const SizedBox(height: AppNumbers.spacingLarge),
-            Text(
-              'ask_permission_request_type'.tr,
-              style: Get.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: AppNumbers.spacingSmall),
-            Obx(
+          const SizedBox(height: AppNumbers.spacingLarge),
+          _buildOutlinedField(
+            context,
+            title: 'ask_permission_request_type'.tr,
+            child: Obx(
               () => DropdownButtonFormField<String>(
                 key: ValueKey(controller.selectedRequestType.value),
                 initialValue: controller.selectedRequestType.value,
@@ -331,12 +317,22 @@ class AskPermissionScreenView
                 },
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: theme.cardColor,
+                  fillColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppNumbers.spacingMedium,
                     vertical: AppNumbers.spacingMedium,
                   ),
                   border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius:
+                        BorderRadius.circular(AppNumbers.radiusMedium),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius:
+                        BorderRadius.circular(AppNumbers.radiusMedium),
+                  ),
+                  focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide.none,
                     borderRadius:
                         BorderRadius.circular(AppNumbers.radiusMedium),
@@ -350,21 +346,20 @@ class AskPermissionScreenView
                 ),
               ),
             ),
-            const SizedBox(height: AppNumbers.spacingLarge),
-            Obx(() {
-              if (!controller.isBySubject) {
-                return const SizedBox.shrink();
-              }
+          ),
+          const SizedBox(height: AppNumbers.spacingMedium),
+          Obx(() {
+            if (!controller.isBySubject) {
+              return const SizedBox.shrink();
+            }
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'ask_permission_subject'.tr,
-                    style: Get.textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: AppNumbers.spacingSmall),
-                  DropdownButtonFormField<String>(
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildOutlinedField(
+                  context,
+                  title: 'ask_permission_subject'.tr,
+                  child: DropdownButtonFormField<String>(
                     key: ValueKey(controller.selectedScheduleId.value),
                     initialValue: controller.schedules.any(
                       (item) => item.id == controller.selectedScheduleId.value,
@@ -393,12 +388,22 @@ class AskPermissionScreenView
                     isExpanded: true,
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: theme.cardColor,
+                      fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: AppNumbers.spacingMedium,
                         vertical: AppNumbers.spacingMedium,
                       ),
                       border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius:
+                            BorderRadius.circular(AppNumbers.radiusMedium),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius:
+                            BorderRadius.circular(AppNumbers.radiusMedium),
+                      ),
+                      focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide.none,
                         borderRadius:
                             BorderRadius.circular(AppNumbers.radiusMedium),
@@ -409,16 +414,15 @@ class AskPermissionScreenView
                         BorderRadius.circular(AppNumbers.radiusMedium),
                     icon: const Icon(Icons.keyboard_arrow_down_rounded),
                   ),
-                  const SizedBox(height: AppNumbers.spacingLarge),
-                ],
-              );
-            }),
-            Text(
-              'ask_permission_permission_type'.tr,
-              style: Get.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: AppNumbers.spacingSmall),
-            Obx(
+                ),
+                const SizedBox(height: AppNumbers.spacingMedium),
+              ],
+            );
+          }),
+          _buildOutlinedField(
+            context,
+            title: 'ask_permission_permission_type'.tr,
+            child: Obx(
               () => DropdownButtonFormField<String>(
                 key: ValueKey(controller.selectedPermissionType.value),
                 initialValue: controller.permissionTypes
@@ -442,12 +446,22 @@ class AskPermissionScreenView
                     controller.selectedPermissionType.value = value ?? '',
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: theme.cardColor,
+                  fillColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppNumbers.spacingMedium,
                     vertical: AppNumbers.spacingMedium,
                   ),
                   border: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius:
+                        BorderRadius.circular(AppNumbers.radiusMedium),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius:
+                        BorderRadius.circular(AppNumbers.radiusMedium),
+                  ),
+                  focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide.none,
                     borderRadius:
                         BorderRadius.circular(AppNumbers.radiusMedium),
@@ -458,32 +472,57 @@ class AskPermissionScreenView
                 icon: const Icon(Icons.keyboard_arrow_down_rounded),
               ),
             ),
-            const SizedBox(height: AppNumbers.spacingLarge),
-            Text(
-              'ask_permission_reason'.tr,
-              style: Get.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: AppNumbers.spacingSmall),
-            CustomTextField(
-              hintText: 'ask_permission_write_reason'.tr,
-              controller: controller.reasonController,
-              isMultiline: true,
-            ),
-            const SizedBox(height: AppNumbers.spacingLarge),
-            SizedBox(
-              width: double.infinity,
-              height: AppNumbers.buttonHeight,
-              child: Obx(
-                () => CustomButton(
-                  text: 'ask_permission_submit_request'.tr,
-                  isLoading: controller.isLoading.value,
-                  onPressed: controller.submitPermission,
-                ),
+          ),
+          const SizedBox(height: AppNumbers.spacingMedium),
+          _buildOutlinedField(
+            context,
+            title: 'ask_permission_reason'.tr,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: theme.dividerColor),
+                borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
+              ),
+              child: CustomTextField(
+                hintText: 'ask_permission_write_reason'.tr,
+                controller: controller.reasonController,
+                isMultiline: true,
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: AppNumbers.spacingLarge),
+          SizedBox(
+            width: double.infinity,
+            height: AppNumbers.buttonHeight,
+            child: Obx(
+              () => CustomButton(
+                text: 'ask_permission_submit_request'.tr,
+                isLoading: controller.isLoading.value,
+                onPressed: controller.submitPermission,
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildOutlinedField(
+    BuildContext context, {
+    required String title,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Get.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppNumbers.spacingSmall),
+        child,
+      ],
     );
   }
 
