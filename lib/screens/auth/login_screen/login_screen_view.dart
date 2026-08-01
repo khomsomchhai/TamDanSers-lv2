@@ -22,6 +22,18 @@ import 'package:tamdansers_lv2/core/widgets/textfield.dart/custom_textfield.dart
 part 'login_screen_binding.dart';
 part 'login_screen_controller.dart';
 
+class _AuthTabData {
+  const _AuthTabData({required this.icon, required this.labelKey});
+
+  final IconData icon;
+  final String labelKey;
+}
+
+const List<_AuthTabData> _kAuthTabs = [
+  _AuthTabData(icon: PhosphorIconsRegular.student, labelKey: 'student'),
+  _AuthTabData(icon: PhosphorIconsRegular.users, labelKey: 'parent'),
+];
+
 class LoginScreenView extends GetView<LoginScreenViewController> {
   const LoginScreenView({super.key});
 
@@ -37,25 +49,17 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           Positioned(
             top: -60,
             left: -50,
-            child: Container(
-              width: 220,
-              height: 220,
-                decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: theme.colorScheme.primary.withOpacity(0.08),
-              ),
+            child: _BackgroundBlob(
+              size: 220,
+              color: theme.colorScheme.primary.withOpacity(0.08),
             ),
           ),
           Positioned(
             bottom: -70,
             right: -40,
-            child: Container(
-              width: 240,
-              height: 240,
-                decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: theme.colorScheme.secondary.withOpacity(0.08),
-              ),
+            child: _BackgroundBlob(
+              size: 240,
+              color: theme.colorScheme.secondary.withOpacity(0.08),
             ),
           ),
           SafeArea(
@@ -63,7 +67,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
                     child: Column(
                       children: [
@@ -73,15 +78,14 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                         ),
                         const SizedBox(height: 8),
                         _buildHeader(theme),
-                        const SizedBox(height: 46,),
-                        _buildAuthTabBar(theme),
+                        const SizedBox(height: 46),
+                        _AuthTabBar(controller: controller, theme: theme),
                         const SizedBox(height: 24),
                         _buildForm(theme),
                       ],
                     ),
                   ),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                   child: _buildFooter(context, theme),
@@ -95,181 +99,30 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
   }
 
   Widget _buildHeader(ThemeData theme) {
-    return Column(
-      children: [
-        Hero(
-          tag: 'app_logo',
-            child: Container(
-            width: 140,
-            height: 140,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.colorScheme.primary,
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withOpacity(0.18),
-                  blurRadius: 22,
-                  spreadRadius: 3,
-                ),
-              ],
+    return Hero(
+      tag: 'app_logo',
+      child: Container(
+        width: 140,
+        height: 140,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: theme.colorScheme.primary,
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withOpacity(0.18),
+              blurRadius: 22,
+              spreadRadius: 3,
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: SvgPicture.asset(
-                AppIcons.appIconPrimary,
-                colorFilter: ColorFilter.mode(theme.colorScheme.onPrimary, BlendMode.srcIn),
-              ),
-            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: SvgPicture.asset(
+            AppIcons.appIconPrimary,
+            colorFilter:
+                ColorFilter.mode(theme.colorScheme.onPrimary, BlendMode.srcIn),
           ),
         ),
-      ],
-    );
-  }
-  Widget _buildAuthTabBar(ThemeData theme) {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: theme.dividerColor,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.dark.withOpacity(0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final tabWidth = (constraints.maxWidth - 8) / 2;
-          return Obx(
-            () => Stack(
-              children: [
-                // Sliding pill indicator
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  left: controller.selectedTab.value == 0 ? 3 : (tabWidth + 6),
-                  top: 2,
-                  child: Container(
-                    width: tabWidth,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          theme.colorScheme.primary,
-                          theme.colorScheme.primary.withOpacity(0.9),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(26),
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.colorScheme.primary.withOpacity(0.2),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Tab buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: Material(
-                        color: AppColors.transparent,
-                        child: InkWell(
-                          onTap: () => controller.changeTab(0),
-                          borderRadius: BorderRadius.circular(26),
-                          splashColor: AppColors.transparent,
-                          highlightColor: AppColors.transparent,
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                AnimatedScale(
-                                  duration: const Duration(milliseconds: 200),
-                                  scale: controller.selectedTab.value == 0 ? 1.1 : 0.95,
-                                  child: Icon(
-                                    PhosphorIconsRegular.student,
-                                    size: 20,
-                                    color: controller.selectedTab.value == 0
-                                      ? AppColors.white
-                                      : theme.hintColor,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                AnimatedDefaultTextStyle(
-                                  duration: const Duration(milliseconds: 200),
-                                  style: Get.textTheme.bodyLarge!.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: controller.selectedTab.value == 0
-                                      ? AppColors.white
-                                      : theme.textTheme.bodyLarge?.color,
-                                  ),
-                                  child: Text('student'.tr),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Material(
-                        color: AppColors.transparent,
-                        child: InkWell(
-                          onTap: () => controller.changeTab(1),
-                          borderRadius: BorderRadius.circular(26),
-                          splashColor: AppColors.transparent,
-                          highlightColor: AppColors.transparent,
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                AnimatedScale(
-                                  duration: const Duration(milliseconds: 200),
-                                  scale: controller.selectedTab.value == 1 ? 1.1 : 0.95,
-                                  child: Icon(
-                                    PhosphorIconsRegular.users,
-                                    size: 20,
-                                    color: controller.selectedTab.value == 1
-                                      ? AppColors.white
-                                      : theme.hintColor,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                AnimatedDefaultTextStyle(
-                                  duration: const Duration(milliseconds: 200),
-                                  style: Get.textTheme.bodyLarge!.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: controller.selectedTab.value == 1
-                                      ? AppColors.white
-                                      : theme.textTheme.bodyLarge?.color,
-                                  ),
-                                  child: Text('parent'.tr),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }
@@ -302,7 +155,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
           ),
         ),
       ],
-            child: Container(
+      child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: theme.cardColor,
@@ -327,8 +180,14 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
             ),
             const SizedBox(width: 8),
             Text(
-              Get.locale?.languageCode == 'km' ? 'language_khmer'.tr : 'language_english'.tr,
-              style: GoogleFonts.kantumruyPro(fontSize: 13, fontWeight: FontWeight.w600, color: theme.textTheme.bodyMedium?.color),
+              Get.locale?.languageCode == 'km'
+                  ? 'language_khmer'.tr
+                  : 'language_english'.tr,
+              style: GoogleFonts.kantumruyPro(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: theme.textTheme.bodyMedium?.color,
+              ),
             ),
             const SizedBox(width: 4),
             Icon(
@@ -347,40 +206,36 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
       key: controller.formKey,
       child: Obx(
         () => AnimatedSwitcher(
-          duration: const Duration(milliseconds: 450),
+          duration: const Duration(milliseconds: 300),
           transitionBuilder: (child, animation) {
-            final direction = controller.selectedTab.value >= controller.previousTab.value ? 1 : -1;
-            final slideOffset = Tween<Offset>(
-              begin: Offset(direction.toDouble() * 0.3, 0),
-              end: Offset.zero,
-            );
-            final scale = Tween<double>(begin: 0.92, end: 1.0);
-            final opacity = Tween<double>(begin: 0.0, end: 1.0);
-            
+            final isOutgoing = animation.status == AnimationStatus.reverse;
+            final direction =
+                controller.selectedTab.value >= controller.previousTab.value
+                    ? 1.0
+                    : -1.0;
+            final begin = isOutgoing ? Offset.zero : Offset(direction * 0.2, 0);
+            final end = isOutgoing ? Offset(direction * 0.2, 0) : Offset.zero;
+
             return SlideTransition(
-              position: slideOffset.animate(
+              position: Tween<Offset>(begin: begin, end: end).animate(
                 CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
               ),
-              child: ScaleTransition(
-                scale: scale.animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
-                ),
-                child: FadeTransition(
-                  opacity: opacity.animate(
-                    CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
-                  ),
-                  child: child,
-                ),
-              ),
+              child: FadeTransition(opacity: animation, child: child),
             );
           },
+          layoutBuilder: (currentChild, previousChildren) => Stack(
+            alignment: Alignment.topCenter,
+            children: [...previousChildren, if (currentChild != null) currentChild],
+          ),
           child: Column(
             key: ValueKey(controller.selectedTab.value),
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'sign_in_title'.tr,
-                style: Get.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                style: Get.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: 20),
               CustomTextField(
@@ -411,10 +266,8 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                   isPwd: true,
                   isHide: controller.isHidePwd.value,
                   suffixIcon: Bounceable(
-                    onTap: () {
-                      controller.togglePwd();
-                    },
-                      child: Icon(
+                    onTap: controller.togglePwd,
+                    child: Icon(
                       controller.isHidePwd.value
                           ? PhosphorIconsRegular.eyeSlash
                           : PhosphorIconsRegular.eye,
@@ -428,12 +281,12 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Bounceable(
-                    onTap: () {
-                      Get.toNamed(AppRoutes.forgetPasswordScreen);
-                    },
-                      child: Text(
+                    onTap: () => Get.toNamed(AppRoutes.forgetPasswordScreen),
+                    child: Text(
                       'forget_password'.tr,
-                      style: Get.textTheme.bodyLarge?.copyWith(color: AppColors.info),
+                      style: Get.textTheme.bodyLarge?.copyWith(
+                        color: AppColors.info,
+                      ),
                     ),
                   ),
                 ],
@@ -465,26 +318,22 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
     return Obx(
       () {
         return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 500),
           switchInCurve: Curves.easeOutCubic,
           switchOutCurve: Curves.easeInCubic,
           transitionBuilder: (child, animation) {
             final isVisibleFooter = child.key == const ValueKey('footer_visible');
             final isOutgoing = animation.status == AnimationStatus.reverse;
-            final begin = isVisibleFooter && !isOutgoing
-                ? const Offset(0.2, 0)
-                : Offset.zero;
-            final end = isVisibleFooter && isOutgoing
-                ? const Offset(0.2, 0)
-                : Offset.zero;
+            final begin =
+                isVisibleFooter && !isOutgoing ? const Offset(0.2, 0) : Offset.zero;
+            final end =
+                isVisibleFooter && isOutgoing ? const Offset(0.2, 0) : Offset.zero;
 
             return SlideTransition(
-              position: Tween<Offset>(begin: begin, end: end)
-                  .animate(CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic)),
-              child: FadeTransition(
-                opacity: animation,
-                child: child,
+              position: Tween<Offset>(begin: begin, end: end).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
               ),
+              child: FadeTransition(opacity: animation, child: child),
             );
           },
           child: controller.selectedTab.value == 0
@@ -495,13 +344,13 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                   children: [
                     Text(
                       'no_account'.tr,
-                        style: theme.textTheme.bodyLarge?.copyWith(color: theme.hintColor),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.hintColor,
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Bounceable(
-                      onTap: () {
-                        Get.toNamed(AppRoutes.registerParentScreen);
-                      },
+                      onTap: () => Get.toNamed(AppRoutes.registerParentScreen),
                       child: Text(
                         'sign_up'.tr,
                         style: theme.textTheme.bodyLarge?.copyWith(
@@ -516,116 +365,188 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
       },
     );
   }
-
-  // void _showRegistrationSheet(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     backgroundColor: AppColors.transparent,
-  //     builder: (sheetContext) {
-  //       return Container(
-  //         decoration: BoxDecoration(
-  //           color: Get.theme.colorScheme.surface,
-  //           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-  //         ),
-  //         child: SafeArea(
-  //           child: Padding(
-  //             padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-  //             child: Column(
-  //               mainAxisSize: MainAxisSize.min,
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 Center(
-  //                   child: Container(
-  //                     width: 44,
-  //                     height: 5,
-  //                     decoration: BoxDecoration(
-  //                       color: AppColors.border,
-  //                       borderRadius: BorderRadius.circular(999),
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 20),
-  //                 Text(
-  //                   'join_app'.tr,
-  //                   style: Get.textTheme.titleLarge?.copyWith(
-  //                     fontWeight: FontWeight.w700,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 8),
-  //                 Text(
-  //                   'choose_how_to_use'.tr,
-  //                   style: Get.textTheme.bodyMedium?.copyWith(
-  //                     color: AppColors.hintColor,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 20),
-  //                 InkWell(
-  //                   onTap: () {
-  //                     Navigator.of(sheetContext).pop();
-  //                     Get.toNamed(AppRoutes.registerParentScreen);
-  //                   },
-  //                   borderRadius: BorderRadius.circular(AppNumbers.radiusLarge),
-  //                   child: Container(
-  //                     padding: const EdgeInsets.all(16),
-  //                     decoration: BoxDecoration(
-  //                       color: AppColors.lightBackground,
-  //                       borderRadius: BorderRadius.circular(AppNumbers.radiusLarge),
-  //                       border: Border.all(color: AppColors.border),
-  //                     ),
-  //                     child: Row(
-  //                       children: [
-  //                         Container(
-  //                           width: 48,
-  //                           height: 48,
-  //                           decoration: BoxDecoration(
-  //                             color: AppColors.primary.withValues(alpha: 0.12),
-  //                             borderRadius: BorderRadius.circular(14),
-  //                           ),
-  //                           child: Icon(
-  //                             PhosphorIconsRegular.usersThree,
-  //                             color: AppColors.primary,
-  //                             size: 25,
-  //                           ),
-  //                         ),
-  //                         const SizedBox(width: 14),
-  //                         Expanded(
-  //                           child: Column(
-  //                             crossAxisAlignment: CrossAxisAlignment.start,
-  //                             children: [
-  //                               Text(
-  //                                 'i_am_parent'.tr,
-  //                                 style: Get.textTheme.bodyLarge?.copyWith(
-  //                                   fontWeight: FontWeight.w700,
-  //                                 ),
-  //                               ),
-  //                               const SizedBox(height: 3),
-  //                               Text(
-  //                                 'stay_connected_child'.tr,
-  //                                 style: Get.textTheme.bodySmall?.copyWith(
-  //                                   color: AppColors.hintColor,
-  //                                 ),
-  //                               ),
-  //                             ],
-  //                           ),
-  //                         ),
-  //                         Icon(
-  //                           PhosphorIconsRegular.caretRight,
-  //                           color: AppColors.hintColor,
-  //                           size: 20,
-  //                         ),
-  //                       ],
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 }
 
+class _BackgroundBlob extends StatelessWidget {
+  const _BackgroundBlob({required this.size, required this.color});
 
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+    );
+  }
+}
+
+class _AuthTabBar extends StatelessWidget {
+  const _AuthTabBar({required this.controller, required this.theme});
+
+  final LoginScreenViewController controller;
+  final ThemeData theme;
+
+  static const double _height = 56;
+  static const double _padding = 4;
+  static const double _indicatorHeight = 42;
+  static const Duration _duration = Duration(milliseconds: 450);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: _height,
+      padding: const EdgeInsets.all(_padding),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: theme.dividerColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.dark.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final tabWidth =
+              (constraints.maxWidth - _padding * 2) / _kAuthTabs.length;
+
+          return Obx(
+            () => Stack(
+              children: [
+                _TabIndicator(
+                  selectedIndex: controller.selectedTab.value,
+                  tabWidth: tabWidth,
+                  height: _indicatorHeight,
+                  color: theme.colorScheme.primary,
+                  duration: _duration,
+                ),
+                Row(
+                  children: [
+                    for (var i = 0; i < _kAuthTabs.length; i++)
+                      Expanded(
+                        child: _TabButton(
+                          data: _kAuthTabs[i],
+                          isSelected: controller.selectedTab.value == i,
+                          inactiveColor: theme.hintColor,
+                          textStyle: Get.textTheme.bodyLarge,
+                          duration: _duration,
+                          onTap: () => controller.changeTab(i),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TabIndicator extends StatelessWidget {
+  const _TabIndicator({
+    required this.selectedIndex,
+    required this.tabWidth,
+    required this.height,
+    required this.color,
+    required this.duration,
+  });
+
+  final int selectedIndex;
+  final double tabWidth;
+  final double height;
+  final Color color;
+  final Duration duration;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedPositioned(
+      duration: duration,
+      curve: Curves.easeOutCubic,
+      left: 3 + (selectedIndex * (tabWidth + 3)),
+      top: 2,
+      child: Container(
+        width: tabWidth,
+        height: height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [color, color.withOpacity(0.9)],
+          ),
+          borderRadius: BorderRadius.circular(26),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+class _TabButton extends StatelessWidget {
+  const _TabButton({
+    required this.data,
+    required this.isSelected,
+    required this.inactiveColor,
+    required this.textStyle,
+    required this.duration,
+    required this.onTap,
+  });
+
+  final _AuthTabData data;
+  final bool isSelected;
+  final Color inactiveColor;
+  final TextStyle? textStyle;
+  final Duration duration;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final contentColor = isSelected ? AppColors.white : inactiveColor;
+
+    return Material(
+      color: AppColors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(26),
+        splashColor: AppColors.transparent,
+        highlightColor: AppColors.transparent,
+        child: Container(
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedScale(
+                duration: duration,
+                curve: Curves.easeOutCubic,
+                scale: isSelected ? 1.1 : 0.95,
+                child: Icon(data.icon, size: 20, color: contentColor),
+              ),
+              const SizedBox(width: 8),
+              AnimatedDefaultTextStyle(
+                duration: duration,
+                curve: Curves.easeOutCubic,
+                style: (textStyle ?? const TextStyle()).copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: contentColor,
+                ),
+                child: Text(data.labelKey.tr),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -1,22 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
+import 'package:tamdansers_lv2/app/themes/skeleton_theme.dart';
 
 ThemeData get darkTheme => ThemeData(
   brightness: Brightness.dark,
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.darkBackground,
-  cardColor: const Color(0xFF1F1F2D),
+  cardColor: const Color(0xFF1F2937),
   dividerColor: Colors.white12,
   hintColor: AppColors.hintColor,
   colorScheme: const ColorScheme.dark(
     primary: AppColors.primary,
-    surface: Color(0xFF1E1E2C),
+    surface: Color(0xFF1F2937),
     onPrimary: AppColors.white,
     onSurface: AppColors.white,
     error: AppColors.error,
     onError: AppColors.white,
   ),
+  extensions: <ThemeExtension<dynamic>>[
+    SkeletonTheme(
+      baseColor: const Color(0xFF2A2A2A),
+      highlightColor: const Color(0xFF3A3A3A),
+    ),
+  ],
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.darkBackground,
     foregroundColor: AppColors.white,

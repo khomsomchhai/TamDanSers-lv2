@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -21,10 +22,16 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await GetStorage.init();
-  await initializeDateFormatting();
+  final themeService = ThemeService();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, 
+    ),
   );
 
   FirebaseMessaging.onBackgroundMessage(
@@ -33,7 +40,9 @@ Future<void> main() async {
 
   await setupLocalNotifications();
 
-  final themeService = ThemeService();
+  Future.microtask(() async {
+    await initializeDateFormatting();
+  });
 
   runApp(
     MainApp(
@@ -41,7 +50,6 @@ Future<void> main() async {
     ),
   );
 
-  // កុំ await ដើម្បីកុំឱ្យ App រង់ចាំ FCM
   unawaited(setupFCM());
 }
 

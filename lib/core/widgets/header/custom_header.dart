@@ -12,8 +12,6 @@ class CustomHeader extends StatelessWidget {
 
   final UserController controller;
 
-  /// បើផ្ញើ textColor វានឹងប្រើពណ៌នោះ
-  /// បើមិនផ្ញើ វានឹងយកពណ៌តាម Theme
   final Color? textColor;
 
   String getGreeting() {
@@ -85,7 +83,7 @@ class CustomHeader extends StatelessWidget {
                 getGreeting(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Get.textTheme.bodyMedium?.copyWith(
+                style: Get.textTheme.bodySmall?.copyWith(
                   color: resolvedTextColor.withValues(
                     alpha: 0.80,
                   ),

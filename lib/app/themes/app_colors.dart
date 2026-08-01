@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
 
   static const Color primary = Color(0xff3A5BBC);
-  static const Color secondary = Color.fromARGB(255, 215, 225, 237);
+  static const Color secondary = Color.fromARGB(255, 229, 233, 239);
 
   static const Color lightBackground = Color(0xFFF4F4F9);
   static const Color darkBackground = Color(0xff121212);
@@ -12,8 +12,8 @@ class AppColors {
   static const Color dark = Color(0xff1C1C1E);
   static const Color hintColor = Color(0xFF6E6E73);
 
-  static final Color skeletonBaseColor = Colors.grey.shade300;
-  static final Color skeletonHighlightColor = Colors.grey.shade100;
+  static final Color skeletonBaseColor = Colors.grey.shade400;
+  static final Color skeletonHighlightColor = Colors.grey.shade200;
 
   static const Color success = Color(0xff22C55E); 
   static const Color warning = Color(0xffF59E0B); 
