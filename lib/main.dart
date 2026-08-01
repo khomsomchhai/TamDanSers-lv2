@@ -18,18 +18,26 @@ import 'package:tamdansers_lv2/firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Fast initialization only
   await GetStorage.init();
-  await initializeDateFormatting();
-
   final themeService = ThemeService();
+
+  // Initialize Firebase (required first)
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
+  // Setup local notifications (quick)
   await setupLocalNotifications();
-  await setupFCM();
+
+  // Defer heavy operations: date formatting and FCM setup
+  // These will run in background after app loads
+  Future.microtask(() async {
+    await initializeDateFormatting();
+    await setupFCM();
+  });
 
   runApp(MainApp(
     themeService: themeService,

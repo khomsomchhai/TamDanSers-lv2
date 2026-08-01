@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
@@ -64,9 +65,9 @@ Future<void> saveFcmTokenToBackend(String token) async {
       },
     );
 
-    print("FCM Token saved to backend");
+    debugPrint("FCM Token saved to backend");
   } catch (e) {
-    print("Save FCM Token Error: $e");
+    debugPrint("Save FCM Token Error: $e");
   }
 }
 
@@ -80,15 +81,19 @@ Future<void> setupFCM() async {
   );
 
   final token = await messaging.getToken();
-
   if (token != null) {
-    print("FCM Token: $token");
-    await saveFcmTokenToBackend(token);
+    debugPrint("FCM Token: $token");
+
+    saveFcmTokenToBackend(token).catchError((e) {
+      debugPrint("Error saving FCM token: $e");
+    });
   }
 
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    print("New FCM Token: $newToken");
-    await saveFcmTokenToBackend(newToken);
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+    debugPrint("New FCM Token: $newToken");
+    saveFcmTokenToBackend(newToken).catchError((e) {
+      debugPrint("Error saving new FCM token: $e");
+    });
   });
 
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
@@ -147,6 +152,6 @@ Future<void> setupFCM() async {
       Get.find<HomeworkViewController>().fetchHomework();
     }
 
-    print("User tapped notification");
+    debugPrint("User tapped notification");
   });
 }
