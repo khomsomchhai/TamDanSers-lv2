@@ -241,44 +241,103 @@ Map<String, String> kmKh = {
   'Biology': 'ជីវវិទ្យា',
   'Earth': 'ផែនដីវិទ្យា',
   'Social': 'ពលរដ្ឋវិជ្ជា',
+// Attendance
+'record':'កំណត់ត្រា',
+'attendance_no_records': 'មិនមានកំណត់ត្រាវត្តមានទេ',
+'attendance_select_date': 'ជ្រើសកាលបរិច្ឆេទ',
+'attendance_all_days': 'ថ្ងៃទាំងអស់',
+'attendance_failed_load':
+    'មិនអាចទាញយកកំណត់ត្រាវត្តមានបានទេ',
+'attendance_status_present': 'មានវត្តមាន',
+'attendance_status_absent': 'អវត្តមាន',
+'attendance_status_late': 'យឺត',
+'attendance_status_permission': 'សុំច្បាប់',
 
-  // Attendance
-  'attendance_no_records': 'មិនមានកំណត់ត្រាវត្តមានទេ',
-  'attendance_select_date': 'ជ្រើសកាលបរិច្ឆេទ',
-  'attendance_all_days': 'ថ្ងៃទាំងអស់',
-  'attendance_failed_load': 'មិនអាចទាញយកកំណត់ត្រាវត្តមានបានទេ',
-  'attendance_status_present': 'មានវត្តមាន',
-  'attendance_status_absent': 'អវត្តមាន',
-  'attendance_status_late': 'យឺត',
-  'attendance_status_permission': 'សុំច្បាប់',
+'attendance_summary': 'សង្ខេបវត្តមាន',
+'attendance_history': 'ប្រវត្តិវត្តមាន',
+'attendance_today': 'វត្តមានថ្ងៃនេះ',
 
-  // Ask permission
-  'ask_permission_my_requests': 'សំណើសុំច្បាប់របស់ខ្ញុំ',
-  'ask_permission_no_requests': 'មិនទាន់មានសំណើសុំច្បាប់ទេ',
-  'ask_permission_subject': 'មុខវិជ្ជា',
-  'ask_permission_permission_type': 'ប្រភេទសុំច្បាប់',
-  'ask_permission_reason': 'មូលហេតុ',
-  'ask_permission_created': 'បានបង្កើត',
-  'ask_permission_request_permission': 'ស្នើសុំច្បាប់',
-  'ask_permission_request_type': 'ប្រភេទសំណើ',
-  'ask_permission_loading_subjects': 'កំពុងទាញយកមុខវិជ្ជា...',
-  'ask_permission_select_subject': 'ជ្រើសមុខវិជ្ជា',
-  'ask_permission_select_permission_type': 'ជ្រើសប្រភេទសុំច្បាប់',
-  'ask_permission_write_reason': 'សូមសរសេរមូលហេតុ...',
-  'ask_permission_submit_request': 'ដាក់សំណើ',
-  'ask_permission_please_select_request_type': 'សូមជ្រើសប្រភេទសំណើ',
-  'ask_permission_please_select_subject': 'សូមជ្រើសមុខវិជ្ជា',
-  'ask_permission_please_select_permission_type': 'សូមជ្រើសប្រភេទសុំច្បាប់',
-  'ask_permission_please_enter_reason': 'សូមបញ្ចូលមូលហេតុ',
-  'ask_permission_submitted': 'បានដាក់សំណើសុំច្បាប់រួចរាល់',
-  'ask_permission_failed_submit': 'មិនអាចដាក់សំណើសុំច្បាប់បានទេ',
-  'ask_permission_no_schedule_today':
-      'ថ្ងៃនេះមិនមានកាលវិភាគទេ។ មិនអាចសុំច្បាប់ពេញមួយថ្ងៃបានទេ។',
-  'ask_permission_already_requested_today':
-      'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
-  'ask_permission_request_type_by_subject': 'តាមមុខវិជ្ជា',
-  'ask_permission_request_type_full_day': 'ពេញមួយថ្ងៃ',
+'present_days': 'ថ្ងៃវត្តមាន',
+'absent_days': 'ថ្ងៃអវត្តមាន',
+'permission_days': 'ថ្ងៃសុំច្បាប់',
+'attendance_total_days': 'ចំនួនថ្ងៃសរុប',
+'subjects': 'មុខវិជ្ជា',
+'days': 'ថ្ងៃ',
+'no_attendance': 'មិនមានទិន្នន័យវត្តមាន',
 
+// Ask permission
+'ask_permission': 'សុំច្បាប់',
+'ask_permission_for': 'សុំច្បាប់សម្រាប់',
+'ask_permission_my_requests':
+    'សំណើសុំច្បាប់របស់ខ្ញុំ',
+'ask_permission_no_requests':
+    'មិនទាន់មានសំណើសុំច្បាប់ទេ',
+'ask_permission_subject': 'មុខវិជ្ជា',
+'ask_permission_permission_type':
+    'ប្រភេទសុំច្បាប់',
+'ask_permission_reason': 'មូលហេតុ',
+'ask_permission_created': 'បានបង្កើត',
+'ask_permission_request_permission':
+    'ស្នើសុំច្បាប់',
+'ask_permission_request_type':
+    'ប្រភេទសំណើ',
+'ask_permission_loading_subjects':
+    'កំពុងទាញយកមុខវិជ្ជា...',
+'ask_permission_select_subject':
+    'ជ្រើសមុខវិជ្ជា',
+'ask_permission_select_permission_type':
+    'ជ្រើសប្រភេទសុំច្បាប់',
+'ask_permission_write_reason':
+    'សូមសរសេរមូលហេតុ...',
+'ask_permission_submit_request':
+    'ដាក់សំណើ',
+'ask_permission_please_select_request_type':
+    'សូមជ្រើសប្រភេទសំណើ',
+'ask_permission_please_select_subject':
+    'សូមជ្រើសមុខវិជ្ជា',
+'ask_permission_please_select_permission_type':
+    'សូមជ្រើសប្រភេទសុំច្បាប់',
+'ask_permission_please_enter_reason':
+    'សូមបញ្ចូលមូលហេតុ',
+'ask_permission_submitted':
+    'បានដាក់សំណើសុំច្បាប់រួចរាល់',
+'ask_permission_failed_submit':
+    'មិនអាចដាក់សំណើសុំច្បាប់បានទេ',
+'ask_permission_failed_load':
+    'មិនអាចទាញយកទិន្នន័យសុំច្បាប់បានទេ',
+'ask_permission_student_not_found':
+    'រកមិនឃើញព័ត៌មានសិស្ស',
+'ask_permission_no_schedule_today':
+    'ថ្ងៃនេះមិនមានកាលវិភាគទេ។ '
+    'មិនអាចសុំច្បាប់ពេញមួយថ្ងៃបានទេ។',
+'ask_permission_already_requested_today':
+    'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
+
+// Request type
+'ask_permission_request_type_by_subject':
+    'តាមមុខវិជ្ជា',
+'ask_permission_request_type_full_day':
+    'ពេញមួយថ្ងៃ',
+
+// Permission type
+'ask_permission_type_sick': 'ឈឺ',
+'ask_permission_type_personal':
+    'មានធុរៈផ្ទាល់ខ្លួន',
+'ask_permission_type_family':
+    'មានធុរៈគ្រួសារ',
+'ask_permission_type_other': 'ផ្សេងៗ',
+
+// Permission status
+'ask_permission_status_pending':
+    'កំពុងរង់ចាំ',
+'ask_permission_status_approved':
+    'បានអនុម័ត',
+'ask_permission_status_rejected':
+    'បានបដិសេធ',
+
+// Common
+'success': 'ជោគជ័យ',
+'error': 'មានបញ្ហា',
 
   //prent
   'hello_parent': 'សួស្ដីអាណាព្យាបាល\n សិស្ស',

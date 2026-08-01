@@ -391,7 +391,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: Get.theme.cardColor,
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
                 boxShadow: const [
                   BoxShadow(
@@ -494,7 +494,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                       child: Container(
                         width: 1.5,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFCBD5E1),
+                          color: Get.theme.dividerColor,
                           borderRadius: BorderRadius.circular(1),
                         ),
                       ),
@@ -509,9 +509,9 @@ class HomeTabView extends GetView<HomeTabViewController> {
             child: Container(
               margin: EdgeInsets.only(bottom: isLast ? 0 : 14),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Get.theme.cardColor,
                 borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
-                border: Border.all(color: const Color(0xFFF1F5F9)),
+                border: Border.all(color: Get.theme.dividerColor),
                 boxShadow: const [
                   BoxShadow(
                     color: Color.fromRGBO(0, 0, 0, 0.03),
@@ -562,7 +562,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
                                           Get.textTheme.titleMedium?.copyWith(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 15,
-                                        color: AppColors.dark,
+                                        color: Get.theme.textTheme.titleMedium?.color,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -582,17 +582,17 @@ class HomeTabView extends GetView<HomeTabViewController> {
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.person_outline_rounded,
                                             size: 15,
-                                            color: Color(0xFF94A3B8),
+                                            color: Get.theme.hintColor,
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
                                             teacherName,
                                             style: Get.textTheme.bodySmall
                                                 ?.copyWith(
-                                              color: const Color(0xFF64748B),
+                                              color: Get.theme.hintColor,
                                               fontSize: 12.5,
                                               fontWeight: FontWeight.w500,
                                             ),
@@ -603,17 +603,17 @@ class HomeTabView extends GetView<HomeTabViewController> {
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.meeting_room_outlined,
                                             size: 15,
-                                            color: Color(0xFF94A3B8),
+                                            color: Get.theme.hintColor,
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
                                             item.room,
                                             style: Get.textTheme.bodySmall
                                                 ?.copyWith(
-                                              color: const Color(0xFF64748B),
+                                              color: Get.theme.hintColor,
                                               fontSize: 12.5,
                                               fontWeight: FontWeight.w500,
                                             ),
@@ -624,17 +624,17 @@ class HomeTabView extends GetView<HomeTabViewController> {
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.schedule_outlined,
                                             size: 15,
-                                            color: Color(0xFF94A3B8),
+                                            color: Get.theme.hintColor,
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
                                             'Until ${controller.parseTimePill(item.endTime)['time']} ${controller.parseTimePill(item.endTime)['period']}',
                                             style: Get.textTheme.bodySmall
                                                 ?.copyWith(
-                                              color: const Color(0xFF64748B),
+                                              color: Get.theme.hintColor,
                                               fontSize: 12.5,
                                               fontWeight: FontWeight.w500,
                                             ),

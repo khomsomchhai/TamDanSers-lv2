@@ -84,7 +84,9 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
           });
         }
       } else {
-        final XFile? image = await _picker.pickImage(source: source);
+       final XFile? image = await _picker.pickImage(
+        source: source,
+      );
         if (image != null) {
           setState(() {
             _selectedFiles.add(image);

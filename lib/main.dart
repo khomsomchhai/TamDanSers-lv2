@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -15,46 +17,48 @@ import 'package:tamdansers_lv2/core/services/notification_service.dart';
 import 'package:tamdansers_lv2/core/services/theme_service.dart';
 import 'package:tamdansers_lv2/firebase_options.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Fast initialization only
   await GetStorage.init();
   final themeService = ThemeService();
 
-  // Initialize Firebase (required first)
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onBackgroundMessage(
+    firebaseMessagingBackgroundHandler,
+  );
 
-  // Setup local notifications (quick)
   await setupLocalNotifications();
 
-  // Defer heavy operations: date formatting and FCM setup
-  // These will run in background after app loads
   Future.microtask(() async {
     await initializeDateFormatting();
-    await setupFCM();
   });
 
-  runApp(MainApp(
-    themeService: themeService,
-  ));
+  runApp(
+    MainApp(
+      themeService: themeService,
+    ),
+  );
+
+  unawaited(setupFCM());
 }
 
 class MainApp extends StatefulWidget {
   final ThemeService themeService;
-  const MainApp({super.key, required this.themeService});
 
-  @override 
+  const MainApp({
+    super.key,
+    required this.themeService,
+  });
+
+  @override
   State<MainApp> createState() => _MainAppState();
 }
 
 class _MainAppState extends State<MainApp> {
-
-
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -65,7 +69,6 @@ class _MainAppState extends State<MainApp> {
       locale: LocalizationService().getLocale(),
       theme: lightTheme,
       darkTheme: darkTheme,
-
       themeMode: widget.themeService.themeMode,
       getPages: AppPages.getPages,
       scrollBehavior: const MaterialScrollBehavior().copyWith(

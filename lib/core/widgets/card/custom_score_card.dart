@@ -24,107 +24,141 @@ class CustomScoreCard extends StatelessWidget {
       final percent =
           totalMax > 0 ? (totalScore / totalMax).clamp(0.0, 1.0) : 0.0;
 
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    month == null
-                        ? 'ranking_for_month'.tr
-                        : '${'ranking_for_month'.tr} ${(controller.months[month] ?? "").tr}',
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    currentRank,
-                    style: AppTextStyles.headlineMedium.copyWith(
-                      color: AppColors.lightBackground,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow = constraints.maxWidth < 340;
+          final circleSize = isNarrow ? 48.0 : 60.0;
+
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.lightBackground,
-                          borderRadius:
-                              BorderRadius.circular(AppNumbers.radiusSmall),
+                      Text(
+                        month == null
+                            ? 'ranking_for_month'.tr
+                            : '${'ranking_for_month'.tr} ${(controller.months[month] ?? "").tr}',
+                        style: AppTextStyles.bodyLarge.copyWith(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.w600,
                         ),
-                        child: RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '${'total_score'.tr}: ',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.info,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '$totalScore',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.error,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.lightBackground,
-                          borderRadius:
-                              BorderRadius.circular(AppNumbers.radiusSmall),
-                        ),
+                      const SizedBox(height: 4),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          '${'average'.tr}: $average',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.info,
+                          currentRank,
+                          style: AppTextStyles.headlineMedium.copyWith(
+                            color: AppColors.lightBackground,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.lightBackground,
+                                borderRadius: BorderRadius.circular(
+                                    AppNumbers.radiusSmall),
+                              ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: '${'total_score'.tr}: ',
+                                        style: AppTextStyles.bodyMedium
+                                            .copyWith(
+                                          color: AppColors.info,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '$totalScore',
+                                        style: AppTextStyles.bodyMedium
+                                            .copyWith(
+                                          color: AppColors.error,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.lightBackground,
+                                borderRadius: BorderRadius.circular(
+                                    AppNumbers.radiusSmall),
+                              ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '${'average'.tr}: $average',
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.info,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  height: 60,
-                  width: 60,
-                  child: CircularProgressIndicator(
-                    value: percent,
-                    strokeWidth: 8,
-                    color: AppColors.white,
-                    backgroundColor: AppColors.white.withValues(alpha: 0.2),
-                    strokeCap: StrokeCap.round,
+                ),
+                const SizedBox(width: 8),
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        height: circleSize,
+                        width: circleSize,
+                        child: CircularProgressIndicator(
+                          value: percent,
+                          strokeWidth: 8,
+                          color: AppColors.white,
+                          backgroundColor:
+                              AppColors.white.withValues(alpha: 0.2),
+                          strokeCap: StrokeCap.round,
+                        ),
+                      ),
+                      Icon(Icons.star,
+                          size: isNarrow ? 16 : 20, color: AppColors.white),
+                    ],
                   ),
                 ),
-                const Icon(Icons.star, size: 20, color: AppColors.white),
               ],
             ),
-          ],
-        ),
+          );
+        },
       );
     });
   }
