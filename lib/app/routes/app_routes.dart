@@ -19,7 +19,8 @@ class AppRoutes {
   //Parent
   static const String parentDashboard = "/parent_dashboard";
   static const String homeTab = "/home_tab";
-
+static const parentPermission =
+    '/parent-permission';
 
   //Notification
   static const String notificationScreen = "/notification_screen";

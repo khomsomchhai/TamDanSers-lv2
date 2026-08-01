@@ -2,6 +2,10 @@ part of 'parent_home_tab_view.dart';
 
 class ParentHomeTabViewController
     extends GetxController {
+  // =====================================================
+  // Dependencies
+  // =====================================================
+
   final UserController userController =
       Get.find<UserController>();
 
@@ -10,12 +14,33 @@ class ParentHomeTabViewController
       Get.find<
           ParentAttendanceTabViewController>();
 
-  final GetStorage box = GetStorage();
+  final GetStorage box =
+      GetStorage();
 
   final ResultApi resultApi =
       ResultApi();
 
+  final AuthServices authServices =
+      AuthServices();
+
+  final ScheduleApi scheduleApi =
+      ScheduleApi();
+
+  // =====================================================
+  // Loading and error states
+  // =====================================================
+
   final isLoading = false.obs;
+
+  final isScheduleLoading = false.obs;
+
+  final errorMessage = ''.obs;
+
+  final scheduleError = ''.obs;
+
+  // =====================================================
+  // Parent children
+  // =====================================================
 
   final students =
       <Map<String, dynamic>>[].obs;
@@ -24,11 +49,31 @@ class ParentHomeTabViewController
       selectedChild =
       Rxn<Map<String, dynamic>>();
 
+  // =====================================================
+  // Dashboard
+  // =====================================================
+
   final Rxn<ParentDashboardModel>
       dashboard =
       Rxn<ParentDashboardModel>();
 
-  final errorMessage = ''.obs;
+  // =====================================================
+  // Today's schedule
+  // =====================================================
+
+  final todaySchedule =
+      <ScheduleModel>[].obs;
+
+  // =====================================================
+  // Attendance expand state
+  // =====================================================
+
+  final isAttendanceExpanded =
+      false.obs;
+
+  // =====================================================
+  // Lifecycle
+  // =====================================================
 
   @override
   void onInit() {
@@ -42,34 +87,159 @@ class ParentHomeTabViewController
     }
   }
 
-  void loadStudents() {
-    final data =
+  // =====================================================
+  // Load parent children
+  // =====================================================
+
+  Future<void> loadStudents() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final response =
+          await authServices
+              .getParentChildren();
+
+      debugPrint(
+        'PARENT CHILDREN RESPONSE: '
+        '$response',
+      );
+
+      final dynamic data =
+          response['students'];
+
+      if (data is! List) {
+        _clearStudentData();
+
+        await box.remove(
+          'students',
+        );
+
+        return;
+      }
+
+      final updatedStudents =
+          data.map<Map<String, dynamic>>(
+        (item) {
+          return Map<String, dynamic>.from(
+            item as Map,
+          );
+        },
+      ).toList();
+
+      students.assignAll(
+        updatedStudents,
+      );
+
+      await box.write(
+        'students',
+        updatedStudents,
+      );
+
+      debugPrint(
+        'TOTAL PARENT CHILDREN: '
+        '${students.length}',
+      );
+
+      if (students.isEmpty) {
+        _clearStudentData();
+        return;
+      }
+
+      final oldSelectedId =
+          _parseStudentId(
+        selectedChild.value?['id'],
+      );
+
+      Map<String, dynamic>?
+          childToSelect;
+
+      if (oldSelectedId != null) {
+        for (final child in students) {
+          final childId =
+              _parseStudentId(
+            child['id'],
+          );
+
+          if (childId ==
+              oldSelectedId) {
+            childToSelect =
+                child;
+
+            break;
+          }
+        }
+      }
+
+      childToSelect ??=
+          students.first;
+
+      selectedChild.value =
+          childToSelect;
+
+      final studentId =
+          _parseStudentId(
+        childToSelect['id'],
+      );
+
+      if (studentId != null) {
+        await _loadChildData(
+          studentId,
+        );
+      }
+    } catch (error, stackTrace) {
+      errorMessage.value =
+          'Failed to load children';
+
+      debugPrint(
+        'LOAD CHILDREN ERROR: '
+        '$error',
+      );
+
+      debugPrintStack(
+        stackTrace: stackTrace,
+      );
+
+      await loadStudentsFromStorage();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // =====================================================
+  // Load children from local storage
+  // =====================================================
+
+  Future<void>
+      loadStudentsFromStorage() async {
+    final dynamic data =
         box.read('students');
 
     debugPrint(
-      'STUDENTS FROM STORAGE: $data',
+      'STUDENTS FROM STORAGE: '
+      '$data',
     );
 
     if (data is! List) {
-      students.clear();
+      _clearStudentData();
       return;
     }
 
-    students.assignAll(
-      data.map(
-        (item) =>
-            Map<String, dynamic>.from(
+    final cachedStudents =
+        data.map<Map<String, dynamic>>(
+      (item) {
+        return Map<String, dynamic>.from(
           item as Map,
-        ),
-      ),
-    );
+        );
+      },
+    ).toList();
 
-    debugPrint(
-      'TOTAL STUDENTS: ${students.length}',
+    students.assignAll(
+      cachedStudents,
     );
 
     if (students.isEmpty) {
-      selectedChild.value = null;
+      _clearStudentData();
       return;
     }
 
@@ -82,50 +252,59 @@ class ParentHomeTabViewController
     );
 
     if (studentId != null) {
-      fetchDashboard(studentId);
+      await _loadChildData(
+        studentId,
+      );
     }
   }
 
-  int? _parseStudentId(
-    dynamic value,
-  ) {
-    if (value is int) {
-      return value;
-    }
+  // =====================================================
+  // Select child
+  // =====================================================
 
-    return int.tryParse(
-      value?.toString() ?? '',
-    );
-  }
-
-  String get childName {
-    return selectedChild
-            .value?['student_name']
-            ?.toString() ??
-        'dont_have_child'.tr;
-  }
-
-  String get childCode {
-    return selectedChild
-            .value?['student_code']
-            ?.toString() ??
-        'dont_have_child'.tr;
-  }
-
-  void selectChild(
+  Future<void> selectChild(
     Map<String, dynamic> child,
-  ) {
-    selectedChild.value = child;
+  ) async {
+    selectedChild.value =
+        child;
 
     final studentId =
         _parseStudentId(
       child['id'],
     );
 
-    if (studentId != null) {
-      fetchDashboard(studentId);
+    if (studentId == null) {
+      dashboard.value = null;
+      todaySchedule.clear();
+
+      return;
     }
+
+    await _loadChildData(
+      studentId,
+    );
   }
+
+  // =====================================================
+  // Load all selected child data
+  // =====================================================
+
+  Future<void> _loadChildData(
+    int studentId,
+  ) async {
+    await Future.wait([
+      fetchDashboard(
+        studentId,
+      ),
+      getTodaySchedule(
+        studentId,
+      ),
+    ]);
+  }
+
+  // =====================================================
+  // Fetch parent dashboard
+  // =====================================================
 
   Future<void> fetchDashboard(
     int studentId,
@@ -153,7 +332,8 @@ class ParentHomeTabViewController
           'Failed to load dashboard';
 
       debugPrint(
-        'PARENT DASHBOARD ERROR: $error',
+        'PARENT DASHBOARD ERROR: '
+        '$error',
       );
 
       debugPrintStack(
@@ -164,23 +344,175 @@ class ParentHomeTabViewController
     }
   }
 
-  Future<void> refreshHome() async {
-    final studentId =
-        _parseStudentId(
-      selectedChild.value?['id'],
-    );
+  // =====================================================
+  // Fetch today's schedule
+  // =====================================================
 
-    if (studentId == null) {
-      return;
+  Future<void> getTodaySchedule(
+    int studentId,
+  ) async {
+    try {
+      isScheduleLoading.value =
+          true;
+
+      scheduleError.value = '';
+
+      final response =
+          await scheduleApi
+              .getParentSchedule(
+        studentId,
+      );
+
+      final dynamic responseData =
+          response is Map<String, dynamic>
+              ? response
+              : response.data;
+
+      if (responseData
+          is! Map<String, dynamic>) {
+        todaySchedule.clear();
+        return;
+      }
+
+      final dynamic schedulesData =
+          responseData['schedules'];
+
+      if (schedulesData is! List) {
+        todaySchedule.clear();
+        return;
+      }
+
+      final schedules =
+          schedulesData
+              .map<ScheduleModel>(
+        (item) {
+          return ScheduleModel.fromJson(
+            Map<String, dynamic>.from(
+              item as Map,
+            ),
+          );
+        },
+      ).toList();
+
+      schedules.sort(
+        (first, second) {
+          final firstTime =
+              _timeToMinutes(
+            first.startTime,
+          );
+
+          final secondTime =
+              _timeToMinutes(
+            second.startTime,
+          );
+
+          return firstTime.compareTo(
+            secondTime,
+          );
+        },
+      );
+
+      todaySchedule.assignAll(
+        schedules,
+      );
+
+      debugPrint(
+        'TODAY SCHEDULE TOTAL: '
+        '${todaySchedule.length}',
+      );
+    } catch (error, stackTrace) {
+      todaySchedule.clear();
+
+      scheduleError.value =
+          error.toString();
+
+      debugPrint(
+        'GET TODAY SCHEDULE ERROR: '
+        '$error',
+      );
+
+      debugPrintStack(
+        stackTrace: stackTrace,
+      );
+    } finally {
+      isScheduleLoading.value =
+          false;
+    }
+  }
+
+  // =====================================================
+  // Refresh homepage
+  // =====================================================
+
+  Future<void> refreshHome() async {
+    await loadStudents();
+  }
+
+  // =====================================================
+  // Attendance expand/collapse
+  // =====================================================
+
+  void toggleAttendanceExpanded() {
+    isAttendanceExpanded.toggle();
+  }
+
+  // =====================================================
+  // Clear student data
+  // =====================================================
+
+  void _clearStudentData() {
+    students.clear();
+
+    selectedChild.value =
+        null;
+
+    dashboard.value =
+        null;
+
+    todaySchedule.clear();
+  }
+
+  // =====================================================
+  // Parse student ID
+  // =====================================================
+
+  int? _parseStudentId(
+    dynamic value,
+  ) {
+    if (value is int) {
+      return value;
     }
 
-    await fetchDashboard(
-      studentId,
+    return int.tryParse(
+      value?.toString() ?? '',
     );
   }
 
+  // =====================================================
+  // Selected child information
+  // =====================================================
+
+  String get childName {
+    return selectedChild
+            .value?['student_name']
+            ?.toString() ??
+        'dont_have_child'.tr;
+  }
+
+  String get childCode {
+    return selectedChild
+            .value?['student_code']
+            ?.toString() ??
+        'dont_have_child'.tr;
+  }
+
+  // =====================================================
+  // Current Khmer date
+  // =====================================================
+
   String getCurrentDate() {
-    final now = DateTime.now();
+    final now =
+        DateTime.now();
 
     const khmerWeekDays = [
       'ថ្ងៃច័ន្ទ',
@@ -219,6 +551,10 @@ class ParentHomeTabViewController
         'ខែ$month ឆ្នាំ${now.year}';
   }
 
+  // =====================================================
+  // Number formatting
+  // =====================================================
+
   String formatNumber(
     dynamic value,
   ) {
@@ -244,5 +580,88 @@ class ParentHomeTabViewController
 
     return number
         .toStringAsFixed(1);
+  }
+
+  // =====================================================
+  // Schedule helpers
+  // =====================================================
+
+  bool isMorning(
+    String startTime,
+  ) {
+    final text =
+        startTime.trim();
+
+    if (text.isEmpty) {
+      return true;
+    }
+
+    final parts =
+        text.split(':');
+
+    if (parts.isEmpty) {
+      return true;
+    }
+
+    final hour =
+        int.tryParse(
+          parts.first,
+        ) ??
+        0;
+
+    return hour < 12;
+  }
+
+  String formatTime(
+    String value,
+  ) {
+    final text =
+        value.trim();
+
+    if (text.isEmpty) {
+      return '--:--';
+    }
+
+    final parts =
+        text.split(':');
+
+    if (parts.length < 2) {
+      return text;
+    }
+
+    return '${parts[0]}:${parts[1]}';
+  }
+
+  int _timeToMinutes(
+    String value,
+  ) {
+    final text =
+        value.trim();
+
+    if (text.isEmpty) {
+      return 0;
+    }
+
+    final parts =
+        text.split(':');
+
+    if (parts.length < 2) {
+      return 0;
+    }
+
+    final hour =
+        int.tryParse(
+          parts[0],
+        ) ??
+        0;
+
+    final minute =
+        int.tryParse(
+          parts[1],
+        ) ??
+        0;
+
+    return hour * 60 +
+        minute;
   }
 }

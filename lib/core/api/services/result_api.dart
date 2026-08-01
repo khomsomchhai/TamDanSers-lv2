@@ -33,4 +33,5 @@ class ResultApi {
 
   return ParentDashboardModel.fromMap(response);
 }
+
 }

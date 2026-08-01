@@ -9,4 +9,8 @@ class ScheduleApi {
     );
     return response;
   }
+  Future<dynamic> getParentSchedule(int studentId)async{
+    final response =await baseApiService.get(endpoint: '/parents/schedules/$studentId/today');
+    return response;
+  }
 }

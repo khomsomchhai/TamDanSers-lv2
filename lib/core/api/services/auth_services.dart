@@ -67,13 +67,23 @@ class AuthServices {
     );
     return response;
   }
-
   Future<Map<String, dynamic>> fechProfile() async {
-    var response = await baseApi.get(
-      endpoint: "/profile/me",
-    );
-    return response;
-  }
+  var response = await baseApi.get(
+    endpoint: "/profile/me",
+  );
+
+  return response;
+}
+
+Future<Map<String, dynamic>> getParentChildren() async {
+  final response = await baseApi.get(
+    endpoint: "/parents/children",
+  );
+
+  return response;
+}
+
+
 
   Future<bool> checkSmsService({
     required String phone,

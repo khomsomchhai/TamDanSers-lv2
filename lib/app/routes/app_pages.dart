@@ -8,6 +8,7 @@ import 'package:tamdansers_lv2/screens/auth/register_parent_screen/register_pare
 import 'package:tamdansers_lv2/screens/auth/reset_password_screen/reset_password_screen_view.dart';
 import 'package:tamdansers_lv2/screens/auth/splash_screen/splash_screen_view.dart';
 import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
+import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_attendance_tab/parent_permission/parent_permission_view.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_dashboard_view.dart';
 import 'package:tamdansers_lv2/screens/student/ask_permission_screen/ask_permission_screen_view.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
@@ -103,6 +104,13 @@ class AppPages {
       binding: HomeTabViewBinding(),
       transition: Transition.rightToLeft,
     ),
+    GetPage(
+  name: AppRoutes.parentPermission,
+  page: () =>
+      const ParentPermissionView(),
+  binding:
+      ParentPermissionBinding(),
+),
 
     //Notification
     GetPage(

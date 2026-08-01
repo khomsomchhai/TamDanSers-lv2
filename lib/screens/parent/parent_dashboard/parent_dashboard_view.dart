@@ -7,6 +7,7 @@ import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_attendance
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_attendance_tab/parent_attendance_tab_view.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_home_tab/parent_home_tab_view.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_homework_tab/parent_homework_tab_view.dart';
+import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_profile_tab/parent_profile_tab_controller.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_profile_tab/parent_profile_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/profile_tab/profile_tab_view.dart';
 
