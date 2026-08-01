@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
@@ -43,13 +44,15 @@ class ParentAttendanceTabView
               ),
               children: [
                 Text(
-                  'វត្តមាន',
+                  'attencdance'.tr,
                   style: AppTextStyles.headlineSmall.copyWith(
                     color: AppColors.dark,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
                 const SizedBox(height: 20),
+
                 CustomAttendanceCard(
                   totalDays: controller.totalDays,
                   presentDays: controller.presentDays.value,
@@ -61,32 +64,45 @@ class ParentAttendanceTabView
                   attendanceRate: controller.attendanceRate,
                   currentMonth: controller.currentMonthName,
                 ),
+
+                const SizedBox(height: 18),
+
+                // Ask permission function
+                _buildAskPermissionCard(
+                  context,
+                ),
+
                 const SizedBox(height: 28),
+
                 Row(
                   children: [
                     Expanded(
                       child: Text(
-                        'ប្រវត្តិវត្តមាន',
-                        style: AppTextStyles.titleLarge.copyWith(
+                        'attendance_history'.tr,
+                        style: AppTextStyles.titleSmall.copyWith(
                           color: AppColors.dark,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Text(
-                      '${monthlyAttendance.length} កំណត់ត្រា',
+                      '${monthlyAttendance.length} ${'record'.tr}',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.hintColor,
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 14),
+
                 if (monthlyAttendance.isEmpty)
                   _buildEmptyState()
                 else
                   ...monthlyAttendance.map(
-                    (attendance) => _buildAttendanceItem(attendance),
+                    (attendance) => _buildAttendanceItem(
+                      attendance,
+                    ),
                   ),
               ],
             ),
@@ -103,143 +119,327 @@ class ParentAttendanceTabView
       attendance.status,
     );
 
-    final remark = attendance.remark.toString().trim() ?? '';
+    final statusText = controller.getStatusText(
+      attendance.status,
+    );
+
+    final remark = attendance.remark.trim();
+
+    final subjectName = attendance.subjectName.trim().isEmpty
+        ? '-'
+        : attendance.subjectName.trim();
+
+    final className =
+        attendance.className.trim().isEmpty ? '-' : attendance.className.trim();
+
+    final teacherName = attendance.teacherName.trim().isEmpty
+        ? '-'
+        : attendance.teacherName.trim();
 
     return Container(
       margin: const EdgeInsets.only(
         bottom: 12,
       ),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(
+        16,
+      ),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(
           AppNumbers.radiusLarge,
         ),
-        border: Border.all(
-          color: statusColor.withValues(
-            alpha: 0.18,
-          ),
-        ),
         boxShadow: [
           BoxShadow(
             color: AppColors.dark.withValues(
-              alpha: 0.05,
+              alpha: 0.04,
             ),
             blurRadius: 12,
-            offset: const Offset(0, 5),
+            offset: const Offset(
+              0,
+              5,
+            ),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: statusColor.withValues(
-                alpha: 0.12,
-              ),
-              borderRadius: BorderRadius.circular(
-                AppNumbers.radiusMedium,
-              ),
-            ),
-            child: Icon(
-              controller.getStatusIcon(
-                attendance.status,
-              ),
-              color: statusColor,
-              size: 28,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  controller.getStatusText(
-                    attendance.status,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(
+                    alpha: 0.14,
                   ),
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.dark,
-                    fontWeight: FontWeight.bold,
+                  borderRadius: BorderRadius.circular(
+                    AppNumbers.radiusMedium,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Row(
+                child: const Icon(
+                  Icons.menu_book_rounded,
+                  color: AppColors.primary,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.calendar_today_outlined,
-                      size: 15,
-                      color: AppColors.hintColor,
+                    Text(
+                      '$subjectName - $className',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: AppColors.dark,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        controller.formatDate(
-                          attendance.date,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.hintColor,
-                        ),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    Text(
+                      '${'teacher'.tr}: $teacherName',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.neutral500,
                       ),
                     ),
                   ],
                 ),
-                if (remark.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(
-                        Icons.notes_rounded,
-                        size: 15,
-                        color: AppColors.grey,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          remark,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.grey,
-                          ),
-                        ),
-                      ),
-                    ],
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(
+                    alpha: 0.12,
                   ),
-                ],
+                  borderRadius: BorderRadius.circular(
+                    24,
+                  ),
+                ),
+                child: Text(
+                  statusText,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: statusColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          const Divider(
+            height: 1,
+            color: AppColors.border,
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              const Icon(
+                Icons.calendar_today_outlined,
+                size: 19,
+                color: AppColors.neutral500,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  controller.formatDate(
+                    attendance.date,
+                  ),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.neutral500,
+                  ),
+                ),
+              ),
+              const Icon(
+                Icons.access_time_rounded,
+                size: 20,
+                color: AppColors.neutral500,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _formatTimeRange(
+                  attendance.startTime,
+                  attendance.endTime,
+                ),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.neutral500,
+                ),
+              ),
+            ],
+          ),
+          if (remark.isNotEmpty) ...[
+            const SizedBox(
+              height: 12,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.notes_rounded,
+                  size: 18,
+                  color: AppColors.grey,
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                Expanded(
+                  child: Text(
+                    remark,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 7,
-            ),
-            decoration: BoxDecoration(
-              color: statusColor.withValues(
-                alpha: 0.12,
-              ),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Text(
-              _getShortStatus(
-                attendance.status,
-              ),
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: statusColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          ],
         ],
       ),
     );
+  }
+
+Widget _buildAskPermissionCard(
+  BuildContext context,
+) {
+  return Material(
+    color: Colors.transparent,
+    borderRadius: BorderRadius.circular(
+      AppNumbers.radiusLarge,
+    ),
+    child: InkWell(
+      borderRadius: BorderRadius.circular(
+        AppNumbers.radiusLarge,
+      ),
+      onTap: () {
+        Get.toNamed(
+          AppRoutes.parentPermission,
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(
+          16,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(
+            alpha: 0.10,
+          ),
+          borderRadius: BorderRadius.circular(
+            AppNumbers.radiusLarge,
+          ),
+          border: Border.all(
+            color: AppColors.primary.withValues(
+              alpha: 0.18,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(
+                  AppNumbers.radiusMedium,
+                ),
+              ),
+              child: const Icon(
+                Icons.edit_calendar_rounded,
+                color: AppColors.white,
+                size: 27,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ask_permission'.tr,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.dark,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    'ask_permission_my_requests'.tr,
+                    style: AppTextStyles.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 18,
+              color: AppColors.primary,
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+  String _formatTimeRange(
+    String startTime,
+    String endTime,
+  ) {
+    final start = _formatTime(
+      startTime,
+    );
+
+    final end = _formatTime(
+      endTime,
+    );
+
+    if (start.isEmpty && end.isEmpty) {
+      return '-';
+    }
+
+    if (start.isEmpty) {
+      return end;
+    }
+
+    if (end.isEmpty) {
+      return start;
+    }
+
+    return '$start - $end';
+  }
+
+  String _formatTime(
+    String value,
+  ) {
+    final text = value.trim();
+
+    if (text.isEmpty) {
+      return '';
+    }
+
+    final parts = text.split(':');
+
+    if (parts.length < 2) {
+      return text;
+    }
+
+    return '${parts[0]}:${parts[1]}';
   }
 
   Widget _buildEmptyState() {
@@ -275,22 +475,20 @@ class ParentAttendanceTabView
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(
+            height: 18,
+          ),
           Text(
-            'មិនមានទិន្នន័យវត្តមាន',
+            'no_attendance'.tr,
             style: AppTextStyles.titleMedium.copyWith(
               color: AppColors.dark,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 7),
-          Text(
-            'ទិន្នន័យវត្តមានរបស់សិស្សនឹងបង្ហាញនៅទីនេះ',
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.hintColor,
-            ),
+          const SizedBox(
+            height: 7,
           ),
+          
         ],
       ),
     );

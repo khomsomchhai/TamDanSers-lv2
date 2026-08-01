@@ -248,6 +248,7 @@ Map<String, String> enUs = {
   'Social': 'Social Studies',
 
   // Attendance
+  'record': 'Record',
   'attendance_no_records': 'No attendance records',
   'attendance_select_date': 'Select date',
   'attendance_all_days': 'All days',
@@ -259,6 +260,7 @@ Map<String, String> enUs = {
   'attendance': 'Attendance',
   'attendance_summary': 'Attendance Summary',
   'attendance_history': 'Attendance History',
+  'attendance_today': 'Attendance Today',
 
   'present_days': 'Present Days',
   'absent_days': 'Absent Days',
@@ -270,6 +272,22 @@ Map<String, String> enUs = {
   'no_attendance': 'No attendance data',
 
   // Ask permission
+
+  'ask_permission': 'Permission',
+'ask_permission_for': 'Permission for',
+'ask_permission_type_sick': 'Sick',
+'ask_permission_type_personal': 'Personal',
+'ask_permission_type_family': 'Family',
+'ask_permission_type_other': 'Other',
+'ask_permission_status_pending': 'Pending',
+'ask_permission_status_approved': 'Approved',
+'ask_permission_status_rejected': 'Rejected',
+'ask_permission_failed_load':
+    'Failed to load permission data',
+'ask_permission_student_not_found':
+    'Student not found',
+'success': 'Success',
+'error': 'Error',
   'ask_permission_my_requests': 'My Permission Requests',
   'ask_permission_no_requests': 'No permission requests yet',
   'ask_permission_subject': 'Subject',

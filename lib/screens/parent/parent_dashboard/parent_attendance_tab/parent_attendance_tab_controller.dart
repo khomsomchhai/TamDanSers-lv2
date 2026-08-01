@@ -115,63 +115,135 @@ class ParentAttendanceTabViewController extends GetxController {
       isLoading.value = false;
     }
   }
+bool isPresentStatus(String status) {
+  return status == 'p' ||
+      status == 'present';
+}
 
-  void countAttendance() {
-    /*
-      API example:
-      date: 2026-07-30, status: P, subject_id: 1
-      date: 2026-07-30, status: P, subject_id: 2
+bool isAbsentStatus(String status) {
+  return status == 'a' ||
+      status == 'absent';
+}
 
-      Result:
-      presentSubjects = 2
-      presentDays = 1
-    */
+bool isPermissionStatus(String status) {
+  return status == 'l' ||
+      status == 'leave' ||
+      status == 'permission' ||
+      status == 'permitted';
+}
+void countAttendance() {
+  final Map<String, List<AttendanceModel>> attendanceByDate = {};
 
-    final presentRecords = attendanceList.where((item) {
-      final status = normalizeStatus(item.status);
+  for (final item in attendanceList) {
+    final dateKey = normalizeDate(item.date);
 
-      return status == 'p' ||
-          status == 'present';
-    }).toList();
+    if (dateKey.isEmpty) {
+      continue;
+    }
 
-    final absentRecords = attendanceList.where((item) {
-      final status = normalizeStatus(item.status);
+    attendanceByDate.putIfAbsent(
+      dateKey,
+      () => <AttendanceModel>[],
+    );
 
-      return status == 'a' ||
-          status == 'absent';
-    }).toList();
-
-    final permissionRecords =
-        attendanceList.where((item) {
-      final status = normalizeStatus(item.status);
-
-      return status == 'l' ||
-          status == 'leave' ||
-          status == 'permission' ||
-          status == 'permitted';
-    }).toList();
-
-    // ចំនួន records / subjects
-    presentSubjects.value =
-        presentRecords.length;
-
-    absentSubjects.value =
-        absentRecords.length;
-
-    permissionSubjects.value =
-        permissionRecords.length;
-
-    // ចំនួនថ្ងៃមិនស្ទួន
-    presentDays.value =
-        _countUniqueDates(presentRecords);
-
-    absentDays.value =
-        _countUniqueDates(absentRecords);
-
-    permissionDays.value =
-        _countUniqueDates(permissionRecords);
+    attendanceByDate[dateKey]!.add(item);
   }
 
+  int calculatedPresentDays = 0;
+  int calculatedAbsentDays = 0;
+  int calculatedPermissionDays = 0;
+
+  for (final dailyAttendance in attendanceByDate.values) {
+    final statuses = dailyAttendance
+        .map(
+          (item) => normalizeStatus(item.status),
+        )
+        .toList();
+
+    final hasPresent = statuses.any(
+      isPresentStatus,
+    );
+
+    final allAbsent = statuses.isNotEmpty &&
+        statuses.every(
+          isAbsentStatus,
+        );
+
+    final allPermission = statuses.isNotEmpty &&
+        statuses.every(
+          isPermissionStatus,
+        );
+
+    if (hasPresent) {
+      calculatedPresentDays += 1;
+    } else if (allAbsent) {
+      calculatedAbsentDays += 1;
+    } else if (allPermission) {
+      calculatedPermissionDays += 1;
+    } else {
+      final hasPermission = statuses.any(
+        isPermissionStatus,
+      );
+
+      final hasAbsent = statuses.any(
+        isAbsentStatus,
+      );
+
+      if (hasPermission && !hasAbsent) {
+        calculatedPermissionDays += 1;
+      } else if (hasAbsent) {
+        calculatedAbsentDays += 1;
+      }
+    }
+  }
+
+  presentDays.value = calculatedPresentDays;
+  absentDays.value = calculatedAbsentDays;
+  permissionDays.value = calculatedPermissionDays;
+
+  presentSubjects.value = attendanceList.where((item) {
+    return isPresentStatus(
+      normalizeStatus(item.status),
+    );
+  }).length;
+
+  absentSubjects.value = attendanceList.where((item) {
+    return isAbsentStatus(
+      normalizeStatus(item.status),
+    );
+  }).length;
+
+  permissionSubjects.value =
+      attendanceList.where((item) {
+    return isPermissionStatus(
+      normalizeStatus(item.status),
+    );
+  }).length;
+
+  debugPrint(
+    'PRESENT DAYS: ${presentDays.value}',
+  );
+
+  debugPrint(
+    'ABSENT DAYS: ${absentDays.value}',
+  );
+
+  debugPrint(
+    'PERMISSION DAYS: ${permissionDays.value}',
+  );
+
+  debugPrint(
+    'PRESENT SUBJECTS: ${presentSubjects.value}',
+  );
+
+  debugPrint(
+    'ABSENT SUBJECTS: ${absentSubjects.value}',
+  );
+
+  debugPrint(
+    'PERMISSION SUBJECTS: ${permissionSubjects.value}',
+  );
+}
   int _countUniqueDates(
     List<AttendanceModel> records,
   ) {
