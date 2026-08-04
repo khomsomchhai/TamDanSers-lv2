@@ -87,6 +87,9 @@ Map<String, String> enUs = {
   'parent_dashboard_description':
       'Monitor your child’s academic life, attendance, and school updates from one place.',
   'your_child': 'Your Child',
+  'morning': 'Morning',
+  'afternoon': 'Afternoon',
+  'Homework Details' : 'Homework Details',
   'child_summary': 'Child summary',
   'quick_access': 'Quick access',
   'guardian_contact_details': 'Guardian contact details',

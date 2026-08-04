@@ -18,6 +18,7 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: "attendance".tr,
         showBackButton: false,

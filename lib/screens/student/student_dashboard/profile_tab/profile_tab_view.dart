@@ -9,6 +9,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
+import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/services/theme_service.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
@@ -165,8 +166,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
   Widget _buildLoadingSkeleton(BuildContext context) {
     final theme = Theme.of(context);
     return Shimmer.fromColors(
-      baseColor: theme.colorScheme.surfaceContainerHighest,
-      highlightColor: theme.colorScheme.surface,
+      baseColor: AppColors.skeletonBaseColor,
+      highlightColor: AppColors.skeletonHighlightColor,
       period: const Duration(milliseconds: 1300),
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),

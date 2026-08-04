@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -37,7 +38,8 @@ class CustomTextField extends StatelessWidget {
       obscureText: isPwd && isHide,
       minLines: isMultiline ? 5 : 1,
       maxLines: isMultiline ? 10 : 1,
-      cursorColor: theme.textSelectionTheme.cursorColor ?? theme.colorScheme.onSurface,
+      cursorColor:
+          theme.textSelectionTheme.cursorColor ?? theme.colorScheme.onSurface,
       style: theme.textTheme.bodyLarge,
       decoration: InputDecoration(
         labelStyle: theme.textTheme.bodyLarge,
@@ -45,15 +47,27 @@ class CustomTextField extends StatelessWidget {
         hintStyle: theme.textTheme.bodyLarge!.copyWith(color: theme.hintColor),
         prefixIcon: prefixIcon,
         suffixIcon: isPwd ? suffixIcon : null,
-        errorStyle: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.error),
-        border:  OutlineInputBorder(
+        errorStyle:
+            theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.error),
+        border: OutlineInputBorder(
           borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(AppNumbers.radiusMedium)
+          borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
         ),
         filled: true,
-        fillColor: theme.cardColor,
+        fillColor: Get.theme.cardColor,
+        // contentPadding: const EdgeInsets.symmetric(
+        //   horizontal: AppNumbers.spacingMedium,
+        //   vertical: AppNumbers.spacingMedium,
+        // ),
       ),
-      
     );
   }
 }

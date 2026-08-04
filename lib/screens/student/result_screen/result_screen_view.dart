@@ -24,6 +24,7 @@ class ResultScreenView
         Theme.of(context);
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: 'result'.tr,
         showNotification: false,

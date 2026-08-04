@@ -85,6 +85,9 @@ Map<String, String> kmKh = {
   'quick_access': 'ចូលដំណើរការ យ៉ាងលឿន',
   'guardian_contact_details': 'ព័ត៌មានទំនាក់ទំនងឪពុកម្តាយ',
   'latest_updates': 'ព័ត៌មានថ្មីៗ',
+  'morning': 'ព្រឹក',
+  'afternoon': 'រសៀល',
+  'Homework Details' 'ព័ត៌មានលម្អិតកិច្ចការផ្ទះ'
   'notifications': 'ការជូនដំណឹង',
   'account_details': 'ព័ត៌មានគណនី',
   'account_details_hint': 'បញ្ចូលព័ត៌មានដែលបានចុះឈ្មោះជាមួយសាលា។',

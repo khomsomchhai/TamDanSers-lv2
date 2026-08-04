@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class InAppPdfViewer extends StatefulWidget {
   final String url;
@@ -58,8 +58,7 @@ class _InAppPdfViewerState extends State<InAppPdfViewer> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xff0F0F12) : const Color(0xff1A1A2E),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor:
             isDark ? const Color(0xff1A1A1E) : const Color(0xff1A1A2E),

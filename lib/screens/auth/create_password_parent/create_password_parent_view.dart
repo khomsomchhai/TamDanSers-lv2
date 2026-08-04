@@ -21,7 +21,7 @@ class CreatePasswordParentView extends GetView<CreatePasswordParentViewControlle
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       appBar: const CustomAppBar(title: '', showNotification: false),
       body: SafeArea(

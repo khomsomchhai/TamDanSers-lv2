@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
 import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 import 'package:tamdansers_lv2/firebase_options.dart';
 import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
@@ -250,86 +249,14 @@ Future<void> _handleNotificationTap(
   // if (Get.currentRoute != '/notification') {
   //   Get.toNamed('/notification');
   // }
-  // if (token != null) {
-  //   print("FCM Token: $token");
-  //   await saveFcmTokenToBackend(token);
-  // }
-
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    print("New FCM Token: $newToken");
-    await saveFcmTokenToBackend(newToken);
-  });
-
-  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-
-  if (initialMessage != null) {
-    if (Get.isRegistered<NotificationController>()) {
-      await Get.find<NotificationController>().loadNotifications();
-    }
-  }
-
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    if (Get.isRegistered<NotificationController>()) {
-      await Get.find<NotificationController>().loadNotifications();
-    }
-    if (Get.isRegistered<HomeworkViewController>()) {
-      Get.find<HomeworkViewController>().fetchHomework();
-    }
-
-    final title =
-        message.notification?.title ?? message.data["title"] ?? "Notification";
-
-    final body = message.notification?.body ??
-        message.data["body"] ??
-        message.data["message"] ??
-        "";
-
-    await flutterLocalNotificationsPlugin.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      title,
-      body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          channel.id,
-          channel.name,
-          channelDescription: channel.description,
-          importance: Importance.max,
-          priority: Priority.max,
-          playSound: true,
-          enableVibration: true,
-          icon: 'ic_launcher_foreground',
-        ),
-        iOS: const DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-      ),
-    );
-  });
-
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-    if (Get.isRegistered<NotificationController>()) {
-      await Get.find<NotificationController>().loadNotifications();
-    }
-    if (Get.isRegistered<HomeworkViewController>()) {
-      Get.find<HomeworkViewController>().fetchHomework();
-    }
-
-    print("User tapped notification");
-  });
 }
 
 Future<void> _refreshNotificationList() async {
   if (Get.isRegistered<NotificationController>()) {
-    try {
-      await Get.find<NotificationController>()
-          .loadNotifications();
-    } catch (e) {
-      debugPrint(
-        'Load notifications error: $e',
-      );
-    }
+    await Get.find<NotificationController>().loadNotifications();
+  }
+  if (Get.isRegistered<HomeworkViewController>()) {
+    Get.find<HomeworkViewController>().fetchHomework();
   }
 }
 
