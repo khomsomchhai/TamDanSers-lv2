@@ -1,13 +1,16 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
+import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/api/services/permission_services.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
+import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/core/widgets/textfield.dart/custom_textfield.dart';
 import 'package:tamdansers_lv2/data/model/permission_model.dart';
-
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/'
     'parent_home_tab/parent_home_tab_view.dart';
 
@@ -22,58 +25,34 @@ class ParentPermissionView
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
-      backgroundColor:
-          theme.scaffoldBackgroundColor,
+      backgroundColor: AppColors.lightBackground,
       appBar: CustomAppBar(
         title: 'ask_permission'.tr,
         showNotification: false,
       ),
       body: SafeArea(
         child: RefreshIndicator(
+          color: AppColors.primary,
           onRefresh: controller.loadData,
           child: SingleChildScrollView(
-            physics:
-                const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(
               AppNumbers.screenPadding,
+              16,
+              AppNumbers.screenPadding,
+              100,
             ),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildStudentCard(context),
-
-                const SizedBox(
-                  height:
-                      AppNumbers.spacingMedium,
-                ),
-
-                _buildPermissionForm(context),
-
-                const SizedBox(
-                  height:
-                      AppNumbers.spacingXLarge,
-                ),
-
-                Text(
-                  'ask_permission_my_requests'.tr,
-                  style: Get.textTheme.titleSmall
-                      ?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(
-                  height:
-                      AppNumbers.spacingMedium,
-                ),
-
-                _buildPermissionHistory(
-                  context,
-                ),
+                _buildStudentCard(),
+                const SizedBox(height: 16),
+                _buildPermissionForm(),
+                const SizedBox(height: 24),
+                _buildHistoryHeader(),
+                const SizedBox(height: 12),
+                _buildPermissionHistory(),
               ],
             ),
           ),
@@ -82,99 +61,71 @@ class ParentPermissionView
     );
   }
 
-  // =====================================================
-  // Selected child card
-  // =====================================================
-  Widget _buildStudentCard(
-    BuildContext context,
-  ) {
-    final theme = Theme.of(context);
-
+  Widget _buildStudentCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(
-        AppNumbers.cardPadding,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 14,
       ),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary,
-        borderRadius: BorderRadius.circular(
-          AppNumbers.radiusRounded,
-        ),
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.16),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            width: 52,
-            height: 52,
+            width: 46,
+            height: 46,
             decoration: BoxDecoration(
-              color: theme.colorScheme.onPrimary
-                  .withValues(alpha: 0.15),
-              borderRadius:
-                  BorderRadius.circular(
-                AppNumbers.radiusMedium,
-              ),
+              color: AppColors.white.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(13),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.person_rounded,
-              color:
-                  theme.colorScheme.onPrimary,
-              size: 28,
+              color: AppColors.white,
+              size: 24,
             ),
           ),
-
-          const SizedBox(
-            width: AppNumbers.spacingMedium,
-          ),
-
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'ask_permission_for'.tr,
-                  style: Get.textTheme.bodySmall
-                      ?.copyWith(
-                    color: theme
-                        .colorScheme.onPrimary
-                        .withValues(
-                      alpha: 0.80,
-                    ),
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.white.withValues(alpha: 0.80),
+                    fontSize: 12,
                   ),
                 ),
-
-                const SizedBox(height: 4),
-
+                const SizedBox(height: 3),
                 Obx(
                   () => Text(
                     controller.childName,
                     maxLines: 1,
-                    overflow:
-                        TextOverflow.ellipsis,
-                    style: Get
-                        .textTheme.titleMedium
-                        ?.copyWith(
-                      color: theme
-                          .colorScheme.onPrimary,
-                      fontWeight:
-                          FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.titleSmall.copyWith(
+                      color: AppColors.white,
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 2),
-
                 Obx(
                   () => Text(
                     controller.childCode,
-                    style: Get
-                        .textTheme.bodySmall
-                        ?.copyWith(
-                      color: theme
-                          .colorScheme.onPrimary
-                          .withValues(
-                        alpha: 0.85,
-                      ),
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.white.withValues(alpha: 0.84),
+                      fontSize: 12,
                     ),
                   ),
                 ),
@@ -186,649 +137,571 @@ class ParentPermissionView
     );
   }
 
-  // =====================================================
-  // Permission form
-  // =====================================================
-  Widget _buildPermissionForm(
-    BuildContext context,
-  ) {
-    final theme = Theme.of(context);
+  Widget _buildPermissionForm() {
+    return Obx(() {
+      final isEditing = controller.isEditing;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(
-        AppNumbers.cardPadding,
-      ),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(
-          AppNumbers.radiusRounded,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(
-              0,
-              0,
-              0,
-              0.04,
-            ),
-            blurRadius: 12,
-            offset: Offset(0, 5),
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isEditing
+                ? AppColors.primary.withValues(alpha: 0.35)
+                : AppColors.border,
           ),
-        ],
-      ),
-      child: Form(
-        key: controller.formKey,
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme
-                        .primaryContainer,
-                    borderRadius:
-                        BorderRadius.circular(
-                      12,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.dark.withValues(alpha: 0.04),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Form(
+          key: controller.formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                    child: Icon(
+                      isEditing
+                          ? Icons.edit_note_rounded
+                          : Icons.edit_calendar_rounded,
+                      color: AppColors.primary,
+                      size: 22,
                     ),
                   ),
-                  child: Icon(
-                    Icons.edit_calendar_rounded,
-                    color: theme.colorScheme
-                        .onPrimaryContainer,
+                  const SizedBox(width: 11),
+                  Expanded(
+                    child: Text(
+                      isEditing
+                          ? 'permission_edit_title'.tr
+                          : 'ask_permission_request_permission'.tr,
+                      style: AppTextStyles.titleSmall.copyWith(
+                        color: AppColors.dark,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
+                  if (isEditing)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'edit'.tr,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              const Divider(height: 1, color: AppColors.border),
+              const SizedBox(height: 16),
+              _buildRequestTypeField(),
+              const SizedBox(height: 14),
+              if (controller.isBySubject) _buildScheduleField(),
+              if (controller.isBySubject) const SizedBox(height: 14),
+              _buildPermissionTypeField(),
+              const SizedBox(height: 14),
+              _buildReasonField(),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                height: AppNumbers.buttonHeight,
+                child: CustomButton(
+                  text: isEditing
+                      ? 'edit'.tr
+                      : 'ask_permission_submit_request'.tr,
+                  isLoading: controller.isSubmitting.value,
+                  onPressed: controller.submitPermission,
                 ),
-
-                const SizedBox(width: 12),
-
-                Expanded(
-                  child: Text(
-                    'ask_permission_request_permission'
-                        .tr,
-                    style: Get
-                        .textTheme.titleSmall
-                        ?.copyWith(
-                      fontWeight:
-                          FontWeight.bold,
+              ),
+              if (isEditing) ...[
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                    onPressed: controller.cancelEditPermission,
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      size: 18,
+                    ),
+                    label: Text(
+                      'cancel'.tr,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.error,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ],
-            ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
 
-            const SizedBox(
-              height:
-                  AppNumbers.spacingMedium,
-            ),
-
-            Divider(
-              color: theme.dividerColor,
-            ),
-
-            const SizedBox(
-              height:
-                  AppNumbers.spacingMedium,
-            ),
-
-            // =================================================
-            // Request Type
-            // =================================================
-            Text(
-              'ask_permission_request_type'.tr,
-              style:
-                  Get.textTheme.bodyMedium,
-            ),
-
-            const SizedBox(
-              height:
-                  AppNumbers.spacingSmall,
-            ),
-
-            Obx(
-              () =>
-                  DropdownButtonFormField<
-                      String>(
-                key: ValueKey(
-                  controller
-                      .selectedRequestType
-                      .value,
-                ),
-                initialValue: controller
-                    .selectedRequestType.value,
-                isExpanded: true,
-                items: controller.requestTypes
-                    .map(
-                      (type) =>
-                          DropdownMenuItem<
-                              String>(
-                        value: type,
-                        child: Text(
-                          controller
-                              .requestTypeLabel(
-                            type,
-                          ),
-                          maxLines: 1,
-                          overflow:
-                              TextOverflow
-                                  .ellipsis,
-                          style: Get
-                              .textTheme.bodyMedium
-                              ?.copyWith(
-                            fontSize: 16,
-                            fontWeight:
-                                FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    controller
-                        .changeRequestType(
-                      value,
-                    );
-                  }
-                },
-                decoration:
-                    _inputDecoration(
-                  context,
-                ),
-                icon: const Icon(
-                  Icons
-                      .keyboard_arrow_down_rounded,
-                  size: 24,
-                ),
-                dropdownColor:
-                    theme.cardColor,
-              ),
-            ),
-
-            const SizedBox(
-              height:
-                  AppNumbers.spacingLarge,
-            ),
-
-            // =================================================
-            // Subject Schedule
-            // =================================================
-            Obx(
-              () {
-                if (!controller
-                    .isBySubject) {
-                  return const SizedBox
-                      .shrink();
-                }
-
-                return Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'ask_permission_subject'.tr,
-                      style: Get
-                          .textTheme.bodyMedium,
-                    ),
-
-                    const SizedBox(
-                      height: AppNumbers
-                          .spacingSmall,
-                    ),
-
-                    DropdownButtonFormField<
-                        int>(
-                      key: ValueKey(
-                        controller
-                            .selectedScheduleId
-                            .value,
-                      ),
-                      initialValue: controller
-                          .selectedScheduleId
-                          .value,
-                      isExpanded: true,
-                      hint: Text(
-                        'ask_permission_select_subject'
-                            .tr,
-                        style: Get
-                            .textTheme.bodyMedium
-                            ?.copyWith(
-                          fontSize: 16,
-                          color:
-                              theme.hintColor,
-                        ),
-                      ),
-                      items: controller.schedules
-                          .map(
-                            (
-                              schedule,
-                            ) =>
-                                DropdownMenuItem<
-                                    int>(
-                              value: controller
-                                  .parseId(
-                                schedule['id'],
-                              ),
-                              child: Text(
-                                controller
-                                    .scheduleLabel(
-                                  schedule,
-                                ),
-                                maxLines: 1,
-                                overflow:
-                                    TextOverflow
-                                        .ellipsis,
-                                style: Get
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                  fontSize: 16,
-                                  fontWeight:
-                                      FontWeight
-                                          .w500,
-                                ),
-                              ),
-                            ),
-                          )
-                          .where(
-                            (item) =>
-                                item.value !=
-                                null,
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        controller
-                            .selectedScheduleId
-                            .value = value;
-                      },
-                      decoration:
-                          _inputDecoration(
-                        context,
-                      ),
-                      icon: const Icon(
-                        Icons
-                            .keyboard_arrow_down_rounded,
-                        size: 24,
-                      ),
-                      dropdownColor:
-                          theme.cardColor,
-                    ),
-
-                    const SizedBox(
-                      height: AppNumbers
-                          .spacingLarge,
-                    ),
-                  ],
+  Widget _buildRequestTypeField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildFieldLabel('ask_permission_request_type'.tr),
+        const SizedBox(height: 7),
+        Obx(
+          () => DropdownButtonFormField<String>(
+            key: ValueKey(controller.selectedRequestType.value),
+            initialValue: controller.selectedRequestType.value,
+            isExpanded: true,
+            style: _dropdownTextStyle(),
+            items: controller.requestTypes.map(
+              (type) {
+                return DropdownMenuItem<String>(
+                  value: type,
+                  child: Text(
+                    controller.requestTypeLabel(type),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: _dropdownTextStyle(),
+                  ),
                 );
               },
+            ).toList(),
+            onChanged: (value) {
+              if (value != null) {
+                controller.changeRequestType(value);
+              }
+            },
+            decoration: _inputDecoration(),
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 21,
+              color: AppColors.hintColor,
             ),
+            dropdownColor: AppColors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ],
+    );
+  }
 
-            // =================================================
-            // Permission Type
-            // =================================================
-            Text(
-              'ask_permission_permission_type'
-                  .tr,
-              style:
-                  Get.textTheme.bodyMedium,
+  Widget _buildScheduleField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildFieldLabel('ask_permission_subject'.tr),
+        const SizedBox(height: 7),
+        Obx(() {
+          final selectedId = controller.selectedScheduleId.value;
+          final hasSelected = controller.schedules.any(
+            (schedule) =>
+                controller.parseId(schedule['id']) == selectedId,
+          );
+
+          return DropdownButtonFormField<int>(
+            key: ValueKey(selectedId),
+            initialValue: hasSelected ? selectedId : null,
+            isExpanded: true,
+            style: _dropdownTextStyle(),
+            hint: Text(
+              'ask_permission_select_subject'.tr,
+              style: _hintTextStyle(),
             ),
+            items: controller.schedules
+                .map(
+                  (schedule) {
+                    final id = controller.parseId(schedule['id']);
 
-            const SizedBox(
-              height:
-                  AppNumbers.spacingSmall,
-            ),
+                    if (id == null) {
+                      return null;
+                    }
 
-            Obx(
-              () =>
-                  DropdownButtonFormField<
-                      String>(
-                key: ValueKey(
-                  controller
-                      .selectedPermissionType
-                      .value,
-                ),
-                initialValue: controller
-                    .selectedPermissionType
-                    .value,
-                isExpanded: true,
-                items: controller
-                    .permissionTypes
-                    .map(
-                      (type) =>
-                          DropdownMenuItem<
-                              String>(
-                        value: type,
-                        child: Text(
-                          controller
-                              .permissionTypeLabel(
-                            type,
-                          ),
-                          maxLines: 1,
-                          overflow:
-                              TextOverflow
-                                  .ellipsis,
-                          style: Get
-                              .textTheme.bodyMedium
-                              ?.copyWith(
-                            fontSize: 16,
-                            fontWeight:
-                                FontWeight.w500,
-                          ),
-                        ),
+                    return DropdownMenuItem<int>(
+                      value: id,
+                      child: Text(
+                        controller.scheduleLabel(schedule),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: _dropdownTextStyle(),
                       ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    controller
-                        .selectedPermissionType
-                        .value = value;
-                  }
-                },
-                decoration:
-                    _inputDecoration(
-                  context,
+                    );
+                  },
+                )
+                .whereType<DropdownMenuItem<int>>()
+                .toList(),
+            onChanged: (value) {
+              controller.selectedScheduleId.value = value;
+            },
+            decoration: _inputDecoration(),
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 21,
+              color: AppColors.hintColor,
+            ),
+            dropdownColor: AppColors.white,
+            borderRadius: BorderRadius.circular(12),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildPermissionTypeField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildFieldLabel('ask_permission_permission_type'.tr),
+        const SizedBox(height: 7),
+        Obx(
+          () => DropdownButtonFormField<String>(
+            key: ValueKey(controller.selectedPermissionType.value),
+            initialValue: controller.permissionTypes
+                    .contains(controller.selectedPermissionType.value)
+                ? controller.selectedPermissionType.value
+                : null,
+            isExpanded: true,
+            style: _dropdownTextStyle(),
+            hint: Text(
+              'ask_permission_select_permission_type'.tr,
+              style: _hintTextStyle(),
+            ),
+            items: controller.permissionTypes.map(
+              (type) {
+                return DropdownMenuItem<String>(
+                  value: type,
+                  child: Text(
+                    controller.permissionTypeLabel(type),
+                    style: _dropdownTextStyle(),
+                  ),
+                );
+              },
+            ).toList(),
+            onChanged: (value) {
+              controller.selectedPermissionType.value = value ?? '';
+            },
+            decoration: _inputDecoration(),
+            icon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 21,
+              color: AppColors.hintColor,
+            ),
+            dropdownColor: AppColors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReasonField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildFieldLabel('ask_permission_reason'.tr),
+        const SizedBox(height: 7),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: CustomTextField(
+            hintText: 'ask_permission_write_reason'.tr,
+            controller: controller.reasonController,
+            isMultiline: true,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFieldLabel(String text) {
+    return Text(
+      text,
+      style: AppTextStyles.bodySmall.copyWith(
+        color: AppColors.dark,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+
+  Widget _buildHistoryHeader() {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            'ask_permission_my_requests'.tr,
+            style: AppTextStyles.titleSmall.copyWith(
+              color: AppColors.dark,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Obx(
+          () => Text(
+            '${controller.permissionRequests.length}',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.hintColor,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPermissionHistory() {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(28),
+            child: CircularProgressIndicator(
+              color: AppColors.primary,
+            ),
+          ),
+        );
+      }
+
+      if (controller.permissionRequests.isEmpty) {
+        return _buildEmptyState();
+      }
+
+      return ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: controller.permissionRequests.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (_, index) {
+          return _buildPermissionCard(
+            controller.permissionRequests[index],
+          );
+        },
+      );
+    });
+  }
+
+  Widget _buildPermissionCard(PermissionModel request) {
+    final status = request.status.trim().toLowerCase();
+    final statusColor = controller.statusColor(status);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: request.attendanceSaved
+              ? AppColors.grey.withValues(alpha: 0.25)
+              : AppColors.border,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.dark.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                icon: const Icon(
-                  Icons
-                      .keyboard_arrow_down_rounded,
-                  size: 24,
+                child: Icon(
+                  Icons.fact_check_outlined,
+                  color: statusColor,
+                  size: 22,
                 ),
-                dropdownColor:
-                    theme.cardColor,
               ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  controller.formatRequestType(request.requestType),
+                  style: AppTextStyles.titleSmall.copyWith(
+                    color: AppColors.dark,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              _buildStatusBadge(status, statusColor),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: AppColors.border),
+          const SizedBox(height: 10),
+          if (request.requestType == 'subject' &&
+              request.subjectName.isNotEmpty)
+            _historyRow(
+              icon: Icons.menu_book_rounded,
+              label:
+                  '${'ask_permission_subject'.tr}: ${request.subjectName}',
             ),
+          _historyRow(
+            icon: Icons.label_outline_rounded,
+            label:
+                '${'ask_permission_permission_type'.tr}: ${controller.permissionTypeLabel(request.type)}',
+          ),
+          _historyRow(
+            icon: Icons.notes_outlined,
+            label: '${'ask_permission_reason'.tr}: ${request.reason}',
+          ),
+          _historyRow(
+            icon: Icons.schedule_rounded,
+            label:
+                '${'ask_permission_created'.tr}: ${controller.formatCreatedDate(request.createdAt)}',
+          ),
+          const SizedBox(height: 6),
+          _buildPermissionActions(request),
+        ],
+      ),
+    );
+  }
 
-            const SizedBox(
-              height:
-                  AppNumbers.spacingLarge,
+  Widget _buildPermissionActions(PermissionModel request) {
+    if (request.attendanceSaved ||
+        (!request.canEdit && !request.canDelete)) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 11,
+          vertical: 9,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.grey.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.lock_outline_rounded,
+              size: 17,
+              color: AppColors.grey,
             ),
-
-            // =================================================
-            // Reason
-            // =================================================
-            Text(
-              'ask_permission_reason'.tr,
-              style:
-                  Get.textTheme.bodyMedium,
-            ),
-
-            const SizedBox(
-              height:
-                  AppNumbers.spacingSmall,
-            ),
-
-            CustomTextField(
-              hintText:
-                  'ask_permission_write_reason'
-                      .tr,
-              controller:
-                  controller.reasonController,
-              isMultiline: true,
-            ),
-
-            const SizedBox(
-              height:
-                  AppNumbers.spacingLarge,
-            ),
-
-            SizedBox(
-              width: double.infinity,
-              height:
-                  AppNumbers.buttonHeight,
-              child: Obx(
-                () => CustomButton(
-                  text:
-                      'ask_permission_submit_request'
-                          .tr,
-                  isLoading: controller
-                      .isSubmitting.value,
-                  onPressed: controller
-                      .submitPermission,
+            const SizedBox(width: 7),
+            Expanded(
+              child: Text(
+                'permission_attendance_locked'.tr,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.grey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ],
         ),
-      ),
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: request.canEdit
+                ? () => controller.startEditPermission(request)
+                : null,
+            icon: const Icon(Icons.edit_outlined, size: 17),
+            label: Text(
+              'edit'.tr,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.primary,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              )
+            ),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(42),
+              foregroundColor: AppColors.primary,
+              side: const BorderSide(color: AppColors.primary),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(11),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 9),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: request.canDelete
+                ? () => controller.confirmDeletePermission(request)
+                : null,
+            icon: const Icon(Icons.delete_outline, size: 17),
+            label: Text(
+              'delete'.tr,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.error,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(42),
+              foregroundColor: AppColors.error,
+              side: const BorderSide(color: AppColors.error),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(11),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  // =====================================================
-  // Permission history
-  // =====================================================
-  Widget _buildPermissionHistory(
-    BuildContext context,
-  ) {
-    final theme = Theme.of(context);
-
-    return Obx(
-      () {
-        if (controller.isLoading.value) {
-          return const Center(
-            child:
-                CircularProgressIndicator(),
-          );
-        }
-
-        if (controller
-            .permissionRequests.isEmpty) {
-          return Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(
-              AppNumbers.cardPadding,
-            ),
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius:
-                  BorderRadius.circular(
-                AppNumbers.radiusLarge,
-              ),
-              border: Border.all(
-                color: theme.dividerColor,
-              ),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.fact_check_outlined,
-                  size: 42,
-                  color: theme.iconTheme.color
-                      ?.withValues(
-                    alpha: 0.6,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  'ask_permission_no_requests'
-                      .tr,
-                  textAlign:
-                      TextAlign.center,
-                  style: Get
-                      .textTheme.bodyMedium,
-                ),
-              ],
-            ),
-          );
-        }
-
-        return ListView.separated(
-          shrinkWrap: true,
-          physics:
-              const NeverScrollableScrollPhysics(),
-          itemCount: controller
-              .permissionRequests.length,
-          separatorBuilder: (_, __) =>
-              const SizedBox(
-            height: 12,
-          ),
-          itemBuilder: (_, index) {
-            final request = controller
-                .permissionRequests[index];
-
-            final status =
-                request.status.toLowerCase();
-
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(
-                AppNumbers.cardPadding,
-              ),
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius:
-                    BorderRadius.circular(
-                  AppNumbers.radiusRounded,
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color.fromRGBO(
-                      0,
-                      0,
-                      0,
-                      0.03,
-                    ),
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          color: theme
-                              .colorScheme
-                              .primaryContainer,
-                          borderRadius:
-                              BorderRadius.circular(
-                            10,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons
-                              .assignment_turned_in_outlined,
-                          color: theme
-                              .colorScheme
-                              .onPrimaryContainer,
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      Expanded(
-                        child: Text(
-                          controller
-                              .formatRequestType(
-                            request.requestType,
-                          ),
-                          style: Get
-                              .textTheme.titleSmall
-                              ?.copyWith(
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      Container(
-                        padding: const EdgeInsets
-                            .symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: controller
-                              .statusColor(
-                                status,
-                              )
-                              .withValues(
-                            alpha: 0.12,
-                          ),
-                          borderRadius:
-                              BorderRadius.circular(
-                            20,
-                          ),
-                        ),
-                        child: Text(
-                          controller
-                              .statusLabel(
-                            status,
-                          ),
-                          style: TextStyle(
-                            color: controller
-                                .statusColor(
-                              status,
-                            ),
-                            fontWeight:
-                                FontWeight.w600,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  Divider(
-                    color: theme.dividerColor,
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  if (request.requestType ==
-                          'subject' &&
-                      request.subjectName
-                          .isNotEmpty)
-                    _historyRow(
-                      icon:
-                          Icons.menu_book_rounded,
-                      label:
-                          '${'ask_permission_subject'.tr}: '
-                          '${request.subjectName}',
-                    ),
-
-                  _historyRow(
-                    icon:
-                        Icons.label_outline,
-                    label:
-                        '${'ask_permission_permission_type'.tr}: '
-                        '${controller.permissionTypeLabel(request.type)}',
-                  ),
-
-                  _historyRow(
-                    icon:
-                        Icons.notes_outlined,
-                    label:
-                        '${'ask_permission_reason'.tr}: '
-                        '${request.reason}',
-                  ),
-
-                  _historyRow(
-                    icon: Icons
-                        .calendar_today_outlined,
-                    label:
-                        '${'ask_permission_created'.tr}: '
-                        '${controller.formatCreatedDate(request.createdAt)}',
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
+  Widget _buildStatusBadge(String status, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 9,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        controller.statusLabel(status),
+        style: AppTextStyles.bodySmall.copyWith(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 
@@ -837,26 +710,23 @@ class ParentPermissionView
     required String label,
   }) {
     return Padding(
-      padding:
-          const EdgeInsets.only(
-        bottom: 8,
-      ),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
             icon,
-            size: 17,
+            size: 16,
+            color: AppColors.hintColor,
           ),
-
-          const SizedBox(width: 8),
-
+          const SizedBox(width: 7),
           Expanded(
             child: Text(
               label,
-              style:
-                  Get.textTheme.bodySmall,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.hintColor,
+                fontSize: 13,
+              ),
             ),
           ),
         ],
@@ -864,45 +734,87 @@ class ParentPermissionView
     );
   }
 
-  InputDecoration _inputDecoration(
-    BuildContext context,
-  ) {
-    final theme = Theme.of(context);
+  Widget _buildEmptyState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 44,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 68,
+            height: 68,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.fact_check_outlined,
+              size: 34,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'ask_permission_no_requests'.tr,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.dark,
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  TextStyle _dropdownTextStyle() {
+    return AppTextStyles.bodySmall.copyWith(
+      color: AppColors.dark,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+    );
+  }
+
+  TextStyle _hintTextStyle() {
+    return AppTextStyles.bodySmall.copyWith(
+      color: AppColors.hintColor,
+      fontSize: 14,
+    );
+  }
+
+  InputDecoration _inputDecoration() {
     return InputDecoration(
       filled: true,
-      fillColor:
-          theme.scaffoldBackgroundColor,
-      contentPadding:
-          const EdgeInsets.symmetric(
-        horizontal: 18,
-        vertical: 16,
+      fillColor: AppColors.lightBackground,
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 12,
       ),
+      hintStyle: _hintTextStyle(),
       border: OutlineInputBorder(
         borderSide: BorderSide.none,
-        borderRadius:
-            BorderRadius.circular(
-          AppNumbers.radiusMedium,
-        ),
+        borderRadius: BorderRadius.circular(12),
       ),
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide.none,
-        borderRadius:
-            BorderRadius.circular(
-          AppNumbers.radiusMedium,
-        ),
+        borderRadius: BorderRadius.circular(12),
       ),
-      focusedBorder:
-          OutlineInputBorder(
-        borderSide: BorderSide(
-          color: theme
-              .colorScheme.primary,
-          width: 1.4,
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(
+          color: AppColors.primary,
+          width: 1.2,
         ),
-        borderRadius:
-            BorderRadius.circular(
-          AppNumbers.radiusMedium,
-        ),
+        borderRadius: BorderRadius.circular(12),
       ),
     );
   }

@@ -317,6 +317,23 @@ Map<String, String> enUs = {
       'You already requested permission for today.',
   'ask_permission_request_type_by_subject': 'By Subject',
   'ask_permission_request_type_full_day': 'Full Day',
+  'permission_delete_title':
+    'Delete Permission Request',
+
+'permission_delete_message':
+    'Are you sure you want to delete this permission request?',
+
+'cancel':
+    'Cancel',
+
+'delete':
+    'Delete',
+
+'edit':
+    'Edit',
+
+'permission_attendance_locked':
+    'Attendance has already been saved. This request cannot be edited or deleted.',
 
   //parent
   'hello_parent': 'Hello, Guardian!',
