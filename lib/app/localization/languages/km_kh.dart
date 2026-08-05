@@ -316,6 +316,23 @@ Map<String, String> kmKh = {
 'ask_permission_already_requested_today':
     'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
 
+  'permission_delete_title':
+    'លុបសំណើសុំច្បាប់',
+
+'permission_delete_message':
+    'តើអ្នកប្រាកដថាចង់លុបសំណើសុំច្បាប់នេះមែនទេ?',
+
+'cancel':
+    'បោះបង់',
+
+'delete':
+    'លុប',
+'edit':
+    'កែប្រែ',
+
+'permission_attendance_locked':
+    'គ្រូបានរក្សាទុកវត្តមានរួច មិនអាចកែប្រែ ឬលុបបានទេ',
+
 // Request type
 'ask_permission_request_type_by_subject':
     'តាមមុខវិជ្ជា',

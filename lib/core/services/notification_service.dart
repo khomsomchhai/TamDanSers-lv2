@@ -65,8 +65,7 @@ Future<void> setupLocalNotifications() async {
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
-  await FirebaseMessaging.instance
-      .setForegroundNotificationPresentationOptions(
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
     sound: true,
@@ -88,8 +87,7 @@ Future<void> saveFcmTokenToBackend(
    * If you save it as "token", change this to:
    * storage.read<String>("token");
    */
-  final accessToken =
-      storage.read<String>('access_token');
+  final accessToken = storage.read<String>('access_token');
 
   if (accessToken == null || accessToken.isEmpty) {
     debugPrint(
@@ -114,11 +112,9 @@ Future<void> saveFcmTokenToBackend(
 
 Future<void> setupFCM() async {
   try {
-    final FirebaseMessaging messaging =
-        FirebaseMessaging.instance;
+    final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    final NotificationSettings settings =
-        await messaging.requestPermission(
+    final NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
@@ -129,11 +125,9 @@ Future<void> setupFCM() async {
       '${settings.authorizationStatus}',
     );
 
-    final String? fcmToken =
-        await messaging.getToken();
+    final String? fcmToken = await messaging.getToken();
 
-    if (fcmToken != null &&
-        fcmToken.isNotEmpty) {
+    if (fcmToken != null && fcmToken.isNotEmpty) {
       debugPrint('FCM Token received');
 
       await saveFcmTokenToBackend(
@@ -157,8 +151,7 @@ Future<void> setupFCM() async {
     );
 
     final RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance
-            .getInitialMessage();
+        await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
       await _handleNotificationTap(
@@ -170,37 +163,31 @@ Future<void> setupFCM() async {
       (RemoteMessage message) async {
         await _refreshNotificationList();
 
-        final String title =
-            message.notification?.title ??
-                message.data['title']?.toString() ??
-                'Notification';
+        final String title = message.notification?.title ??
+            message.data['title']?.toString() ??
+            'Notification';
 
-        final String body =
-            message.notification?.body ??
-                message.data['body']?.toString() ??
-                message.data['message']?.toString() ??
-                '';
+        final String body = message.notification?.body ??
+            message.data['body']?.toString() ??
+            message.data['message']?.toString() ??
+            '';
 
         await flutterLocalNotificationsPlugin.show(
-          DateTime.now()
-                  .millisecondsSinceEpoch ~/
-              1000,
+          DateTime.now().millisecondsSinceEpoch ~/ 1000,
           title,
           body,
           NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channelDescription:
-                  channel.description,
-              importance: Importance.max,
-              priority: Priority.max,
-              playSound: true,
-              enableVibration: true,
-              icon: '@drawable/ic_notification',
-            ),
-            iOS:
-                const DarwinNotificationDetails(
+            android: AndroidNotificationDetails(channel.id, channel.name,
+                channelDescription: channel.description,
+                importance: Importance.max,
+                priority: Priority.max,
+                playSound: true,
+                enableVibration: true,
+                icon: '@drawable/ic_notification',
+                largeIcon: DrawableResourceAndroidBitmap(
+                  '@drawable/ic_notification',
+                )),
+            iOS: const DarwinNotificationDetails(
               presentAlert: true,
               presentBadge: true,
               presentSound: true,
@@ -262,11 +249,9 @@ Future<void> _refreshNotificationList() async {
 
 Future<void> saveCurrentFcmTokenAfterLogin() async {
   try {
-    final String? fcmToken =
-        await FirebaseMessaging.instance.getToken();
+    final String? fcmToken = await FirebaseMessaging.instance.getToken();
 
-    if (fcmToken == null ||
-        fcmToken.isEmpty) {
+    if (fcmToken == null || fcmToken.isEmpty) {
       debugPrint(
         'Cannot save FCM token: token is empty',
       );

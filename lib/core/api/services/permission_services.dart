@@ -171,4 +171,50 @@ class PermissionServices {
       ),
     );
   }
+
+Future<PermissionModel> updatePermission({
+  required int permissionId,
+  required String requestType,
+  int? scheduleId,
+  required String type,
+  required String reason,
+}) async {
+  final Map<String, dynamic> payload = {
+    'request_type': requestType,
+    'type': type,
+    'reason': reason.trim(),
+  };
+
+  if (requestType == 'subject' &&
+      scheduleId != null) {
+    payload['schedule_id'] = scheduleId;
+  } else {
+    payload['schedule_id'] = null;
+  }
+
+  final response = await baseApi.put(
+    endpoint: '/permissions/$permissionId',
+    data: payload,
+  );
+
+  dynamic responseData = response;
+
+  if (response is Map &&
+      response['data'] is Map) {
+    responseData = response['data'];
+  }
+
+  return PermissionModel.fromJson(
+    Map<String, dynamic>.from(
+      responseData as Map,
+    ),
+  );
+}
+Future<void> deletePermission({
+  required int permissionId,
+}) async {
+  await baseApi.delete(
+    endpoint: '/permissions/$permissionId',
+  );
+}
 }
