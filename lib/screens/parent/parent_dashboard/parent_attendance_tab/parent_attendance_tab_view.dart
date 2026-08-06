@@ -44,7 +44,7 @@ class ParentAttendanceTabView
               ),
               children: [
                 Text(
-                  'attencdance'.tr,
+                  'attendance'.tr,
                   style: AppTextStyles.headlineSmall.copyWith(
                     color: AppColors.dark,
                     fontWeight: FontWeight.bold,

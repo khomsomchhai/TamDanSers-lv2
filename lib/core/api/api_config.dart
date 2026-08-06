@@ -8,7 +8,7 @@ class ApiConfig {
     dio = Dio(
       BaseOptions(
 
-        baseUrl: "https://tamdansers-56q81mrhl79g8.sabay.com",
+        baseUrl: "https://tamdansers-1fvbe1msgz9hki.sabay.com",
         connectTimeout: const Duration(seconds: 20),
         receiveTimeout: const Duration(seconds: 20),
         headers: {

@@ -409,4 +409,183 @@ class HomeworkViewController extends GetxController {
 
     return 'homework_${DateTime.now().millisecondsSinceEpoch}$extension';
   }
+  Future<void> executeUpdateSubmission({
+  required BuildContext context,
+  required int submissionId,
+  required String answerText,
+  required List<XFile> selectedFiles,
+  required bool keepOldFiles,
+}) async {
+  final isKm =
+      Get.locale?.languageCode == 'km';
+
+  try {
+    Get.dialog(
+      const Center(
+        child:
+            CircularProgressIndicator(),
+      ),
+      barrierDismissible: false,
+    );
+
+    final userController =
+        Get.find<UserController>();
+
+    if (userController.profile ==
+        null) {
+      await userController.getProfile();
+    }
+
+    final studentId =
+        userController.profile?.id ?? 0;
+
+    if (studentId == 0) {
+      Get.back();
+
+      Get.snackbar(
+        isKm ? 'កំហុស' : 'Error',
+        isKm
+            ? 'រកមិនឃើញព័ត៌មានសិស្ស'
+            : 'Student profile not found',
+      );
+
+      return;
+    }
+
+    final List<MultipartFile>
+        fileParts = [];
+
+    for (final file
+        in selectedFiles) {
+      final fileName =
+          _buildUploadFileName(file);
+
+      fileParts.add(
+        await MultipartFile.fromFile(
+          file.path,
+          filename: fileName,
+        ),
+      );
+    }
+
+    await homeworkServices
+        .updateSubmission(
+      submissionId: submissionId,
+      studentId: studentId,
+      answerText: answerText,
+      keepOldFiles: keepOldFiles,
+      files: fileParts,
+    );
+
+    Get.back();
+    Get.back();
+
+    Get.snackbar(
+      isKm ? 'ជោគជ័យ' : 'Success',
+      isKm
+          ? 'កិច្ចការត្រូវបានកែប្រែដោយជោគជ័យ'
+          : 'Submission updated successfully',
+      backgroundColor:
+          AppColors.success.withValues(
+        alpha: 0.10,
+      ),
+      colorText: AppColors.success,
+    );
+
+    await fetchHomework();
+  } catch (error) {
+    if (Get.isDialogOpen == true) {
+      Get.back();
+    }
+
+    Get.snackbar(
+      isKm ? 'កំហុស' : 'Error',
+      isKm
+          ? 'មិនអាចកែប្រែកិច្ចការបានទេ៖ $error'
+          : 'Failed to update submission: $error',
+      backgroundColor:
+          AppColors.error.withValues(
+        alpha: 0.10,
+      ),
+      colorText: AppColors.error,
+    );
+  }
+}
+Future<void> executeDeleteSubmission({
+  required int submissionId,
+}) async {
+  final isKm =
+      Get.locale?.languageCode == 'km';
+
+  try {
+    final userController =
+        Get.find<UserController>();
+
+    if (userController.profile ==
+        null) {
+      await userController.getProfile();
+    }
+
+    final studentId =
+        userController.profile?.id ?? 0;
+
+    if (studentId == 0) {
+      Get.snackbar(
+        isKm ? 'កំហុស' : 'Error',
+        isKm
+            ? 'រកមិនឃើញព័ត៌មានសិស្ស'
+            : 'Student profile not found',
+      );
+
+      return;
+    }
+
+    Get.dialog(
+      const Center(
+        child:
+            CircularProgressIndicator(),
+      ),
+      barrierDismissible: false,
+    );
+
+    await homeworkServices
+        .deleteSubmission(
+      submissionId: submissionId,
+      studentId: studentId,
+    );
+
+    Get.back();
+    Get.back();
+
+    Get.snackbar(
+      isKm ? 'ជោគជ័យ' : 'Success',
+      isKm
+          ? 'កិច្ចការត្រូវបានលុបដោយជោគជ័យ'
+          : 'Submission deleted successfully',
+      backgroundColor:
+          AppColors.success.withValues(
+        alpha: 0.10,
+      ),
+      colorText: AppColors.success,
+    );
+
+    await fetchHomework();
+  } catch (error) {
+    if (Get.isDialogOpen == true) {
+      Get.back();
+    }
+
+    Get.snackbar(
+      isKm ? 'កំហុស' : 'Error',
+      isKm
+          ? 'មិនអាចលុបកិច្ចការបានទេ៖ $error'
+          : 'Failed to delete submission: $error',
+      backgroundColor:
+          AppColors.error.withValues(
+        alpha: 0.10,
+      ),
+      colorText: AppColors.error,
+    );
+  }
+}
 }
