@@ -193,6 +193,7 @@ Map<String, String> enUs = {
   'choose_new_profile_photo': 'Choose a new profile photo',
   'take_photo': 'Take Photo',
   'choose_from_gallery': 'Choose from Gallery',
+  'confirm_upload_photo': 'Do you want to upload this photo as your profile picture?',
   'theme': 'Theme',
   'choose_look_fits_style': 'Choose the look that fits your style',
   'light_mode': 'Light Mode',
@@ -322,6 +323,9 @@ Map<String, String> enUs = {
 
 'permission_delete_message':
     'Are you sure you want to delete this permission request?',
+
+'delete_notification_title': 'Delete Notification',
+'delete_notification_message': 'Are you sure you want to remove this notification?',
 
 'cancel':
     'Cancel',

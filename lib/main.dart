@@ -11,6 +11,7 @@ import 'package:tamdansers_lv2/app/localization/app_translation.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_pages.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
+import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/dark_theme.dart';
 import 'package:tamdansers_lv2/app/themes/light_theme.dart';
 import 'package:tamdansers_lv2/core/api/controllers/initial_binding.dart';
@@ -28,29 +29,26 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent, 
-    ),
-  );
-
   FirebaseMessaging.onBackgroundMessage(
     firebaseMessagingBackgroundHandler,
   );
 
   await setupLocalNotifications();
+  await setupFCM();
 
-  Future.microtask(() async {
-    await initializeDateFormatting();
-  });
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor:AppColors.transparent,
+    ),
+  );
+
+  unawaited(initializeDateFormatting());
 
   runApp(
     MainApp(
       themeService: themeService,
     ),
   );
-
-  unawaited(setupFCM());
 }
 
 class MainApp extends StatefulWidget {

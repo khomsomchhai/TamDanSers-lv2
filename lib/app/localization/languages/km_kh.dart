@@ -87,7 +87,7 @@ Map<String, String> kmKh = {
   'latest_updates': 'ព័ត៌មានថ្មីៗ',
   'morning': 'ព្រឹក',
   'afternoon': 'រសៀល',
-  'Homework Details' 'ព័ត៌មានលម្អិតកិច្ចការផ្ទះ'
+  'Homework Details': 'ព័ត៌មានលម្អិតកិច្ចការផ្ទះ',
   'notifications': 'ការជូនដំណឹង',
   'account_details': 'ព័ត៌មានគណនី',
   'account_details_hint': 'បញ្ចូលព័ត៌មានដែលបានចុះឈ្មោះជាមួយសាលា។',
@@ -142,7 +142,7 @@ Map<String, String> kmKh = {
   'reset_your_password': 'កំណត់ពាក្យសម្ងាត់ឡើងវិញ',
   'general_section': 'ទូទៅ',
   'change_theme': 'ផ្លាស់ប្តូររចនាបថកម្មវិធី',
-  'toggle_app_theme': 'បិទ/បើករចនាបថកម្មវិធី',
+  'toggle_app_theme': 'ផ្លាស់ប្ដូររចនាបថកម្មវិធី',
   'change_app_language': 'ផ្លាស់ប្តូរភាសាកម្មវិធី',
   'faq': 'សំណួរ និងចម្លើយ',
   'read_frequently_asked_questions': 'អានសំណួរដែលសួរញឹកញាប់',
@@ -168,9 +168,10 @@ Map<String, String> kmKh = {
   'update_photo': 'ធ្វើបច្ចុប្បន្នភាពរូបថត',
   'choose_new_profile_photo': 'ជ្រើសរូបថតថ្មីសម្រាប់ប្រវត្តិរូប',
   'take_photo': 'ថតរូប',
-  'choose_from_gallery': 'ជ្រើសពីបណ្ណាល័យរូបភាព',
-  'theme': 'រចនាប័ទ្ម',
-  'choose_look_fits_style': 'ជ្រើសរចនាប័ទ្មដែលអ្នកចង់',
+  'choose_from_gallery': 'ជ្រើសពីវិចិត្រសាល',
+  'confirm_upload_photo': 'តើអ្នកចង់ផ្ទុករូបថតនេះជារូបថតប្រវត្តិរូបរបស់អ្នកទេ?',
+  'theme': 'រចនាបថ',
+  'choose_look_fits_style': 'ជ្រើសរចនាបថដែលអ្នកចង់',
   'light_mode': 'ភ្លឺ',
   'dark_mode': 'ងងឹត',
   'language': 'ភាសា',
@@ -187,7 +188,7 @@ Map<String, String> kmKh = {
       'ទាក់ទងអ្នកគ្រប់គ្រងសាលា ឬក្រុមគាំទ្ររបស់អ្នក។',
   'are_sure_logout': 'តើអ្នកពិតជាចង់ចាកចេញពីគណនីនេះមែនទេ?',
   'no': 'ទេ',
-  'yes': 'បាទ',
+  'yes': 'យល់ព្រម',
   'upload_failed': 'ការផ្ទុកបានបរាជ័យ',
 
   'math': 'គណិតវិទ្យា',
@@ -321,6 +322,9 @@ Map<String, String> kmKh = {
 
 'permission_delete_message':
     'តើអ្នកប្រាកដថាចង់លុបសំណើសុំច្បាប់នេះមែនទេ?',
+
+'delete_notification_title': 'លុបការជូនដំណឹង',
+'delete_notification_message': 'តើអ្នកពិតជាចង់លុបការជូនដំណឹងនេះឬទេ?',
 
 'cancel':
     'បោះបង់',

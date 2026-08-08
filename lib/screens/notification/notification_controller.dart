@@ -5,9 +5,12 @@ class NotificationController extends GetxController {
 
   var notifications = <NotificationModel>[].obs;
   var expandedNotificationIds = <int>{}.obs;
+  var deletedNotificationIds = <int>{}.obs;
   var unreadCount = 0.obs;
   var isLoading = false.obs;
   final box = GetStorage();
+
+  static const _deletedNotificationIdsKey = 'deletedNotificationIds';
 
   void toggleExpand(int id) {
     if (expandedNotificationIds.contains(id)) {
@@ -22,7 +25,20 @@ class NotificationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadNotifications();
+    loadDeletedNotificationIds().whenComplete(loadNotifications);
+  }
+
+  Future<void> loadDeletedNotificationIds() async {
+    final stored = box.read(_deletedNotificationIdsKey);
+    if (stored is List) {
+      deletedNotificationIds.assignAll(stored
+          .map((item) {
+            if (item is int) return item;
+            return int.tryParse(item.toString());
+          })
+          .whereType<int>()
+          .toSet());
+    }
   }
 
   Future<void> loadNotifications() async {
@@ -31,7 +47,8 @@ class NotificationController extends GetxController {
 
       final fetched = await api.getNotifications();
       fetched.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      notifications.assignAll(fetched);
+      notifications.assignAll(
+          fetched.where((notification) => !deletedNotificationIds.contains(notification.id)).toList());
 
       final lastCount = box.read("notificationsCount") ?? 0;
       unreadCount.value = notifications.length - (lastCount as int);
@@ -53,6 +70,69 @@ class NotificationController extends GetxController {
       "notificationsCount",
       notifications.length,
     );
+  }
+
+  void _updateUnreadCount() {
+    final lastCount = box.read("notificationsCount") ?? 0;
+    unreadCount.value = notifications.length - (lastCount as int);
+
+    if (unreadCount.value < 0) {
+      unreadCount.value = 0;
+    }
+  }
+
+  Future<void> confirmDeleteNotification(BuildContext context, int id) async {
+    final theme = Theme.of(context);
+    final confirmed = await Get.dialog<bool>(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('delete_notification_title'.tr),
+        content: Text('delete_notification_message'.tr),
+        actions: [
+          OutlinedButton(
+            onPressed: () => Get.back(result: false),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: theme.dividerColor),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            ),
+            child: Text(
+              'no'.tr,
+              style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Get.back(result: true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            ),
+            child: Text(
+              'delete'.tr,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onError,
+              ),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+
+    if (confirmed == true) {
+      deleteNotification(id);
+    }
+  }
+
+  void deleteNotification(int id) {
+    deletedNotificationIds.add(id);
+    box.write(_deletedNotificationIdsKey, deletedNotificationIds.toList());
+    notifications.removeWhere((notification) => notification.id == id);
+    expandedNotificationIds.remove(id);
+    _updateUnreadCount();
   }
 
   Map<String, List<NotificationModel>> get groupedNotifications {

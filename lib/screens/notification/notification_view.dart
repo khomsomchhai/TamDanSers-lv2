@@ -13,8 +13,10 @@ class NotificationView extends GetView<NotificationController> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: 'notifications'.tr,
         showNotification: false,
@@ -31,13 +33,13 @@ class NotificationView extends GetView<NotificationController> {
                 Icon(
                   Icons.notifications_off_outlined,
                   size: 64,
-                  color: Colors.grey[400],
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'No notifications available.',
-                  style: Get.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -67,11 +69,10 @@ class NotificationView extends GetView<NotificationController> {
                   ),
                   child: Text(
                     groupTitle.toUpperCase(),
-                    style: const TextStyle(
-                      color: Color(0xFF475569),
-                      fontSize: 13,
+                    style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.8,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
                     ),
                   ),
                 ),
@@ -99,97 +100,116 @@ class NotificationView extends GetView<NotificationController> {
         notification.dueDate != null && notification.dueDate!.isNotEmpty;
 
     final dateStr =
-        "${notification.createdAt.year}-${notification.createdAt.month.toString().padLeft(2, '0')}-${notification.createdAt.day.toString().padLeft(2, '0')} ${notification.createdAt.hour.toString().padLeft(2, '0')}:${notification.createdAt.minute.toString().padLeft(2, '0')}";
+        "${notification.createdAt.year}-${notification.createdAt.month.toString().padLeft(2, '0')}-${notification.createdAt.day.toString().padLeft(2, '0')}";
 
+    final theme = Theme.of(context);
     return Obx(() {
       final isExpanded = controller.isExpanded(notification.id);
 
-      return GestureDetector(
-        onTap: () => controller.toggleExpand(notification.id),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
+      return Dismissible(
+        key: ValueKey(notification.id),
+        direction: DismissDirection.endToStart,
+        confirmDismiss: (_) async {
+          await controller.confirmDeleteNotification(context, notification.id);
+          return false;
+        },
+        background: Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.colorScheme.error.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(18),
-            boxShadow: const [
-              BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.03),
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
-            ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: IntrinsicHeight(
-              child: Row(
-                children: [
-                  // Left Category Color Accent Strip
-                  Container(
-                    width: 4.5,
-                    color: catColor,
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Circular Icon Avatar
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: catBg,
-                              shape: BoxShape.circle,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          alignment: Alignment.centerRight,
+          child: Icon(
+            Icons.delete_outline,
+            color: theme.colorScheme.error,
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () => controller.toggleExpand(notification.id),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.shadowColor.withValues(alpha: 0.08),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: IntrinsicHeight(
+                child: Row(
+                  children: [
+                    // Left Category Color Accent Strip
+                    Container(
+                      width: 4.5,
+                      color: catColor,
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Circular Icon Avatar
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: catBg,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                catIcon,
+                                color: catColor,
+                                size: 20,
+                              ),
                             ),
-                            child: Icon(
-                              catIcon,
-                              color: catColor,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          // Content Area
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Top Row: Title + Time Ago + Arrow Icon
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        notification.title,
-                                        style: const TextStyle(
-                                          color: Color(0xFF0F172A),
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
+                            const SizedBox(width: 14),
+                            // Content Area
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Top Row: Title + Time Ago + Arrow Icon
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          notification.title,
+                                          style: theme.textTheme.bodyLarge!.copyWith(
+                                            color: theme.colorScheme.onSurface,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      timeAgo,
-                                      style: const TextStyle(
-                                        color: Color(0xFF64748B),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        timeAgo,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.72),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    // Expand / Collapse Arrow Icon
-                                    Icon(
-                                      isExpanded
-                                          ? Icons.keyboard_arrow_up_rounded
-                                          : Icons.keyboard_arrow_down_rounded,
-                                      color: const Color(0xFF94A3B8),
-                                      size: 22,
-                                    ),
-                                  ],
-                                ),
+                                      const SizedBox(width: 4),
+                                      // Expand / Collapse Arrow Icon
+                                      Icon(
+                                        isExpanded
+                                            ? Icons.keyboard_arrow_up_rounded
+                                            : Icons.keyboard_arrow_down_rounded,
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                        size: 22,
+                                      ),
+                                    ],
+                                  ),
+                              
                                 if (hasSubtitle) ...[
                                   const SizedBox(height: 4),
                                   Text(
@@ -209,8 +229,8 @@ class NotificationView extends GetView<NotificationController> {
                                     overflow: isExpanded
                                         ? TextOverflow.visible
                                         : TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: Color(0xFF475569),
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
                                       fontSize: 13,
                                       height: 1.3,
                                     ),
@@ -220,16 +240,16 @@ class NotificationView extends GetView<NotificationController> {
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [
-                                      const Icon(
+                                        Icon(
                                         Icons.calendar_today_outlined,
                                         size: 14,
-                                        color: Color(0xFF64748B),
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
                                         '${'due_date_prefix'.tr}${notification.dueDate}',
-                                        style: const TextStyle(
-                                          color: Color(0xFF64748B),
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -245,10 +265,10 @@ class NotificationView extends GetView<NotificationController> {
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF8FAFC),
+                                      color: theme.colorScheme.surfaceContainerHighest,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: const Color(0xFFE2E8F0),
+                                        color: theme.dividerColor,
                                         width: 1,
                                       ),
                                     ),
@@ -258,16 +278,16 @@ class NotificationView extends GetView<NotificationController> {
                                       children: [
                                         Row(
                                           children: [
-                                            const Icon(
+                                            Icon(
                                               Icons.access_time_rounded,
                                               size: 14,
-                                              color: Color(0xFF64748B),
+                                            color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
                                             ),
                                             const SizedBox(width: 6),
                                             Text(
                                               dateStr,
-                                              style: const TextStyle(
-                                                color: Color(0xFF64748B),
+                                              style: theme.textTheme.bodySmall?.copyWith(
+                                                color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500,
                                               ),
@@ -279,16 +299,16 @@ class NotificationView extends GetView<NotificationController> {
                                           const SizedBox(height: 6),
                                           Row(
                                             children: [
-                                              const Icon(
+                                              Icon(
                                                 Icons.category_outlined,
                                                 size: 14,
-                                                color: Color(0xFF64748B),
+                                                color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
                                               ),
                                               const SizedBox(width: 6),
                                               Text(
                                                 notification.type!,
-                                                style: const TextStyle(
-                                                  color: Color(0xFF64748B),
+                                                style: theme.textTheme.bodySmall?.copyWith(
+                                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.68),
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,
                                                 ),
@@ -312,6 +332,7 @@ class NotificationView extends GetView<NotificationController> {
             ),
           ),
         ),
+        )
       );
     });
   }
