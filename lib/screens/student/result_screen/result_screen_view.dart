@@ -41,7 +41,7 @@ class ResultScreenView
               ),
 
               Container(
-                height: 52,
+                height: 50,
                 padding: const EdgeInsets.all(
                   4,
                 ),
@@ -51,7 +51,7 @@ class ResultScreenView
                       .surfaceContainerHighest,
                   borderRadius:
                       BorderRadius.circular(
-                    12,
+                    40,
                   ),
                 ),
                 child: TabBar(
@@ -67,6 +67,9 @@ class ResultScreenView
                       TabBarIndicatorSize.tab,
                   dividerColor:
                       Colors.transparent,
+                  overlayColor:
+                      WidgetStateProperty.all(Colors.transparent),
+                  splashFactory: NoSplash.splashFactory,
                   labelPadding:
                       EdgeInsets.zero,
                   indicator: BoxDecoration(
@@ -74,7 +77,7 @@ class ResultScreenView
                         .colorScheme.primary,
                     borderRadius:
                         BorderRadius.circular(
-                      9,
+                      40,
                     ),
                   ),
                   labelColor:
@@ -82,18 +85,15 @@ class ResultScreenView
                   unselectedLabelColor: theme
                       .textTheme
                       .bodyLarge
-                      ?.color
-                      ?.withOpacity(
-                    0.65,
-                  ),
+                      ?.color,
                   labelStyle:
-                      AppTextStyles.titleSmall
+                      AppTextStyles.bodyLarge
                           .copyWith(
                     fontWeight:
                         FontWeight.bold,
                   ),
                   unselectedLabelStyle:
-                      AppTextStyles.titleSmall
+                      AppTextStyles.bodyLarge
                           .copyWith(
                     fontWeight:
                         FontWeight.w500,
@@ -132,7 +132,7 @@ class ResultScreenView
                     return Column(
                       children: [
                         SizedBox(
-                          height: 56,
+                          height: 32,
                           child: monthList(),
                         ),
 
@@ -316,35 +316,34 @@ Widget monthList() {
       physics: const BouncingScrollPhysics(),
       itemCount: semesterMonths.length,
       separatorBuilder: (context, index) {
-        return const SizedBox(width: 12);
+        return const SizedBox(width: 10);
       },
       itemBuilder: (context, index) {
         final int month = semesterMonths[index];
 
-        final bool isSelected =
-            selectedMonth == month;
+        final bool isSelected = selectedMonth == month;
 
         return GestureDetector(
           key: ValueKey(
             'month_${controller.selectedSemester.value}_$month',
           ),
           behavior: HitTestBehavior.opaque,
-         onTap: () {
-  controller.changeMonth(month);
-},
+          onTap: () {
+            controller.changeMonth(month);
+          },
           child: AnimatedContainer(
             duration: const Duration(
               milliseconds: 200,
             ),
             curve: Curves.easeInOut,
-            width: 120,
-            height: 56,
+            width: 100,
+            height: 46,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: isSelected
                   ? theme.colorScheme.primary
                   : theme.cardColor,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: isSelected
                     ? theme.colorScheme.primary
@@ -355,17 +354,17 @@ Widget monthList() {
                   ? [
                       BoxShadow(
                         color: theme.colorScheme.primary.withOpacity(
-                          0.20,
+                          0.15,
                         ),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
                       ),
                     ]
                   : null,
             ),
             child: Text(
               (controller.months[month] ?? '').tr,
-              style: AppTextStyles.titleSmall.copyWith(
+              style: AppTextStyles.bodyMedium.copyWith(
                 color: isSelected
                     ? theme.colorScheme.onPrimary
                     : theme.textTheme.bodyLarge?.color,

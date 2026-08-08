@@ -27,7 +27,50 @@ class ProfileTabViewController extends GetxController {
       );
       if (xfile != null) {
         pickedImagePath.value = xfile.path;
-        await userController.uploadAvatar(File(xfile.path));
+
+        // Ask user to confirm before uploading the selected image
+        final confirmed = await Get.dialog<bool>(
+          AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text('update_photo'.tr),
+            content: Text('confirm_upload_photo'.tr),
+            actions: [
+              OutlinedButton(
+                onPressed: () => Get.back(result: false),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Get.theme.dividerColor),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                ),
+                child: Text(
+                  'no'.tr,
+                  style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Get.back(result: true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Get.theme.colorScheme.primary,
+                  foregroundColor: Get.theme.colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                ),
+                child: Text(
+                  'yes'.tr,
+                  style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: Get.theme.colorScheme.onPrimary),
+                ),
+              ),
+            ],
+          ),
+          barrierDismissible: false,
+        );
+
+        if (confirmed == true) {
+          await userController.uploadAvatar(File(xfile.path));
+        } else {
+          // User cancelled — clear the picked image
+          pickedImagePath.value = null;
+        }
       }
     } catch (e) {
       debugPrint('pickImage error: $e');

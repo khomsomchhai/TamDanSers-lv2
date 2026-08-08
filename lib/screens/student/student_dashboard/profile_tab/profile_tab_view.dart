@@ -164,7 +164,6 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
   }
 
   Widget _buildLoadingSkeleton(BuildContext context) {
-    final theme = Theme.of(context);
     return Shimmer.fromColors(
       baseColor: AppColors.skeletonBaseColor,
       highlightColor: AppColors.skeletonHighlightColor,

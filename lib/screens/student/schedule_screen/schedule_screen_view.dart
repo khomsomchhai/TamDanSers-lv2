@@ -160,7 +160,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                     left: left,
                     top: 11,
                     child: Container(
-                      width: 52,
+                      width: tabWidth,
                       height: 30,
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primaryContainer,

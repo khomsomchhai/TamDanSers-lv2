@@ -77,17 +77,7 @@ Future<void> saveFcmTokenToBackend(
 ) async {
   final storage = GetStorage();
 
-  /*
-   * IMPORTANT:
-   * Change "access_token" to the key used in your login code.
-   *
-   * Example:
-   * GetStorage().write("access_token", token);
-   *
-   * If you save it as "token", change this to:
-   * storage.read<String>("token");
-   */
-  final accessToken = storage.read<String>('access_token');
+  final accessToken = storage.read<String>('token');
 
   if (accessToken == null || accessToken.isEmpty) {
     debugPrint(
@@ -177,16 +167,19 @@ Future<void> setupFCM() async {
           title,
           body,
           NotificationDetails(
-            android: AndroidNotificationDetails(channel.id, channel.name,
-                channelDescription: channel.description,
-                importance: Importance.max,
-                priority: Priority.max,
-                playSound: true,
-                enableVibration: true,
-                icon: '@drawable/ic_notification',
-                largeIcon: DrawableResourceAndroidBitmap(
-                  '@drawable/ic_notification',
-                )),
+            android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          importance: Importance.max,
+          priority: Priority.max,
+          playSound: true,
+          enableVibration: true,
+          icon: 'ic_launcher_foreground',
+          largeIcon: DrawableResourceAndroidBitmap(
+            'ic_launcher_foreground',
+          ),
+        ),
             iOS: const DarwinNotificationDetails(
               presentAlert: true,
               presentBadge: true,
