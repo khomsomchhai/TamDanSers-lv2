@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
+import 'package:tamdansers_lv2/app/themes/skeleton_theme.dart';
 import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/card/attendance_card.dart';
@@ -87,8 +88,8 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
 
   Widget _buildAttendanceSkeleton() {
     return Shimmer.fromColors(
-      baseColor: AppColors.skeletonBaseColor,
-      highlightColor: AppColors.skeletonHighlightColor,
+      baseColor: Get.theme.skeletonBaseColor,
+      highlightColor: Get.theme.skeletonHighlightColor,
       period: const Duration(milliseconds: 1200),
       child: Column(
         children: List.generate(

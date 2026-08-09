@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
+import 'package:tamdansers_lv2/app/themes/skeleton_theme.dart';
 
 class CustomHeaderPlaceholder extends StatelessWidget {
   const CustomHeaderPlaceholder({super.key});
@@ -8,8 +11,8 @@ class CustomHeaderPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: AppColors.skeletonBaseColor,
-      highlightColor: AppColors.skeletonHighlightColor,
+      baseColor: Get.theme.skeletonBaseColor,
+      highlightColor: Get.theme.skeletonHighlightColor,
       child: Row(
         children: [
           Container(

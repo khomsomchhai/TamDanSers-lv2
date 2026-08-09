@@ -257,10 +257,10 @@ class HomeTabView extends GetView<HomeTabViewController> {
   }
 
   Widget _buildAttendanceCardSkeleton() {
-    final skeletonTheme = Get.theme.extension<SkeletonTheme>();
+    
     return Shimmer.fromColors(
-      baseColor: skeletonTheme?.baseColor ?? Get.theme.cardColor,
-      highlightColor: skeletonTheme?.highlightColor ?? Colors.grey.shade200,
+      baseColor: Get.theme.skeletonBaseColor,
+      highlightColor: Get.theme.skeletonHighlightColor,
       child: Column(
         children: [
           Row(
@@ -299,15 +299,15 @@ class HomeTabView extends GetView<HomeTabViewController> {
   }
 
   Widget _buildRecentAttendanceSkeleton() {
-    final skeletonTheme = Get.theme.extension<SkeletonTheme>();
+    
     return Column(
       children: List.generate(
         3,
         (_) => Padding(
           padding: const EdgeInsets.only(bottom: AppNumbers.spacingMedium),
           child: Shimmer.fromColors(
-            baseColor: skeletonTheme?.baseColor ?? Get.theme.cardColor,
-            highlightColor: skeletonTheme?.highlightColor ?? Colors.grey.shade200,
+            baseColor: Get.theme.skeletonBaseColor,
+            highlightColor: Get.theme.skeletonHighlightColor,
             period: const Duration(milliseconds: 1200),
             child: Container(
               width: double.infinity,
@@ -674,10 +674,10 @@ class HomeTabView extends GetView<HomeTabViewController> {
   }
 
   Widget _buildTodayScheduleSkeleton() {
-    final skeletonTheme = Get.theme.extension<SkeletonTheme>();
+    
     return Shimmer.fromColors(
-      baseColor: skeletonTheme?.baseColor ?? Get.theme.cardColor,
-      highlightColor: skeletonTheme?.highlightColor ?? Colors.grey.shade200,
+      baseColor: Get.theme.skeletonBaseColor,
+      highlightColor: Get.theme.skeletonHighlightColor,
       child: Column(
         children: List.generate(
           2,

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
+import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
 import 'package:tamdansers_lv2/core/utils/dio_exception_handler.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
@@ -90,7 +91,7 @@ class RegisterParentScreenView
           'link_account_child'.tr,
           textAlign: TextAlign.center,
           style: Get.textTheme.bodyMedium?.copyWith(
-            color: theme.hintColor,
+            // color: theme.hintColor,
             height: 1.45,
           ),
         ),
@@ -114,7 +115,7 @@ class RegisterParentScreenView
             Text(
               'account_details_hint'.tr,
               style: Get.textTheme.bodySmall?.copyWith(
-                color: theme.hintColor,
+                // color: theme.hintColor,
               ),
             ),
             const SizedBox(height: 24),
@@ -147,9 +148,7 @@ class RegisterParentScreenView
                 return null;
               },
             ),
-            const SizedBox(height: 16),
-            _PrivacyNotice(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 40),
             SizedBox(
               width: double.infinity,
               height: 52,
@@ -174,7 +173,7 @@ class RegisterParentScreenView
       children: [
         Text(
           'already_have_account'.tr,
-          style: Get.textTheme.bodyLarge?.copyWith(color: theme.hintColor),
+          style: Get.textTheme.bodyLarge,
         ),
         const SizedBox(width: 8),
         Bounceable(
@@ -182,7 +181,7 @@ class RegisterParentScreenView
           child: Text(
             'sign_in'.tr,
             style: Get.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.secondary,
+              color: AppColors.info,
               fontWeight: FontWeight.w700,
             ),
           ),
