@@ -222,7 +222,15 @@ Map<String, String> kmKh = {
   'ranking_for_month': 'ចំណាត់ថ្នាក់ប្រចាំខែ',
   'rank': 'ចំណាត់ថ្នាក់',
   'average': 'មធ្យមភាគ',
+  'average_year': 'មធ្យមភាគប្រចាំឆ្នាំ',
+  'average_month': 'មធ្យមភាគប្រចាំខែ',
+  'average_semester': 'មធ្យមភាគឆមាស',
   'total_score': 'ពិន្ទុសរុប',
+  'yearly': 'ប្រចាំឆ្នាំ',
+  'monthly': 'ប្រចាំខែ',
+  'semester': 'ប្រចាំឆមាស',
+  'result_yearly': 'លទ្ធផលប្រចាំឆ្នាំ',
+
 
   // Months
   'month_1': 'មករា',
@@ -248,6 +256,7 @@ Map<String, String> kmKh = {
   'Earth': 'ផែនដីវិទ្យា',
   'Social': 'ពលរដ្ឋវិជ្ជា',
 // Attendance
+'attendance_scan': 'ស្កេនវត្តមាន',
 'record':'កំណត់ត្រា',
 'attendance_no_records': 'មិនមានកំណត់ត្រាវត្តមានទេ',
 'attendance_select_date': 'ជ្រើសកាលបរិច្ឆេទ',

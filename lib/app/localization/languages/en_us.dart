@@ -231,7 +231,14 @@ Map<String, String> enUs = {
   'ranking_for_month': 'Ranking for',
   'rank': 'Rank',
   'average': 'Average',
+  'average_year': 'Yearly Average',
+  'average_month': 'Monthly Average',
+  'average_semester': 'Semester Average',
+  'result_yearly': 'Yearly Results',
   'total_score': 'Total Score',
+  'yearly': 'Yearly',
+  'monthly': 'Monthly',
+  'semester': 'Semester',
 
   // Months
   'month_1': 'January',
@@ -258,6 +265,7 @@ Map<String, String> enUs = {
   'Social': 'Social Studies',
 
   // Attendance
+  'attendance_scan': 'Scan Attendance',
   'record': 'Record',
   'attendance_no_records': 'No attendance records',
   'attendance_select_date': 'Select date',

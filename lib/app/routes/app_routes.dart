@@ -15,7 +15,8 @@ class AppRoutes {
   static const String scheduleScreen = "/schedule_screen";
   static const String resultScreen = "/result_screen";
   static const String homeworkScreen = "/homework_screen";
-
+  static const attendanceScan =
+    '/student/attendance-scan';
   //Parent
   static const String parentDashboard = "/parent_dashboard";
   static const String homeTab = "/home_tab";
