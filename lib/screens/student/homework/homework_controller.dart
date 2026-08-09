@@ -313,7 +313,7 @@ class HomeworkViewController extends GetxController {
 
       if (studentId == 0) {
         Get.back(); // close loading
-        Get.snackbar("Error", "Student profile not found.");
+        CustomSnackbar.error(Get.locale?.languageCode == 'km' ? 'រកមិនឃើញព័ត៌មានសិស្ស' : 'Student profile not found.');
         return;
       }
 
@@ -345,26 +345,20 @@ class HomeworkViewController extends GetxController {
       Get.back(); // close loading
       Get.back(); // close details screen page
 
-      Get.snackbar(
-        Get.locale?.languageCode == 'km' ? 'ជោគជ័យ' : 'Success',
+      CustomSnackbar.success(
         Get.locale?.languageCode == 'km'
             ? 'កិច្ចការផ្ទះត្រូវបានប្រគល់ដោយជោគជ័យ!'
             : 'Homework submitted successfully!',
-        backgroundColor: AppColors.success.withValues(alpha: 0.1),
-        colorText: AppColors.success,
       );
 
       // Refresh homeworks
       fetchHomework();
     } catch (e) {
       Get.back(); // close loading
-      Get.snackbar(
-        Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
+      CustomSnackbar.error(
         Get.locale?.languageCode == 'km'
             ? 'មិនអាចប្រគល់កិច្ចការផ្ទះបានទេ៖ $e'
             : 'Failed to submit homework: $e',
-        backgroundColor: AppColors.error.withValues(alpha: 0.1),
-        colorText: AppColors.error,
       );
     }
   }
@@ -441,14 +435,7 @@ class HomeworkViewController extends GetxController {
 
     if (studentId == 0) {
       Get.back();
-
-      Get.snackbar(
-        isKm ? 'កំហុស' : 'Error',
-        isKm
-            ? 'រកមិនឃើញព័ត៌មានសិស្ស'
-            : 'Student profile not found',
-      );
-
+      CustomSnackbar.error(isKm ? 'រកមិនឃើញព័ត៌មានសិស្ស' : 'Student profile not found');
       return;
     }
 
@@ -480,17 +467,7 @@ class HomeworkViewController extends GetxController {
     Get.back();
     Get.back();
 
-    Get.snackbar(
-      isKm ? 'ជោគជ័យ' : 'Success',
-      isKm
-          ? 'កិច្ចការត្រូវបានកែប្រែដោយជោគជ័យ'
-          : 'Submission updated successfully',
-      backgroundColor:
-          AppColors.success.withValues(
-        alpha: 0.10,
-      ),
-      colorText: AppColors.success,
-    );
+    CustomSnackbar.success(isKm ? 'កិច្ចការត្រូវបានកែប្រែដោយជោគជ័យ' : 'Submission updated successfully');
 
     await fetchHomework();
   } catch (error) {
@@ -498,17 +475,7 @@ class HomeworkViewController extends GetxController {
       Get.back();
     }
 
-    Get.snackbar(
-      isKm ? 'កំហុស' : 'Error',
-      isKm
-          ? 'មិនអាចកែប្រែកិច្ចការបានទេ៖ $error'
-          : 'Failed to update submission: $error',
-      backgroundColor:
-          AppColors.error.withValues(
-        alpha: 0.10,
-      ),
-      colorText: AppColors.error,
-    );
+    CustomSnackbar.error(isKm ? 'មិនអាចកែប្រែកិច្ចការបានទេ៖ $error' : 'Failed to update submission: $error');
   }
 }
 Future<void> executeDeleteSubmission({
@@ -530,13 +497,7 @@ Future<void> executeDeleteSubmission({
         userController.profile?.id ?? 0;
 
     if (studentId == 0) {
-      Get.snackbar(
-        isKm ? 'កំហុស' : 'Error',
-        isKm
-            ? 'រកមិនឃើញព័ត៌មានសិស្ស'
-            : 'Student profile not found',
-      );
-
+      CustomSnackbar.error(isKm ? 'រកមិនឃើញព័ត៌មានសិស្ស' : 'Student profile not found');
       return;
     }
 
@@ -556,18 +517,7 @@ Future<void> executeDeleteSubmission({
 
     Get.back();
     Get.back();
-
-    Get.snackbar(
-      isKm ? 'ជោគជ័យ' : 'Success',
-      isKm
-          ? 'កិច្ចការត្រូវបានលុបដោយជោគជ័យ'
-          : 'Submission deleted successfully',
-      backgroundColor:
-          AppColors.success.withValues(
-        alpha: 0.10,
-      ),
-      colorText: AppColors.success,
-    );
+    CustomSnackbar.success(isKm ? 'កិច្ចការត្រូវបានលុបដោយជោគជ័យ' : 'Submission deleted successfully');
 
     await fetchHomework();
   } catch (error) {
@@ -575,17 +525,7 @@ Future<void> executeDeleteSubmission({
       Get.back();
     }
 
-    Get.snackbar(
-      isKm ? 'កំហុស' : 'Error',
-      isKm
-          ? 'មិនអាចលុបកិច្ចការបានទេ៖ $error'
-          : 'Failed to delete submission: $error',
-      backgroundColor:
-          AppColors.error.withValues(
-        alpha: 0.10,
-      ),
-      colorText: AppColors.error,
-    );
+    CustomSnackbar.error(isKm ? 'មិនអាចលុបកិច្ចការបានទេ៖ $error' : 'Failed to delete submission: $error');
   }
 }
 }

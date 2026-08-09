@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
-
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/api/services/result_api.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
@@ -217,11 +216,9 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
           5,
         ),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withOpacity(
-            0.65,
-          ),
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(
-            16,
+            60,
           ),
         ),
         child: Row(
@@ -274,7 +271,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
         decoration: BoxDecoration(
           color: selected ? theme.colorScheme.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(
-            13,
+            60,
           ),
         ),
         child: Text(
@@ -298,7 +295,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
     return Column(
       children: [
         SizedBox(
-          height: 48,
+          height: 34,
           child: monthList(),
         ),
         const SizedBox(
@@ -377,7 +374,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
 
             return InkWell(
               borderRadius: BorderRadius.circular(
-                14,
+                20,
               ),
               onTap: () {
                 controller.changeMonth(
@@ -398,7 +395,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                 decoration: BoxDecoration(
                   color: selected ? theme.colorScheme.primary : theme.cardColor,
                   borderRadius: BorderRadius.circular(
-                    14,
+                    40,
                   ),
                   border: Border.all(
                     color: selected

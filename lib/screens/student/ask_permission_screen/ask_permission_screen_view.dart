@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
@@ -47,8 +46,8 @@ class AskPermissionScreenView
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeaderCard(),
-                const SizedBox(height: 16),
+                // _buildHeaderCard(),
+                // const SizedBox(height: 16),
                 _buildPermissionForm(),
                 const SizedBox(height: 24),
                 _buildHistoryHeader(),
@@ -62,69 +61,69 @@ class AskPermissionScreenView
     );
   }
 
-  Widget _buildHeaderCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 14,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.16),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: AppColors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: const Icon(
-              Icons.edit_calendar_rounded,
-              color: AppColors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'ask_permission_request_permission'.tr,
-                  style: AppTextStyles.titleSmall.copyWith(
-                    color: AppColors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  'ask_permission_student_description'.tr,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.white.withValues(alpha: 0.82),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildHeaderCard() {
+  //   return Container(
+  //     width: double.infinity,
+  //     padding: const EdgeInsets.symmetric(
+  //       horizontal: 16,
+  //       vertical: 14,
+  //     ),
+  //     decoration: BoxDecoration(
+  //       color: AppColors.primary,
+  //       borderRadius: BorderRadius.circular(18),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: AppColors.primary.withValues(alpha: 0.16),
+  //           blurRadius: 14,
+  //           offset: const Offset(0, 6),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         Container(
+  //           width: 46,
+  //           height: 46,
+  //           decoration: BoxDecoration(
+  //             color: AppColors.white.withValues(alpha: 0.16),
+  //             borderRadius: BorderRadius.circular(13),
+  //           ),
+  //           child: const Icon(
+  //             Icons.edit_calendar_rounded,
+  //             color: AppColors.white,
+  //             size: 24,
+  //           ),
+  //         ),
+  //         const SizedBox(width: 12),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 'ask_permission_request_permission'.tr,
+  //                 style: AppTextStyles.titleSmall.copyWith(
+  //                   color: AppColors.white,
+  //                   fontSize: 17,
+  //                   fontWeight: FontWeight.bold,
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 3),
+  //               Text(
+  //                 'ask_permission_student_description'.tr,
+  //                 maxLines: 2,
+  //                 overflow: TextOverflow.ellipsis,
+  //                 style: AppTextStyles.bodySmall.copyWith(
+  //                   color: AppColors.white.withValues(alpha: 0.82),
+  //                   fontSize: 12,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildPermissionForm() {
     return Obx(() {
