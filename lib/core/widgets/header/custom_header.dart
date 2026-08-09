@@ -57,7 +57,7 @@ class CustomHeader extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 24,
-          backgroundColor: AppColors.skeletonBaseColor,
+          backgroundColor: Get.theme.cardColor,
           backgroundImage:
               avatarUrl != null && avatarUrl.isNotEmpty
                   ? NetworkImage(avatarUrl)

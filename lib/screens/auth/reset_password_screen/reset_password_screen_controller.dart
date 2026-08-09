@@ -81,7 +81,7 @@ class ResetPasswordScreenViewController extends GetxController {
   Future<void> resendOtp() async {
     if (!canResend.value) return;
     if (phone.isEmpty) {
-      CustomSnackbar.error('Phone number is missing.'.tr);
+      CustomSnackbar.error('phone_number_missing'.tr);
       return;
     }
     try {

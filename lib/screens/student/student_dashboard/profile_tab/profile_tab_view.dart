@@ -9,7 +9,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
+import 'package:tamdansers_lv2/app/themes/skeleton_theme.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/services/theme_service.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
@@ -43,7 +43,6 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                 ),
               );
             }
-
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -165,8 +164,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
 
   Widget _buildLoadingSkeleton(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: AppColors.skeletonBaseColor,
-      highlightColor: AppColors.skeletonHighlightColor,
+      baseColor: Get.theme.skeletonBaseColor,
+      highlightColor: Get.theme.skeletonHighlightColor,
       period: const Duration(milliseconds: 1300),
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -455,16 +454,36 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
     Get.dialog(
       GestureDetector(
         onTap: Get.back,
-        child: Container(
+        child: Material(
           color: Colors.black.withOpacity(0.85),
-          child: Center(
-            child: InteractiveViewer(
-              child: Image(
-                image: imageProvider,
-                fit: BoxFit.contain,
-                width: double.infinity,
-                height: double.infinity,
-              ),
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Center(
+                  child: InteractiveViewer(
+                    child: Image(
+                      image: imageProvider,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: IconButton(
+                    onPressed: Get.back,
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.black.withOpacity(0.35),
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -520,7 +539,6 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
         title,
         style: Get.textTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.w700,
-          letterSpacing: 1.1,
           color: Get.theme.colorScheme.primary,
         ),
       ),

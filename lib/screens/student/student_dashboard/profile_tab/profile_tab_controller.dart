@@ -5,7 +5,6 @@ class ProfileTabViewController extends GetxController {
 
   var box = GetStorage();
 
-  // Local picked image path (not uploaded yet)
   var pickedImagePath = RxnString();
 
   final ImagePicker _picker = ImagePicker();
@@ -593,13 +592,6 @@ class ProfileTabViewController extends GetxController {
                           'logout_action'.tr,
                           style: Get.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'sign_out_account'.tr,
-                          style: Get.textTheme.bodySmall?.copyWith(
-                            color: Get.theme.textTheme.bodySmall?.color?.withOpacity(0.7),
                           ),
                         ),
                       ],
