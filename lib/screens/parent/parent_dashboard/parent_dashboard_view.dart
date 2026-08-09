@@ -23,7 +23,7 @@ class ParentDashboardView extends GetView<ParentDashboardViewController> {
       () => Scaffold(
         body: IndexedStack(
           index: controller.currentIndex.value,
-          children:  [
+          children: [
             ParentHomeTabView(),
             ParentHomeworkTabView(),
             ParentAttendanceTabView(),

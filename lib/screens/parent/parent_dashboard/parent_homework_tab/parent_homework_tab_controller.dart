@@ -137,7 +137,7 @@ class ParentHomeworkTabViewController extends GetxController {
         data.map((item) => Map<String, dynamic>.from(item as Map)),
       );
       selectedChild.value = students.first;
-      final studentId = _parseStudentId(students.first['id']);
+      final studentId = _parseStudentId(students.first);
       if (studentId != null) {
         fetchHomework(studentId);
         return;
@@ -150,12 +150,20 @@ class ParentHomeworkTabViewController extends GetxController {
   void selectChild(Map<String, dynamic> child) {
     selectedChild.value = child;
     selectedSubject.value = null; // reset to subjects overview
-    final studentId = _parseStudentId(child['id']);
+    final studentId = _parseStudentId(child);
     fetchHomework(studentId);
   }
 
   int? _parseStudentId(dynamic value) {
     if (value is int) return value;
+    if (value is Map) {
+      final idVal = value['id'] ??
+          value['student_id'] ??
+          value['studentId'] ??
+          value['user_id'] ??
+          value['userId'];
+      return _parseStudentId(idVal);
+    }
     return int.tryParse(value?.toString() ?? '');
   }
 
@@ -163,7 +171,7 @@ class ParentHomeworkTabViewController extends GetxController {
   Future<void> fetchHomework([int? studentId]) async {
     try {
       isLoading.value = true;
-      final id = studentId ?? _parseStudentId(selectedChild.value?['id']);
+      final id = studentId ?? _parseStudentId(selectedChild.value);
 
       List<dynamic> rawHomework = [];
       List<dynamic> rawSubmissions = [];
@@ -222,7 +230,7 @@ class ParentHomeworkTabViewController extends GetxController {
     final category = _normalizeSubjectName(subject);
 
     ParentHomeworkStatus status = ParentHomeworkStatus.notComplete;
-    double progress = 0.5;
+    double progress = 0.0; // 0% for pending unsubmitted homework
     String score = 'Pending';
     String teacherComment = '';
 
@@ -237,22 +245,29 @@ class ParentHomeworkTabViewController extends GetxController {
           submission['remark']?.toString() ??
           '';
 
-      if (subStatus == 'checked' ||
-          subStatus == 'graded' ||
-          subStatus == 'submitted' ||
-          rawScore != null) {
+      if (subStatus == 'checked' || subStatus == 'graded' || rawScore != null) {
         status = ParentHomeworkStatus.done;
-        progress = 1.0;
+        progress = 1.0; // 100% for completed/graded
         if (rawScore != null) {
           score = '$rawScore / 100';
         } else {
           score = 'Completed';
         }
+      } else {
+        // Student has submitted -> 50%
+        status = ParentHomeworkStatus.notComplete;
+        progress = 0.5; // 50% for submitted
+        score = 'Submitted';
       }
     } else if (dueDateTime != null && DateTime.now().isAfter(dueDateTime)) {
       status = ParentHomeworkStatus.missing;
-      progress = 0.0;
+      progress = 0.0; // 0% for missing/overdue
       score = '0 / 100';
+    } else {
+      // Pending submission by student -> 0%
+      status = ParentHomeworkStatus.notComplete;
+      progress = 0.0; // 0% for pending
+      score = 'Pending';
     }
 
     return ParentHomeworkItem(
@@ -278,7 +293,7 @@ class ParentHomeworkTabViewController extends GetxController {
         title: 'Literature: Reamker Analysis',
         teacherName: 'Mr. Sokha',
         dueDate: 'Due tomorrow',
-        progress: 0.75,
+        progress: 0.0,
         status: ParentHomeworkStatus.notComplete,
         description:
             'Read Chapter 4 of Reamker and analyze character motivations.',
@@ -292,7 +307,7 @@ class ParentHomeworkTabViewController extends GetxController {
         title: 'Poetry Composition & Essay',
         teacherName: 'Mr. Sokha',
         dueDate: 'Overdue (Yesterday)',
-        progress: 0.20,
+        progress: 0.0,
         status: ParentHomeworkStatus.missing,
         description:
             'Write a 3-paragraph poem exploring Khmer traditional metaphors.',
@@ -321,7 +336,7 @@ class ParentHomeworkTabViewController extends GetxController {
         title: 'Calculus: Derivatives',
         teacherName: 'Ms. Priya',
         dueDate: 'Due Fri, 22 Nov',
-        progress: 0.25,
+        progress: 0.0,
         status: ParentHomeworkStatus.notComplete,
         description:
             'Complete exercises 15 through 30 on implicit differentiation.',
@@ -347,7 +362,7 @@ class ParentHomeworkTabViewController extends GetxController {
         title: 'Trigonometric Identities Sheet',
         teacherName: 'Ms. Priya',
         dueDate: 'Overdue (3 days ago)',
-        progress: 0.10,
+        progress: 0.0,
         status: ParentHomeworkStatus.missing,
         description: 'Prove 10 trigonometric identities and submit PDF.',
         score: '0 / 100',
@@ -362,7 +377,7 @@ class ParentHomeworkTabViewController extends GetxController {
         title: 'Cell Structure Lab Report',
         teacherName: 'Dr. Chan',
         dueDate: 'Due Mon, 25 Nov',
-        progress: 0.45,
+        progress: 0.0,
         status: ParentHomeworkStatus.notComplete,
         description:
             'Submit detailed observation report of plant cell mitosis.',
@@ -390,13 +405,13 @@ class ParentHomeworkTabViewController extends GetxController {
         category: 'Physical',
         title: 'Newtonian Mechanics Problems',
         teacherName: 'Dr. Vance',
-        dueDate: 'Due Wed, 27 Nov',
-        progress: 0.85,
+        dueDate: 'Submitted (Awaiting Grade)',
+        progress: 0.5,
         status: ParentHomeworkStatus.notComplete,
         description:
             'Solve force vector and friction coefficient calculation sheet.',
-        score: 'Pending',
-        teacherComment: 'Double check force vector direction signs.',
+        score: 'Submitted',
+        teacherComment: 'Submitted by student. Pending teacher evaluation.',
       ),
       ParentHomeworkItem(
         id: 10,
@@ -433,7 +448,7 @@ class ParentHomeworkTabViewController extends GetxController {
         title: 'Chemical Bonding & Reactions',
         teacherName: 'Mr. Kim',
         dueDate: 'Due Thu, 28 Nov',
-        progress: 0.20,
+        progress: 0.0,
         status: ParentHomeworkStatus.notComplete,
         description: 'Balance equation worksheets and ionic bond diagrams.',
         score: 'Pending',
@@ -660,10 +675,5 @@ class ParentHomeworkTabViewController extends GetxController {
     if (s.contains('hist')) return 'History';
     if (s.contains('geog')) return 'Geography';
     return subject;
-  }
-
-  String get childName {
-    return selectedChild.value?['student_name']?.toString() ??
-        'dont_have_child'.tr;
   }
 }

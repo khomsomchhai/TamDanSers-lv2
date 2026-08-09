@@ -1,33 +1,44 @@
 part of 'parent_permission_view.dart';
 
-class ParentPermissionController
-    extends GetxController {
-  final PermissionServices permissionServices =
-      PermissionServices();
+class ParentPermissionController extends GetxController {
+  // =====================================================
+  // DEPENDENCIES
+  // =====================================================
 
-  final ParentHomeTabViewController
-      parentHomeController =
-      Get.find<
-          ParentHomeTabViewController>();
+  final PermissionServices permissionServices = PermissionServices();
 
-  final GlobalKey<FormState> formKey =
-      GlobalKey<FormState>();
+  final ParentHomeTabViewController parentHomeController =
+      Get.find<ParentHomeTabViewController>();
 
-  final TextEditingController
-      reasonController =
-      TextEditingController();
+  // =====================================================
+  // FORM
+  // =====================================================
+
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  final TextEditingController reasonController = TextEditingController();
+
+  // =====================================================
+  // LOADING STATES
+  // =====================================================
 
   final isLoading = false.obs;
   final isSubmitting = false.obs;
+  final isDeleting = false.obs;
 
-  final permissionRequests =
-      <PermissionModel>[].obs;
+  // =====================================================
+  // DATA
+  // =====================================================
 
-  final schedules =
-      <Map<String, dynamic>>[].obs;
+  final permissionRequests = <PermissionModel>[].obs;
 
-  final editingPermission =
-      Rxn<PermissionModel>();
+  final schedules = <Map<String, dynamic>>[].obs;
+
+  final editingPermission = Rxn<PermissionModel>();
+
+  // =====================================================
+  // REQUEST OPTIONS
+  // =====================================================
 
   final requestTypes = [
     'full_day',
@@ -41,66 +52,207 @@ class ParentPermissionController
     'Other',
   ];
 
-  final selectedRequestType =
-      'full_day'.obs;
+  // =====================================================
+  // MON - SAT DAY FILTER
+  // =====================================================
 
-  final selectedPermissionType =
-      'Sick'.obs;
+  final days = [
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+  ];
 
-  final selectedScheduleId =
-      RxnInt();
+  final selectedDay = 'Mon'.obs;
 
-  bool get isBySubject =>
-      selectedRequestType.value ==
-      'subject';
+  // =====================================================
+  // SELECTED VALUES
+  // =====================================================
 
-  bool get isEditing =>
-      editingPermission.value != null;
+  final selectedRequestType = 'full_day'.obs;
 
-  String get childName =>
-      parentHomeController.childName;
+  final selectedPermissionType = 'Sick'.obs;
 
-  String get childCode =>
-      parentHomeController.childCode;
+  final selectedScheduleId = RxnInt();
+
+  // =====================================================
+  // GETTERS
+  // =====================================================
+
+  bool get isBySubject => selectedRequestType.value == 'subject';
+
+  bool get isEditing => editingPermission.value != null;
+
+  String get childName => parentHomeController.childName;
+
+  String get childCode => parentHomeController.childCode;
 
   int? get selectedStudentId {
-    final value =
-        parentHomeController
-            .selectedChild
-            .value?['id'];
+    final value = parentHomeController.selectedChild.value?['id'];
 
     return parseId(value);
   }
 
+  // =====================================================
+  // INIT
+  // =====================================================
+
   @override
   void onInit() {
     super.onInit();
+
+    // Default selected day = current day
+    final now = DateTime.now();
+
+    // Monday = 1
+    // Tuesday = 2
+    // ...
+    // Saturday = 6
+    if (now.weekday >= 1 && now.weekday <= 6) {
+      selectedDay.value = days[now.weekday - 1];
+    } else {
+      // Sunday
+      selectedDay.value = 'Mon';
+    }
+
     loadData();
   }
 
-  int? parseId(
-    dynamic value,
-  ) {
+  // =====================================================
+  // PARSE ID
+  // =====================================================
+
+  int? parseId(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+
     if (value is int) {
       return value;
     }
 
+    if (value is double) {
+      return value.toInt();
+    }
+
     return int.tryParse(
-      value?.toString() ?? '',
+      value.toString().trim(),
     );
   }
 
+  // =====================================================
+  // FILTER SCHEDULES BY DAY
+  // =====================================================
+
+  List<Map<String, dynamic>> get filteredSchedules {
+    final day = selectedDay.value.trim();
+
+    if (day.isEmpty) {
+      return schedules.toList();
+    }
+
+    return schedules
+        .where(
+          (item) => _matchesDay(item, day),
+        )
+        .toList();
+  }
+
+  // =====================================================
+  // MATCH SCHEDULE DAY
+  // =====================================================
+
+  bool _matchesDay(
+    Map<String, dynamic> item,
+    String targetDay,
+  ) {
+    final rawValue = item['day'] ?? item['day_name'] ?? item['day_of_week'];
+
+    final rawDay = rawValue?.toString().trim().toLowerCase() ?? '';
+
+    if (rawDay.isEmpty) {
+      return false;
+    }
+
+    final target = targetDay.trim().toLowerCase();
+
+    switch (target) {
+      // -------------------------------------------------
+      // MONDAY
+      // -------------------------------------------------
+      case 'mon':
+      case 'monday':
+        return rawDay.contains('mon') ||
+            rawDay.contains('ច័ន្ទ') ||
+            rawDay.contains('ចន្ទ') ||
+            rawDay == '1';
+
+      // -------------------------------------------------
+      // TUESDAY
+      // -------------------------------------------------
+      case 'tue':
+      case 'tuesday':
+        return rawDay.contains('tue') ||
+            rawDay.contains('អង្គារ') ||
+            rawDay == '2';
+
+      // -------------------------------------------------
+      // WEDNESDAY
+      // -------------------------------------------------
+      case 'wed':
+      case 'wednesday':
+        return rawDay.contains('wed') ||
+            rawDay.contains('ពុធ') ||
+            rawDay == '3';
+
+      // -------------------------------------------------
+      // THURSDAY
+      // -------------------------------------------------
+      case 'thu':
+      case 'thursday':
+        return rawDay.contains('thu') ||
+            rawDay.contains('ព្រហស្បតិ៍') ||
+            rawDay.contains('ព្រហស្បតិ៍') ||
+            rawDay == '4';
+
+      // -------------------------------------------------
+      // FRIDAY
+      // -------------------------------------------------
+      case 'fri':
+      case 'friday':
+        return rawDay.contains('fri') ||
+            rawDay.contains('សុក្រ') ||
+            rawDay == '5';
+
+      // -------------------------------------------------
+      // SATURDAY
+      // -------------------------------------------------
+      case 'sat':
+      case 'saturday':
+        return rawDay.contains('sat') ||
+            rawDay.contains('សៅរ៍') ||
+            rawDay == '6';
+
+      default:
+        return false;
+    }
+  }
+
+  // =====================================================
+  // FETCH DATA
+  // =====================================================
+
   Future<void> loadData() async {
-    final studentId =
-        selectedStudentId;
+    final studentId = selectedStudentId;
 
     if (studentId == null) {
       permissionRequests.clear();
       schedules.clear();
 
       _showError(
-        'ask_permission_student_not_found'
-            .tr,
+        'ask_permission_student_not_found'.tr,
       );
 
       return;
@@ -109,26 +261,33 @@ class ParentPermissionController
     try {
       isLoading.value = true;
 
-      final results =
-          await Future.wait([
-        permissionServices
-            .fetchParentPermissions(
-          studentId: studentId,
-        ),
-        permissionServices
-            .fetchParentSchedules(
-          studentId: studentId,
-        ),
-      ]);
+      // -------------------------------------------------
+      // FETCH PERMISSION REQUESTS
+      // -------------------------------------------------
+
+      final fetchedPermissions =
+          await permissionServices.fetchParentPermissions(
+        studentId: studentId,
+      );
+
+      // -------------------------------------------------
+      // FETCH SCHEDULES
+      // -------------------------------------------------
+
+      final fetchedSchedules = await permissionServices.fetchParentSchedules(
+        studentId: studentId,
+      );
+
+      // -------------------------------------------------
+      // UPDATE OBSERVABLES
+      // -------------------------------------------------
 
       permissionRequests.assignAll(
-        results[0]
-            as List<PermissionModel>,
+        fetchedPermissions,
       );
 
       schedules.assignAll(
-        results[1]
-            as List<Map<String, dynamic>>,
+        fetchedSchedules,
       );
     } catch (error, stackTrace) {
       debugPrint(
@@ -147,125 +306,156 @@ class ParentPermissionController
     }
   }
 
-  void changeRequestType(
-    String value,
-  ) {
-    selectedRequestType.value =
-        value;
+  // =====================================================
+  // CHANGE REQUEST TYPE
+  // =====================================================
+
+  void changeRequestType(String value) {
+    selectedRequestType.value = value;
 
     if (value == 'full_day') {
       selectedScheduleId.value = null;
     }
   }
 
+  // =====================================================
+  // SUBMIT CREATE / UPDATE REQUEST
+  // =====================================================
+
   Future<void> submitPermission() async {
     if (isSubmitting.value) {
       return;
     }
 
-    final studentId =
-        selectedStudentId;
+    final studentId = selectedStudentId;
+
+    // -------------------------------------------------
+    // STUDENT CHECK
+    // -------------------------------------------------
 
     if (studentId == null) {
       _showError(
-        'ask_permission_student_not_found'
-            .tr,
+        'ask_permission_student_not_found'.tr,
       );
+
       return;
     }
 
-    if (selectedRequestType.value
-        .trim()
-        .isEmpty) {
+    // -------------------------------------------------
+    // REQUEST TYPE CHECK
+    // -------------------------------------------------
+
+    if (selectedRequestType.value.trim().isEmpty) {
       _showError(
-        'ask_permission_please_select_request_type'
-            .tr,
+        'ask_permission_please_select_request_type'.tr,
       );
+
       return;
     }
 
-    if (isBySubject &&
-        selectedScheduleId.value == null) {
+    // -------------------------------------------------
+    // SUBJECT CHECK
+    // -------------------------------------------------
+
+    if (isBySubject && selectedScheduleId.value == null) {
       _showError(
-        'ask_permission_please_select_subject'
-            .tr,
+        'ask_permission_please_select_subject'.tr,
       );
+
       return;
     }
 
-    if (selectedPermissionType.value
-        .trim()
-        .isEmpty) {
+    // -------------------------------------------------
+    // PERMISSION TYPE CHECK
+    // -------------------------------------------------
+
+    if (selectedPermissionType.value.trim().isEmpty) {
       _showError(
-        'ask_permission_please_select_permission_type'
-            .tr,
+        'ask_permission_please_select_permission_type'.tr,
       );
+
       return;
     }
 
-    final reason =
-        reasonController.text.trim();
+    // -------------------------------------------------
+    // REASON CHECK
+    // -------------------------------------------------
+
+    final reason = reasonController.text.trim();
 
     if (reason.isEmpty) {
       _showError(
-        'ask_permission_please_enter_reason'
-            .tr,
+        'ask_permission_please_enter_reason'.tr,
       );
+
       return;
     }
 
     try {
       isSubmitting.value = true;
 
-      final editing =
-          editingPermission.value;
+      final editing = editingPermission.value;
+
+      // =================================================
+      // CREATE
+      // =================================================
 
       if (editing == null) {
+        // -----------------------------------------------
+        // DUPLICATE CHECK
+        // -----------------------------------------------
+
         if (_hasDuplicateRequestToday()) {
           _showError(
-            'ask_permission_already_requested_today'
-                .tr,
+            'ask_permission_already_requested_today'.tr,
           );
+
           return;
         }
 
-        await permissionServices
-            .createParentPermission(
+        // -----------------------------------------------
+        // CREATE API
+        // -----------------------------------------------
+
+        await permissionServices.createParentPermission(
           studentId: studentId,
-          requestType:
-              selectedRequestType.value,
-          scheduleId:
-              isBySubject
-                  ? selectedScheduleId.value
-                  : null,
-          type:
-              selectedPermissionType.value,
+          requestType: selectedRequestType.value,
+          scheduleId: isBySubject ? selectedScheduleId.value : null,
+          type: selectedPermissionType.value,
           reason: reason,
         );
 
         _showSuccess(
           'ask_permission_submitted'.tr,
         );
-      } else {
-        if (!editing.canEdit ||
-            editing.attendanceSaved) {
+      }
+
+      // =================================================
+      // UPDATE
+      // =================================================
+
+      else {
+        // -----------------------------------------------
+        // ATTENDANCE LOCK CHECK
+        // -----------------------------------------------
+
+        if (!editing.canEdit || editing.attendanceSaved) {
           _showError(
             'permission_attendance_locked'.tr,
           );
+
           return;
         }
 
-        await permissionServices
-            .updatePermission(
+        // -----------------------------------------------
+        // UPDATE API
+        // -----------------------------------------------
+
+        await permissionServices.updatePermission(
           permissionId: editing.id,
-          requestType:
-              selectedRequestType.value,
-          scheduleId:
-              isBySubject
-                  ? selectedScheduleId.value
-                  : null,
-          type:
-              selectedPermissionType.value,
+          requestType: selectedRequestType.value,
+          scheduleId: isBySubject ? selectedScheduleId.value : null,
+          type: selectedPermissionType.value,
           reason: reason,
         );
 
@@ -274,7 +464,15 @@ class ParentPermissionController
         );
       }
 
+      // -------------------------------------------------
+      // RESET FORM
+      // -------------------------------------------------
+
       clearForm();
+
+      // -------------------------------------------------
+      // REFRESH DATA
+      // -------------------------------------------------
 
       await loadData();
     } catch (error, stackTrace) {
@@ -289,8 +487,7 @@ class ParentPermissionController
       _showError(
         _extractErrorMessage(
           error,
-          fallbackKey:
-              'ask_permission_failed_submit',
+          fallbackKey: 'ask_permission_failed_submit',
         ),
       );
     } finally {
@@ -298,50 +495,139 @@ class ParentPermissionController
     }
   }
 
+  // =====================================================
+  // START EDIT
+  // =====================================================
+
   void startEditPermission(
     PermissionModel permission,
   ) {
-    if (!permission.canEdit ||
-        permission.attendanceSaved) {
+    if (!permission.canEdit || permission.attendanceSaved) {
       _showError(
         'permission_attendance_locked'.tr,
       );
+
       return;
     }
 
-    editingPermission.value =
-        permission;
+    editingPermission.value = permission;
+
+    // -------------------------------------------------
+    // REQUEST TYPE
+    // -------------------------------------------------
 
     selectedRequestType.value =
-        permission.requestType ==
-                'subject'
-            ? 'subject'
-            : 'full_day';
+        permission.requestType == 'subject' ? 'subject' : 'full_day';
 
-    selectedPermissionType.value =
-        permission.type;
+    // -------------------------------------------------
+    // PERMISSION TYPE
+    // -------------------------------------------------
 
-    reasonController.text =
-        permission.reason;
+    final matchedType = permissionTypes.firstWhere(
+      (type) => type.toLowerCase() == permission.type.trim().toLowerCase(),
+      orElse: () => 'Sick',
+    );
 
-    Future.microtask(() {
-      selectedScheduleId.value =
-          permission.scheduleId;
-    });
+    selectedPermissionType.value = matchedType;
+
+    // -------------------------------------------------
+    // SCHEDULE
+    // -------------------------------------------------
+
+    selectedScheduleId.value = permission.scheduleId;
+
+    // -------------------------------------------------
+    // REASON
+    // -------------------------------------------------
+
+    reasonController.text = permission.reason;
+
+    // -------------------------------------------------
+    // SELECT DAY FROM PERMISSION SCHEDULE
+    // -------------------------------------------------
+
+    if (permission.scheduleId != null) {
+      final matchedSchedule = schedules.firstWhereOrNull(
+        (item) => parseId(item['id']) == permission.scheduleId,
+      );
+
+      if (matchedSchedule != null) {
+        final scheduleDay = matchedSchedule['day'] ??
+            matchedSchedule['day_name'] ??
+            matchedSchedule['day_of_week'];
+
+        final normalizedDay = _normalizeDay(scheduleDay);
+
+        if (normalizedDay != null) {
+          selectedDay.value = normalizedDay;
+        }
+      }
+    }
   }
+
+  // =====================================================
+  // NORMALIZE DAY
+  // =====================================================
+
+  String? _normalizeDay(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+
+    final day = value.toString().trim().toLowerCase();
+
+    if (day.isEmpty) {
+      return null;
+    }
+
+    if (day == '1' ||
+        day.contains('mon') ||
+        day.contains('ច័ន្ទ') ||
+        day.contains('ចន្ទ')) {
+      return 'Mon';
+    }
+
+    if (day == '2' || day.contains('tue') || day.contains('អង្គារ')) {
+      return 'Tue';
+    }
+
+    if (day == '3' || day.contains('wed') || day.contains('ពុធ')) {
+      return 'Wed';
+    }
+
+    if (day == '4' || day.contains('thu') || day.contains('ព្រហស្បតិ៍')) {
+      return 'Thu';
+    }
+
+    if (day == '5' || day.contains('fri') || day.contains('សុក្រ')) {
+      return 'Fri';
+    }
+
+    if (day == '6' || day.contains('sat') || day.contains('សៅរ៍')) {
+      return 'Sat';
+    }
+
+    return null;
+  }
+
+  // =====================================================
+  // CANCEL EDIT
+  // =====================================================
 
   void cancelEditPermission() {
     clearForm();
   }
 
+  // =====================================================
+  // CLEAR FORM
+  // =====================================================
+
   void clearForm() {
     editingPermission.value = null;
 
-    selectedRequestType.value =
-        'full_day';
+    selectedRequestType.value = 'full_day';
 
-    selectedPermissionType.value =
-        'Sick';
+    selectedPermissionType.value = 'Sick';
 
     selectedScheduleId.value = null;
 
@@ -350,186 +636,216 @@ class ParentPermissionController
     formKey.currentState?.reset();
   }
 
-Future<void> confirmDeletePermission(
-  PermissionModel permission,
-) async {
-  if (!permission.canDelete ||
-      permission.attendanceSaved) {
-    CustomSnackbar.error(
-      'permission_attendance_locked'.tr,
+  // =====================================================
+  // DELETE CONFIRMATION
+  // =====================================================
+
+  Future<void> confirmDeletePermission(
+    PermissionModel permission,
+  ) async {
+    if (!permission.canDelete || permission.attendanceSaved) {
+      _showError(
+        'permission_attendance_locked'.tr,
+      );
+
+      return;
+    }
+
+    final confirmed = await Get.dialog<bool>(
+      Dialog(
+        backgroundColor: AppColors.transparent,
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: 28,
+        ),
+        child: Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(
+            maxWidth: 380,
+          ),
+          padding: const EdgeInsets.fromLTRB(
+            20,
+            22,
+            20,
+            18,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(22),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.dark.withValues(alpha: 0.12),
+                blurRadius: 28,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // -----------------------------------------
+              // DELETE ICON
+              // -----------------------------------------
+
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.10),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: AppColors.error,
+                  size: 30,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // -----------------------------------------
+              // TITLE
+              // -----------------------------------------
+
+              Text(
+                'permission_delete_title'.tr,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.titleSmall.copyWith(
+                  color: AppColors.dark,
+                  fontSize: 18,
+                  height: 1.35,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // -----------------------------------------
+              // MESSAGE
+              // -----------------------------------------
+
+              Text(
+                'permission_delete_message'.tr,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.hintColor,
+                  fontSize: 13,
+                  height: 1.55,
+                ),
+              ),
+
+              const SizedBox(height: 22),
+
+              // -----------------------------------------
+              // BUTTONS
+              // -----------------------------------------
+
+              Row(
+                children: [
+                  // CANCEL
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(
+                        result: false,
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(
+                          double.infinity,
+                          46,
+                        ),
+                        foregroundColor: AppColors.hintColor,
+                        side: const BorderSide(
+                          color: AppColors.border,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            13,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'cancel'.tr,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  // DELETE
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Get.back(
+                        result: true,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(
+                          double.infinity,
+                          46,
+                        ),
+                        elevation: 0,
+                        backgroundColor: AppColors.error,
+                        foregroundColor: AppColors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            13,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'delete'.tr,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: false,
     );
-    return;
+
+    if (confirmed != true) {
+      return;
+    }
+
+    await deletePermission(
+      permission,
+    );
   }
 
-  final confirmed = await Get.dialog<bool>(
-    Dialog(
-      backgroundColor: AppColors.transparent,
-      insetPadding: const EdgeInsets.symmetric(
-        horizontal: 28,
-      ),
-      child: Container(
-        width: double.infinity,
-        constraints: const BoxConstraints(
-          maxWidth: 380,
-        ),
-        padding: const EdgeInsets.fromLTRB(
-          20,
-          22,
-          20,
-          18,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(22),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.dark.withValues(
-                alpha: 0.12,
-              ),
-              blurRadius: 28,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 58,
-              height: 58,
-              decoration: BoxDecoration(
-                color: AppColors.error.withValues(
-                  alpha: 0.10,
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.delete_outline_rounded,
-                color: AppColors.error,
-                size: 30,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'permission_delete_title'.tr,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.titleSmall.copyWith(
-                color: AppColors.dark,
-                fontSize: 18,
-                height: 1.35,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'permission_delete_message'.tr,
-              textAlign: TextAlign.center,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.hintColor,
-                fontSize: 13,
-                height: 1.55,
-              ),
-            ),
-            const SizedBox(height: 22),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Get.back(result: false);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(
-                        double.infinity,
-                        46,
-                      ),
-                      foregroundColor:
-                          AppColors.hintColor,
-                      side: const BorderSide(
-                        color: AppColors.border,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(13),
-                      ),
-                    ),
-                    child: Text(
-                      'cancel'.tr,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Get.back(result: true);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(
-                        double.infinity,
-                        46,
-                      ),
-                      elevation: 0,
-                      backgroundColor:
-                          AppColors.error,
-                      foregroundColor:
-                          AppColors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(13),
-                      ),
-                    ),
-                    child: Text(
-                      'delete'.tr,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
-    barrierDismissible: false,
-  );
+  // =====================================================
+  // DELETE REQUEST
+  // =====================================================
 
-  if (confirmed != true) {
-    return;
-  }
-
-  await deletePermission(
-    permission,
-  );
-}
   Future<void> deletePermission(
     PermissionModel permission,
   ) async {
-    try {
-      isLoading.value = true;
+    if (isDeleting.value) {
+      return;
+    }
 
-      await permissionServices
-          .deletePermission(
-        permissionId:
-            permission.id,
+    try {
+      isDeleting.value = true;
+
+      await permissionServices.deletePermission(
+        permissionId: permission.id,
       );
 
       permissionRequests.removeWhere(
-        (item) =>
-            item.id == permission.id,
+        (item) => item.id == permission.id,
       );
 
-      if (editingPermission.value?.id ==
-          permission.id) {
+      if (editingPermission.value?.id == permission.id) {
         clearForm();
       }
 
@@ -548,14 +864,17 @@ Future<void> confirmDeletePermission(
       _showError(
         _extractErrorMessage(
           error,
-          fallbackKey:
-              'permission_delete_failed',
+          fallbackKey: 'permission_delete_failed',
         ),
       );
     } finally {
-      isLoading.value = false;
+      isDeleting.value = false;
     }
   }
+
+  // =====================================================
+  // DUPLICATE REQUEST CHECK
+  // =====================================================
 
   bool _hasDuplicateRequestToday() {
     return permissionRequests.any(
@@ -566,36 +885,41 @@ Future<void> confirmDeletePermission(
           return false;
         }
 
-        if (selectedRequestType.value ==
-            'full_day') {
-          return request.requestType ==
-              'full_day';
+        // -----------------------------------------------
+        // FULL DAY
+        // -----------------------------------------------
+
+        if (selectedRequestType.value == 'full_day') {
+          return request.requestType == 'full_day';
         }
 
-        return request.requestType ==
-                'subject' &&
-            request.scheduleId ==
-                selectedScheduleId.value;
+        // -----------------------------------------------
+        // SUBJECT
+        // -----------------------------------------------
+
+        return request.requestType == 'subject' &&
+            request.scheduleId == selectedScheduleId.value;
       },
     );
   }
 
-  bool _isToday(
-    String? value,
-  ) {
-    if (value == null ||
-        value.trim().isEmpty) {
+  // =====================================================
+  // CHECK TODAY
+  // =====================================================
+
+  bool _isToday(String? value) {
+    if (value == null || value.trim().isEmpty) {
       return false;
     }
 
-    final parsed =
-        DateTime.tryParse(value);
+    final parsed = DateTime.tryParse(value);
 
     if (parsed == null) {
       return false;
     }
 
     final now = DateTime.now();
+
     final local = parsed.toLocal();
 
     return local.year == now.year &&
@@ -603,75 +927,76 @@ Future<void> confirmDeletePermission(
         local.day == now.day;
   }
 
+  // =====================================================
+  // EXTRACT API ERROR
+  // =====================================================
+
   String _extractErrorMessage(
     dynamic error, {
     required String fallbackKey,
   }) {
     if (error is DioException) {
-      final data =
-          error.response?.data;
+      final data = error.response?.data;
 
       if (data is Map) {
-        final message =
-            data['detail'] ??
-                data['message'];
+        final message = data['detail'] ?? data['message'];
 
-        if (message != null &&
-            message
-                .toString()
-                .trim()
-                .isNotEmpty) {
+        if (message != null && message.toString().trim().isNotEmpty) {
           return message.toString();
         }
       }
     }
 
-    final text =
-        error.toString();
+    final text = error.toString();
 
-    if (text
-        .toLowerCase()
-        .contains('already requested')) {
-      return 'ask_permission_already_requested_today'
-          .tr;
+    if (text.toLowerCase().contains(
+          'already requested',
+        )) {
+      return 'ask_permission_already_requested_today'.tr;
     }
 
     return fallbackKey.tr;
   }
 
+  // =====================================================
+  // ERROR SNACKBAR
+  // =====================================================
+
   void _showError(
     String message,
   ) {
-    Get.snackbar(
-      'error'.tr,
+    CustomSnackbar.error(
       message,
-      snackPosition:
-          SnackPosition.BOTTOM,
+      title: 'error'.tr,
     );
   }
+
+  // =====================================================
+  // SUCCESS SNACKBAR
+  // =====================================================
 
   void _showSuccess(
     String message,
   ) {
-    Get.snackbar(
-      'success'.tr,
+    CustomSnackbar.success(
       message,
-      snackPosition:
-          SnackPosition.BOTTOM,
+      title: 'success'.tr,
     );
   }
+
+  // =====================================================
+  // REQUEST TYPE LABEL
+  // =====================================================
 
   String requestTypeLabel(
     String type,
   ) {
     switch (type.toLowerCase()) {
       case 'full_day':
-        return 'ask_permission_request_type_full_day'
-            .tr;
+        return 'ask_permission_request_type_full_day'.tr;
 
       case 'subject':
-        return 'ask_permission_request_type_by_subject'
-            .tr;
+        return 'ask_permission_request_type_by_subject'.tr;
 
       default:
         return type;
@@ -683,6 +1008,10 @@ Future<void> confirmDeletePermission(
   ) {
     return requestTypeLabel(type);
   }
+
+  // =====================================================
+  // PERMISSION TYPE LABEL
+  // =====================================================
 
   String permissionTypeLabel(
     String type,
@@ -705,51 +1034,126 @@ Future<void> confirmDeletePermission(
     }
   }
 
+  // =====================================================
+  // SCHEDULE LABEL
+  // =====================================================
+
   String scheduleLabel(
     Map<String, dynamic> item,
   ) {
-    final subject =
-        item['subject_name']
-                ?.toString() ??
-            '-';
+    final subject = item['subject_name']?.toString().trim().isNotEmpty == true
+        ? item['subject_name'].toString().trim()
+        : '-';
 
     final start = _formatTime(
-      item['start_time']
-              ?.toString() ??
-          '',
+      item['start_time'],
     );
 
     final end = _formatTime(
-      item['end_time']
-              ?.toString() ??
-          '',
+      item['end_time'],
     );
 
-    if (start.isEmpty &&
-        end.isEmpty) {
+    // -----------------------------------------------
+    // SUBJECT ONLY
+    // -----------------------------------------------
+
+    if (start.isEmpty && end.isEmpty) {
       return subject;
     }
 
-    return '$subject ($start - $end)';
+    // -----------------------------------------------
+    // START + END
+    // -----------------------------------------------
+
+    if (start.isNotEmpty && end.isNotEmpty) {
+      return '$subject ($start - $end)';
+    }
+
+    // -----------------------------------------------
+    // START ONLY
+    // -----------------------------------------------
+
+    if (start.isNotEmpty) {
+      return '$subject ($start)';
+    }
+
+    // -----------------------------------------------
+    // END ONLY
+    // -----------------------------------------------
+
+    return '$subject ($end)';
   }
 
+  // =====================================================
+  // TIME FORMATTER
+  //
+  // Supports:
+  //
+  // 07:30
+  // 7:30
+  // 07:30:00
+  // [07, 30, 00]
+  // [7, 30]
+  // =====================================================
+
   String _formatTime(
-    String value,
+    dynamic value,
   ) {
-    final text = value.trim();
+    if (value == null) {
+      return '';
+    }
+
+    final text = value.toString().trim();
 
     if (text.isEmpty) {
       return '';
     }
 
-    final parts = text.split(':');
+    // -----------------------------------------------
+    // REMOVE BRACKETS
+    // -----------------------------------------------
 
-    if (parts.length < 2) {
-      return text;
+    final clean = text.replaceAll('[', '').replaceAll(']', '').trim();
+
+    // -----------------------------------------------
+    // HANDLE COLON FORMAT
+    //
+    // 07:30
+    // 07:30:00
+    // -----------------------------------------------
+
+    final colonParts = clean.split(':');
+
+    if (colonParts.length >= 2) {
+      final hour = colonParts[0].trim().padLeft(2, '0');
+
+      final minute = colonParts[1].trim().padLeft(2, '0');
+
+      return '$hour:$minute';
     }
 
-    return '${parts[0]}:${parts[1]}';
+    // -----------------------------------------------
+    // HANDLE COMMA FORMAT
+    //
+    // 07, 30, 00
+    // -----------------------------------------------
+
+    final commaParts = clean.split(',');
+
+    if (commaParts.length >= 2) {
+      final hour = commaParts[0].trim().padLeft(2, '0');
+
+      final minute = commaParts[1].trim().padLeft(2, '0');
+
+      return '$hour:$minute';
+    }
+
+    return text;
   }
+
+  // =====================================================
+  // CREATED DATE FORMAT
+  // =====================================================
 
   String formatCreatedDate(
     dynamic value,
@@ -758,8 +1162,7 @@ Future<void> confirmDeletePermission(
       return '-';
     }
 
-    final date =
-        DateTime.tryParse(
+    final date = DateTime.tryParse(
       value.toString(),
     );
 
@@ -769,16 +1172,16 @@ Future<void> confirmDeletePermission(
 
     final local = date.toLocal();
 
-    final day = local.day
-        .toString()
-        .padLeft(2, '0');
+    final day = local.day.toString().padLeft(2, '0');
 
-    final month = local.month
-        .toString()
-        .padLeft(2, '0');
+    final month = local.month.toString().padLeft(2, '0');
 
     return '$day/$month/${local.year}';
   }
+
+  // =====================================================
+  // STATUS COLOR
+  // =====================================================
 
   Color statusColor(
     String status,
@@ -806,30 +1209,36 @@ Future<void> confirmDeletePermission(
     }
   }
 
+  // =====================================================
+  // STATUS LABEL
+  // =====================================================
+
   String statusLabel(
     String status,
   ) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'ask_permission_status_pending'
-            .tr;
+        return 'ask_permission_status_pending'.tr;
 
       case 'approved':
-        return 'ask_permission_status_approved'
-            .tr;
+        return 'ask_permission_status_approved'.tr;
 
       case 'rejected':
-        return 'ask_permission_status_rejected'
-            .tr;
+        return 'ask_permission_status_rejected'.tr;
 
       default:
         return status;
     }
   }
 
+  // =====================================================
+  // DISPOSE
+  // =====================================================
+
   @override
   void onClose() {
     reasonController.dispose();
+
     super.onClose();
   }
 }
