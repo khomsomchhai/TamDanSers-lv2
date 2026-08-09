@@ -285,45 +285,144 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
     });
   }
 
-  Widget _buildSelectedChild(
-    Map<String, dynamic> student,
-  ) {
-    final name = student['student_name']?.toString() ?? '-';
-    final code = student['student_code']?.toString() ?? '-';
+ Widget _buildSelectedChild(
+  Map<String, dynamic> student,
+) {
+  final name =
+      student['student_name']?.toString() ?? '-';
 
-    return Row(
+  final code =
+      student['student_code']?.toString() ?? '-';
+
+  final imageUrl =
+      student['profile_image']?.toString().trim() ?? '';
+
+  return Row(
+    children: [
+      CircleAvatar(
+        radius: 18,
+        backgroundColor: AppColors.info.withValues(
+          alpha: 0.12,
+        ),
+        backgroundImage: imageUrl.isNotEmpty
+            ? NetworkImage(imageUrl)
+            : null,
+        child: imageUrl.isEmpty
+            ? const Icon(
+                Icons.person_outline_rounded,
+                color: AppColors.info,
+                size: 21,
+              )
+            : null,
+      ),
+
+      const SizedBox(width: 10),
+
+      Expanded(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              code,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+Widget _buildDropdownChild(
+  Map<String, dynamic> student,
+) {
+  final name =
+      student['student_name']?.toString() ?? '-';
+
+  final code =
+      student['student_code']?.toString() ?? '-';
+
+  final imageUrl =
+      student['profile_image']?.toString().trim() ?? '';
+
+  final selectedId =
+      controller.selectedChild.value?['id'];
+
+  final isSelected =
+      selectedId?.toString() ==
+          student['id']?.toString();
+
+  return SizedBox(
+    height: 58,
+    child: Row(
       children: [
         CircleAvatar(
-          radius: 18,
-          backgroundColor: AppColors.info.withValues(
-            alpha: 0.12,
-          ),
-          child: const Icon(
-            Icons.person_outline_rounded,
-            color: AppColors.info,
-            size: 21,
-          ),
+          radius: 19,
+          backgroundColor: isSelected
+              ? AppColors.info
+              : AppColors.info.withValues(
+                  alpha: 0.12,
+                ),
+
+          backgroundImage: imageUrl.isNotEmpty
+              ? NetworkImage(imageUrl)
+              : null,
+
+          child: imageUrl.isEmpty
+              ? Icon(
+                  Icons.person_outline_rounded,
+                  color: isSelected
+                      ? AppColors.white
+                      : AppColors.info,
+                  size: 21,
+                )
+              : null,
         ),
-        const SizedBox(width: 10),
+
+        const SizedBox(width: 12),
+
         Expanded(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment:
+                MainAxisAlignment.center,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               Text(
                 name,
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.black87,
+                overflow:
+                    TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: isSelected
+                      ? AppColors.info
+                      : Colors.black87,
                   fontSize: 15,
-                  fontWeight: FontWeight.bold,
+                  fontWeight:
+                      FontWeight.w600,
                 ),
               ),
+
               Text(
                 code,
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                overflow:
+                    TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: Colors.grey,
                   fontSize: 12,
@@ -332,80 +431,17 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
             ],
           ),
         ),
+
+        if (isSelected)
+          const Icon(
+            Icons.check_circle_rounded,
+            color: AppColors.info,
+            size: 20,
+          ),
       ],
-    );
-  }
-
-  Widget _buildDropdownChild(
-    Map<String, dynamic> student,
-  ) {
-    final name = student['student_name']?.toString() ?? '-';
-    final code = student['student_code']?.toString() ?? '-';
-
-    final selectedId = controller.selectedChild.value?['id'];
-
-    final isSelected =
-        selectedId?.toString() == student['id']?.toString();
-
-    return SizedBox(
-      height: 58,
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 19,
-            backgroundColor: isSelected
-                ? AppColors.info
-                : AppColors.info.withValues(
-                    alpha: 0.12,
-                  ),
-            child: Icon(
-              Icons.person_outline_rounded,
-              color: isSelected
-                  ? AppColors.white
-                  : AppColors.info,
-              size: 21,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: isSelected
-                        ? AppColors.info
-                        : Colors.black87,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  code,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (isSelected)
-            const Icon(
-              Icons.check_circle_rounded,
-              color: AppColors.info,
-              size: 20,
-            ),
-        ],
-      ),
-    );
-  }
+    ),
+  );
+}
 
   // =====================================================
   // Attendance summary card

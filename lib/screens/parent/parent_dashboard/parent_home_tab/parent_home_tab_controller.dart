@@ -505,6 +505,12 @@ class ParentHomeTabViewController
             ?.toString() ??
         'dont_have_child'.tr;
   }
+  String get childProfileImage {
+  return selectedChild
+          .value?['profile_image']
+          ?.toString() ??
+      '';
+}
 
   // =====================================================
   // Current Khmer date
