@@ -10,7 +10,7 @@ class AppRoutes {
 
   //Student
   static const String studentDashboard = "/student_dashboard";
-  
+
   static const String askPermissionScreen = "/ask_permission_screen";
   static const String scheduleScreen = "/schedule_screen";
   static const String resultScreen = "/result_screen";
@@ -19,9 +19,8 @@ class AppRoutes {
   //Parent
   static const String parentDashboard = "/parent_dashboard";
   static const String homeTab = "/home_tab";
-static const parentPermission =
-    '/parent-permission';
-
+  static const parentPermission = '/parent-permission';
+  static const viewStudentResultDetail = '/view-student-result-detail';
   //Notification
   static const String notificationScreen = "/notification_screen";
 }

@@ -32,8 +32,7 @@ class CustomAttendanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progressValue =
-        (attendanceRate / 100).clamp(0.0, 1.0);
+    final progressValue = (attendanceRate / 100).clamp(0.0, 1.0);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +52,7 @@ class CustomAttendanceCard extends StatelessWidget {
                 color: AppColors.success,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             Expanded(
               child: _buildStatusCard(
                 title: 'absent_days'.tr,
@@ -63,16 +62,17 @@ class CustomAttendanceCard extends StatelessWidget {
                 color: AppColors.error,
               ),
             ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _buildStatusCard(
+                title: 'permission_days'.tr,
+                dayCount: permissionDays,
+                subjectCount: permissionSubjects,
+                icon: Icons.event_available_outlined,
+                color: AppColors.warning,
+              ),
+            ),
           ],
-        ),
-        const SizedBox(height: 12),
-        _buildStatusCard(
-          title: 'permission_days'.tr,
-          dayCount: permissionDays,
-          subjectCount: permissionSubjects,
-          icon: Icons.event_available_outlined,
-          color: AppColors.warning,
-          isWide: true,
         ),
       ],
     );
@@ -103,24 +103,19 @@ class CustomAttendanceCard extends StatelessWidget {
         children: [
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '${'attendance_summary'.tr} ${currentMonth.tr}',
-                  style:
-                      AppTextStyles.bodyLarge.copyWith(
+                  style: AppTextStyles.bodyLarge.copyWith(
                     color: AppColors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-
                 const SizedBox(height: 8),
                 Text(
                   '${attendanceRate.toStringAsFixed(0)}%',
-                  style: AppTextStyles
-                      .headlineMedium
-                      .copyWith(
+                  style: AppTextStyles.headlineMedium.copyWith(
                     color: AppColors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -128,8 +123,7 @@ class CustomAttendanceCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   'attendance_total_days'.tr,
-                  style:
-                      AppTextStyles.bodySmall.copyWith(
+                  style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.white.withValues(
                       alpha: 0.78,
                     ),
@@ -150,8 +144,7 @@ class CustomAttendanceCard extends StatelessWidget {
                   strokeWidth: 9,
                   strokeCap: StrokeCap.round,
                   color: AppColors.white,
-                  backgroundColor:
-                      AppColors.white.withValues(
+                  backgroundColor: AppColors.white.withValues(
                     alpha: 0.20,
                   ),
                 ),
@@ -167,8 +160,7 @@ class CustomAttendanceCard extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     '${attendanceRate.toStringAsFixed(0)}%',
-                    style:
-                        AppTextStyles.bodySmall.copyWith(
+                    style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -188,11 +180,12 @@ class CustomAttendanceCard extends StatelessWidget {
     required int subjectCount,
     required IconData icon,
     required Color color,
-    bool isWide = false,
   }) {
     return Container(
-      width: isWide ? double.infinity : null,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 12,
+      ),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(
@@ -211,132 +204,51 @@ class CustomAttendanceCard extends StatelessWidget {
           ),
         ],
       ),
-      child: isWide
-          ? Row(
-              children: [
-                _buildIconBox(
-                  icon: icon,
-                  color: color,
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildStatusContent(
-                    title: title,
-                    dayCount: dayCount,
-                    subjectCount: subjectCount,
-                    color: color,
-                  ),
-                ),
-              ],
-            )
-          : Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        maxLines: 1,
-                        overflow:
-                            TextOverflow.ellipsis,
-                        style: AppTextStyles
-                            .bodyMedium
-                            .copyWith(
-                          color:
-                              AppColors.hintColor,
-                          fontWeight:
-                              FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    _buildIconBox(
-                      icon: icon,
-                      color: color,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  dayCount.toString(),
-                  style: AppTextStyles
-                      .headlineMedium
-                      .copyWith(
-                    color: AppColors.dark,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  '$subjectCount ${'subjects'.tr}',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
                   maxLines: 1,
-                  overflow:
-                      TextOverflow.ellipsis,
-                  style:
-                      AppTextStyles.bodySmall.copyWith(
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.hintColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ],
-            ),
-    );
-  }
-
-  Widget _buildStatusContent({
-    required String title,
-    required int dayCount,
-    required int subjectCount,
-    required Color color,
-  }) {
-    return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.hintColor,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          crossAxisAlignment:
-              CrossAxisAlignment.end,
-          children: [
-            Text(
-              dayCount.toString(),
-              style: AppTextStyles
-                  .headlineMedium
-                  .copyWith(
-                color: AppColors.dark,
-                fontWeight: FontWeight.bold,
               ),
-            ),
-            const SizedBox(width: 7),
-            Padding(
-              padding:
-                  const EdgeInsets.only(bottom: 4),
-              child: Text(
-                'days'.tr,
-                style:
-                    AppTextStyles.bodySmall.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                ),
+              const SizedBox(width: 4),
+              _buildIconBox(
+                icon: icon,
+                color: color,
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 3),
-        Text(
-  '$subjectCount ${'subjects'.tr}',
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColors.hintColor,
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: 10),
+          Text(
+            dayCount.toString(),
+            style: AppTextStyles.headlineMedium.copyWith(
+              color: AppColors.dark,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '$subjectCount ${'subjects'.tr}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.hintColor,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -345,8 +257,8 @@ class CustomAttendanceCard extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      width: 44,
-      height: 44,
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(
@@ -356,7 +268,7 @@ class CustomAttendanceCard extends StatelessWidget {
       child: Icon(
         icon,
         color: color,
-        size: 24,
+        size: 18,
       ),
     );
   }

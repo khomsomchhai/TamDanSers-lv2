@@ -61,8 +61,7 @@ class ResultScreenViewController extends GetxController
     try {
       isLoading.value = true;
 
-      final List<ScoreModel> response =
-          await resultApi.getResult();
+      final List<ScoreModel> response = await resultApi.getResult();
 
       result.assignAll(response);
 
@@ -118,9 +117,7 @@ class ResultScreenViewController extends GetxController
   List<int> get semesterMonths {
     final List<int> availableMonths = result
         .where(
-          (score) =>
-              score.semester ==
-              selectedSemester.value,
+          (score) => score.semester == selectedSemester.value,
         )
         .map(
           (score) => score.month,
@@ -134,8 +131,7 @@ class ResultScreenViewController extends GetxController
   }
 
   List<ScoreModel> get filterScores {
-    final int? month =
-        selectedMonth.value;
+    final int? month = selectedMonth.value;
 
     if (month == null) {
       return [];
@@ -143,12 +139,9 @@ class ResultScreenViewController extends GetxController
 
     final List<ScoreModel> scores = result.where(
       (score) {
-        final bool sameSemester =
-            score.semester ==
-            selectedSemester.value;
+        final bool sameSemester = score.semester == selectedSemester.value;
 
-        final bool sameMonth =
-            score.month == month;
+        final bool sameMonth = score.month == month;
 
         return sameSemester && sameMonth;
       },
@@ -164,8 +157,7 @@ class ResultScreenViewController extends GetxController
   }
 
   void _selectInitialSemesterAndMonth() {
-    final List<int> semesters =
-        availableSemesters;
+    final List<int> semesters = availableSemesters;
 
     if (semesters.isEmpty) {
       selectedSemester.value = 1;
@@ -174,15 +166,13 @@ class ResultScreenViewController extends GetxController
       return;
     }
 
-    selectedSemester.value =
-        semesters.last;
+    selectedSemester.value = semesters.last;
 
     _selectLatestMonthForCurrentSemester();
   }
 
   void _selectLatestMonthForCurrentSemester() {
-    final List<int> availableMonths =
-        semesterMonths;
+    final List<int> availableMonths = semesterMonths;
 
     if (availableMonths.isEmpty) {
       selectedMonth.value = null;
@@ -190,13 +180,11 @@ class ResultScreenViewController extends GetxController
       return;
     }
 
-    selectedMonth.value =
-        availableMonths.last;
+    selectedMonth.value = availableMonths.last;
   }
 
   void _syncTabWithSemester() {
-    final int targetIndex =
-        (selectedSemester.value - 1).clamp(0, 1);
+    final int targetIndex = (selectedSemester.value - 1).clamp(0, 1);
 
     if (tabController.index != targetIndex) {
       tabController.animateTo(
@@ -206,56 +194,55 @@ class ResultScreenViewController extends GetxController
   }
 
   Future<void> changeSemester(int semester) async {
-  if (semester < 1 || semester > 2) {
-    return;
+    if (semester < 1 || semester > 2) {
+      return;
+    }
+
+    if (selectedSemester.value == semester) {
+      return;
+    }
+
+    selectedSemester.value = semester;
+    selectedMonth.value = null;
+    rank.value = null;
+
+    // ជ្រើសខែចុងក្រោយតែម្តង នៅពេលប្ដូរ semester
+    _selectLatestMonthForCurrentSemester();
+
+    final int targetIndex = semester - 1;
+
+    if (tabController.index != targetIndex) {
+      tabController.animateTo(targetIndex);
+    }
+
+    await getRank();
   }
-
-  if (selectedSemester.value == semester) {
-    return;
-  }
-
-  selectedSemester.value = semester;
-  selectedMonth.value = null;
-  rank.value = null;
-
-  // ជ្រើសខែចុងក្រោយតែម្តង នៅពេលប្ដូរ semester
-  _selectLatestMonthForCurrentSemester();
-
-  final int targetIndex = semester - 1;
-
-  if (tabController.index != targetIndex) {
-    tabController.animateTo(targetIndex);
-  }
-
-  await getRank();
-}
 
   Future<void> changeMonth(int month) async {
-  if (!semesterMonths.contains(month)) {
+    if (!semesterMonths.contains(month)) {
+      debugPrint(
+        'MONTH $month NOT FOUND IN '
+        'SEMESTER ${selectedSemester.value}',
+      );
+      return;
+    }
+
+    // ប្ដូរ selected color ភ្លាមៗ
+    selectedMonth.value = month;
+
+    // លុប rank ចាស់
+    rank.value = null;
+
     debugPrint(
-      'MONTH $month NOT FOUND IN '
-      'SEMESTER ${selectedSemester.value}',
+      'SELECTED MONTH: ${selectedMonth.value}',
     );
-    return;
+
+    // បន្ទាប់មកទើប load rank
+    await getRank();
   }
 
-  // ប្ដូរ selected color ភ្លាមៗ
-  selectedMonth.value = month;
-
-  // លុប rank ចាស់
-  rank.value = null;
-
-  debugPrint(
-    'SELECTED MONTH: ${selectedMonth.value}',
-  );
-
-  // បន្ទាប់មកទើប load rank
-  await getRank();
-}
-
   Future<void> getRank() async {
-    final int? month =
-        selectedMonth.value;
+    final int? month = selectedMonth.value;
 
     if (month == null) {
       rank.value = null;
@@ -265,22 +252,12 @@ class ResultScreenViewController extends GetxController
     try {
       isRankLoading.value = true;
 
-      final ScoreModel response =
-          await resultApi.getRankStudent(
+      final ScoreModel? response = await resultApi.getRankStudent(
         month: month,
         semester: selectedSemester.value,
       );
 
       rank.value = response;
-
-      debugPrint(
-        'RANK RESPONSE: '
-        'semester=${selectedSemester.value}, '
-        'month=$month, '
-        'rank=${response.rank}, '
-        'average=${response.average}, '
-        'totalScore=${response.totalScore}',
-      );
     } catch (e, stackTrace) {
       debugPrint(
         'GET RANK ERROR: $e',
@@ -297,28 +274,22 @@ class ResultScreenViewController extends GetxController
   }
 
   Future<void> refreshResult() async {
-    final int oldSemester =
-        selectedSemester.value;
+    final int oldSemester = selectedSemester.value;
 
-    final int? oldMonth =
-        selectedMonth.value;
+    final int? oldMonth = selectedMonth.value;
 
     try {
       isLoading.value = true;
 
-      final List<ScoreModel> response =
-          await resultApi.getResult();
+      final List<ScoreModel> response = await resultApi.getResult();
 
       result.assignAll(response);
 
       if (hasSemester(oldSemester)) {
-        selectedSemester.value =
-            oldSemester;
+        selectedSemester.value = oldSemester;
 
-        if (oldMonth != null &&
-            semesterMonths.contains(oldMonth)) {
-          selectedMonth.value =
-              oldMonth;
+        if (oldMonth != null && semesterMonths.contains(oldMonth)) {
+          selectedMonth.value = oldMonth;
         } else {
           _selectLatestMonthForCurrentSemester();
         }

@@ -12,6 +12,16 @@ class ParentAttendanceTabViewController extends GetxController {
   final isLoading = false.obs;
 
   final selectedStudentId = RxnInt();
+  final selectedMonth = DateTime.now().month.obs;
+  final selectedYear = DateTime.now().year.obs;
+
+  void changeMonth(int month, {int? year}) {
+    selectedMonth.value = month;
+    if (year != null) {
+      selectedYear.value = year;
+    }
+    countAttendance();
+  }
 
   // រាប់ចំនួនថ្ងៃមិនស្ទួន
   final presentDays = 0.obs;
@@ -46,6 +56,8 @@ class ParentAttendanceTabViewController extends GetxController {
     int studentId,
   ) async {
     selectedStudentId.value = studentId;
+    selectedMonth.value = DateTime.now().month;
+    selectedYear.value = DateTime.now().year;
 
     await getParentAttendance();
   }
@@ -133,8 +145,9 @@ bool isPermissionStatus(String status) {
 }
 void countAttendance() {
   final Map<String, List<AttendanceModel>> attendanceByDate = {};
+  final recordsToCount = filteredAttendance;
 
-  for (final item in attendanceList) {
+  for (final item in recordsToCount) {
     final dateKey = normalizeDate(item.date);
 
     if (dateKey.isEmpty) {
@@ -201,20 +214,19 @@ void countAttendance() {
   absentDays.value = calculatedAbsentDays;
   permissionDays.value = calculatedPermissionDays;
 
-  presentSubjects.value = attendanceList.where((item) {
+  presentSubjects.value = recordsToCount.where((item) {
     return isPresentStatus(
       normalizeStatus(item.status),
     );
   }).length;
 
-  absentSubjects.value = attendanceList.where((item) {
+  absentSubjects.value = recordsToCount.where((item) {
     return isAbsentStatus(
       normalizeStatus(item.status),
     );
   }).length;
 
-  permissionSubjects.value =
-      attendanceList.where((item) {
+  permissionSubjects.value = recordsToCount.where((item) {
     return isPermissionStatus(
       normalizeStatus(item.status),
     );
@@ -244,24 +256,6 @@ void countAttendance() {
     'PERMISSION SUBJECTS: ${permissionSubjects.value}',
   );
 }
-  int _countUniqueDates(
-    List<AttendanceModel> records,
-  ) {
-    final dates = <String>{};
-
-    for (final attendance in records) {
-      final dateKey = normalizeDate(
-        attendance.date,
-      );
-
-      if (dateKey.isNotEmpty) {
-        dates.add(dateKey);
-      }
-    }
-
-    return dates.length;
-  }
-
   String normalizeDate(dynamic value) {
     if (value == null) {
       return '';
@@ -299,26 +293,24 @@ void countAttendance() {
   }
 
   List<AttendanceModel> get filteredAttendance {
-    final now = DateTime.now();
-
     return attendanceList.where((attendance) {
       final date = DateTime.tryParse(
-        attendance.date?.toString() ?? '',
+        attendance.date.toString(),
       );
 
       if (date == null) {
         return false;
       }
 
-      return date.year == now.year &&
-          date.month == now.month;
+      return date.year == selectedYear.value &&
+          date.month == selectedMonth.value;
     }).toList();
   }
 
   int get totalDays {
     final dates = <String>{};
 
-    for (final attendance in attendanceList) {
+    for (final attendance in filteredAttendance) {
       final dateKey = normalizeDate(
         attendance.date,
       );
@@ -346,8 +338,40 @@ void countAttendance() {
   }
 
   String get currentMonthName {
-  return 'month_${DateTime.now().month}';
-}
+    const khmerMonths = [
+      'មករា',
+      'កុម្ភៈ',
+      'មីនា',
+      'មេសា',
+      'ឧសភា',
+      'មិថុនា',
+      'កក្កដា',
+      'សីហា',
+      'កញ្ញា',
+      'តុលា',
+      'វិច្ឆិកា',
+      'ធ្នូ',
+    ];
+    final monthIndex = (selectedMonth.value - 1).clamp(0, 11);
+    if (Get.locale?.languageCode == 'km') {
+      return khmerMonths[monthIndex];
+    }
+    const englishMonths = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    return englishMonths[monthIndex];
+  }
 
   String getStatusText(dynamic status) {
     switch (normalizeStatus(status)) {
