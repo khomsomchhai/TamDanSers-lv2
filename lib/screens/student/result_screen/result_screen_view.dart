@@ -864,8 +864,14 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
   // ===========================================================
   // YEARLY VIEW
   //
-  // ONLY FINAL AVERAGE
-  // NO PASS / FAIL
+  // Web-style yearly result:
+  // - Final yearly average + yearly rank
+  // - Semester 1 summary
+  // - Semester 2 summary
+  // - Each semester shows:
+  //   Monthly Average
+  //   Semester Exam Average
+  //   Semester Result
   // ===========================================================
 
   Widget yearlyView() {
@@ -888,14 +894,14 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
               bottom: 30,
             ),
             children: [
-              // =========================================
-              // FINAL AVERAGE + YEARLY RANK
-              // =========================================
+              // ===============================================
+              // YEARLY SUMMARY CARD
+              // ===============================================
 
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
-                  vertical: 26,
+                  vertical: 22,
                   horizontal: 18,
                 ),
                 decoration: BoxDecoration(
@@ -916,126 +922,105 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                     ),
                   ],
                 ),
-                child: Row(
+                child: Column(
                   children: [
-                    // ===================================
-                    // FINAL AVERAGE
-                    // ===================================
+                    // -----------------------------------------
+                    // Title
+                    // -----------------------------------------
 
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(
-                                0.15,
-                              ),
-                              shape: BoxShape.circle,
+                    Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(
+                              0.15,
                             ),
-                            child: const Icon(
-                              Icons.workspace_premium_outlined,
-                              color: Colors.white,
-                              size: 23,
+                            borderRadius: BorderRadius.circular(
+                              13,
                             ),
                           ),
-                          const SizedBox(
-                            height: 12,
+                          child: const Icon(
+                            Icons.workspace_premium_outlined,
+                            color: Colors.white,
+                            size: 23,
                           ),
-                          Text(
-                            'average_year'.tr,
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 6,
-                          ),
-                          Text(
-                            finalAverage.toStringAsFixed(
-                              2,
-                            ),
-                            style: const TextStyle(
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        Expanded(
+                          child: Text(
+                            'result_yearly'.tr,
+                            style: AppTextStyles.titleLarge.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 30,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
 
-                    // ===================================
-                    // DIVIDER
-                    // ===================================
-
-                    Container(
-                      width: 1,
-                      height: 100,
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                      ),
-                      color: Colors.white24,
+                    const SizedBox(
+                      height: 24,
                     ),
 
-                    // ===================================
-                    // YEARLY RANK
-                    // ===================================
+                    // -----------------------------------------
+                    // Average + Rank
+                    // -----------------------------------------
 
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(
-                                0.15,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.emoji_events_outlined,
-                              color: Colors.white,
-                              size: 23,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: yearlyTopSummaryItem(
+                            title: 'average_year'.tr,
+                            value: finalAverage.toStringAsFixed(
+                              2,
                             ),
                           ),
-                          const SizedBox(
-                            height: 12,
-                          ),
-                          Text(
-                            'rank'.tr,
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 6,
-                          ),
-                          controller.isYearRankLoading.value
-                              ? const SizedBox(
-                                  width: 25,
-                                  height: 25,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  rank,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30,
-                                  ),
+                        ),
+
+                        Container(
+                          width: 1,
+                          height: 62,
+                          color: Colors.white24,
+                        ),
+
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                'rank'.tr,
+                                textAlign: TextAlign.center,
+                                style: AppTextStyles.bodyLarge.copyWith(
+                                  color: Colors.white70,
                                 ),
-                        ],
-                      ),
+                              ),
+                              const SizedBox(
+                                height: 7,
+                              ),
+                              controller.isYearRankLoading.value
+                                  ? const SizedBox(
+                                      width: 26,
+                                      height: 26,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(
+                                      rank,
+                                      style: AppTextStyles.titleLarge.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 25,
+                                      ),
+                                    ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1045,9 +1030,9 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                 height: 26,
               ),
 
-              // =========================================
-              // SEMESTER RESULTS TITLE
-              // =========================================
+              // ===============================================
+              // SECTION TITLE
+              // ===============================================
 
               Text(
                 'result_yearly'.tr,
@@ -1060,96 +1045,282 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                 height: 14,
               ),
 
-              // =========================================
+              // ===============================================
               // SEMESTER 1
-              // =========================================
+              // ===============================================
 
-              yearlySemesterCard(
+              yearlySemesterSummaryCard(
                 theme: theme,
                 semester: 1,
-                value: controller.semester1Result,
+                monthlyAverage: controller.semester1MonthlyAverage,
+                examAverage: controller.semester1ExamAverage,
+                semesterResult: controller.semester1Result,
               ),
 
               const SizedBox(
-                height: 12,
+                height: 14,
               ),
 
-              // =========================================
+              // ===============================================
               // SEMESTER 2
-              // =========================================
+              // ===============================================
 
-              yearlySemesterCard(
+              yearlySemesterSummaryCard(
                 theme: theme,
                 semester: 2,
-                value: controller.semester2Result,
+                monthlyAverage: controller.semester2MonthlyAverage,
+                examAverage: controller.semester2ExamAverage,
+                semesterResult: controller.semester2Result,
               ),
-
-              // =========================================
-              // TOTAL STUDENTS
-              // =========================================
             ],
           ),
         );
       },
     );
   }
+
   // ===========================================================
-  // YEARLY SEMESTER CARD
+  // YEARLY TOP SUMMARY ITEM
   // ===========================================================
 
-  Widget yearlySemesterCard({
+  Widget yearlyTopSummaryItem({
+    required String title,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodyLarge.copyWith(
+            color: Colors.white70,
+          ),
+        ),
+        const SizedBox(
+          height: 7,
+        ),
+        Text(
+          value,
+          style: AppTextStyles.titleLarge.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 25,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ===========================================================
+  // YEARLY SEMESTER SUMMARY CARD
+  // ===========================================================
+
+  Widget yearlySemesterSummaryCard({
     required ThemeData theme,
     required int semester,
-    required double value,
+    required double monthlyAverage,
+    required double examAverage,
+    required double semesterResult,
   }) {
     final String semesterName =
         semester == 1 ? 'semester 1'.tr : 'semester 2'.tr;
 
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(
-        17,
+        18,
       ),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(
-          17,
+          18,
         ),
         border: Border.all(
           color: theme.dividerColor.withOpacity(
             0.70,
           ),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withOpacity(
+              0.04,
+            ),
+            blurRadius: 12,
+            offset: const Offset(
+              0,
+              4,
+            ),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // -------------------------------------------
+          // Semester header
+          // -------------------------------------------
+
+          Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(
+                    0.10,
+                  ),
+                  borderRadius: BorderRadius.circular(
+                    13,
+                  ),
+                ),
+                child: Icon(
+                  Icons.school_outlined,
+                  color: theme.colorScheme.primary,
+                  size: 23,
+                ),
+              ),
+              const SizedBox(
+                width: 13,
+              ),
+              Expanded(
+                child: Text(
+                  semesterName,
+                  style: AppTextStyles.titleMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(
+            height: 18,
+          ),
+
+          Divider(
+            height: 1,
+            color: theme.dividerColor.withOpacity(
+              0.70,
+            ),
+          ),
+
+          const SizedBox(
+            height: 17,
+          ),
+
+          // -------------------------------------------
+          // Monthly average
+          // -------------------------------------------
+
+          yearlyResultRow(
+            theme: theme,
+            icon: Icons.calendar_month_outlined,
+            title: 'average_month'.tr,
+            value: monthlyAverage,
+          ),
+
+          const SizedBox(
+            height: 14,
+          ),
+
+          // -------------------------------------------
+          // Semester exam average
+          // -------------------------------------------
+
+          yearlyResultRow(
+            theme: theme,
+            icon: Icons.edit_note_rounded,
+            title: 'semester_exam_average'.tr,
+            value: examAverage,
+          ),
+
+          const SizedBox(
+            height: 14,
+          ),
+
+          // -------------------------------------------
+          // Final semester result
+          // -------------------------------------------
+
+          yearlyResultRow(
+            theme: theme,
+            icon: Icons.bar_chart_rounded,
+            title: 'semester_result'.tr,
+            value: semesterResult,
+            highlight: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ===========================================================
+  // YEARLY RESULT ROW
+  // ===========================================================
+
+  Widget yearlyResultRow({
+    required ThemeData theme,
+    required IconData icon,
+    required String title,
+    required double value,
+    bool highlight = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 12,
+      ),
+      decoration: BoxDecoration(
+        color: highlight
+            ? theme.colorScheme.primary.withOpacity(
+                0.07,
+              )
+            : theme.colorScheme.surfaceContainerHighest.withOpacity(
+                0.35,
+              ),
+        borderRadius: BorderRadius.circular(
+          14,
+        ),
       ),
       child: Row(
         children: [
           Container(
-            width: 45,
-            height: 45,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: theme.colorScheme.primary.withOpacity(
                 0.10,
               ),
               borderRadius: BorderRadius.circular(
-                12,
+                11,
               ),
             ),
             child: Icon(
-              Icons.school_outlined,
+              icon,
               color: theme.colorScheme.primary,
-              size: 22,
+              size: 20,
             ),
           ),
+
           const SizedBox(
-            width: 14,
+            width: 12,
           ),
+
           Expanded(
             child: Text(
-              semesterName,
-              style: AppTextStyles.titleMedium.copyWith(
-                fontWeight: FontWeight.bold,
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodyMedium.copyWith(
+                fontWeight:
+                    highlight ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
           ),
+
+          const SizedBox(
+            width: 10,
+          ),
+
           Text(
             value.toStringAsFixed(
               2,
@@ -1157,7 +1328,7 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
             style: AppTextStyles.titleMedium.copyWith(
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.bold,
-              fontSize: 19,
+              fontSize: highlight ? 19 : 17,
             ),
           ),
         ],
