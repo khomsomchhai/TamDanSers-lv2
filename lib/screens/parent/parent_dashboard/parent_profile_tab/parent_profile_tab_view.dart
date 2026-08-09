@@ -872,42 +872,38 @@ void _showFullImageViewer(
   // =====================================================
   // Parent information dialog
   // =====================================================
-
-  void _showParentAccountDialog(
-    BuildContext context,
-    dynamic user,
-    dynamic profile,
-  ) {
-    _showInformationDialog(
-      context: context,
-      icon:
-          PhosphorIconsRegular.userCircle,
-      title: 'parent_information'.tr,
-      subtitle:
-          'personal_profile_details'.tr,
-      rows: [
-        MapEntry(
-          'full_name'.tr,
-          _read(
-            () => user.fullName,
-          ),
+void _showParentAccountDialog(
+  BuildContext context,
+  dynamic user,
+  dynamic profile,
+) {
+  _showInformationDialog(
+    context: context,
+    icon: PhosphorIconsRegular.userCircle,
+    title: 'parent_information'.tr,
+    subtitle: 'personal_profile_details'.tr,
+    rows: [
+      MapEntry(
+        'full_name'.tr,
+        _read(
+          () => user.fullName,
         ),
-        MapEntry(
-          'email'.tr,
-          _read(
-            () => user.email,
-          ),
+      ),
+      MapEntry(
+        'email'.tr,
+        _read(
+          () => user.email,
         ),
-        MapEntry(
-          'phone_number'.tr,
-          _read(
-            () => profile.guardianPhone,
-          ),
+      ),
+      MapEntry(
+        'phone_number'.tr,
+        _read(
+          () => user.phone,
         ),
-      ],
-    );
-  }
-
+      ),
+    ],
+  );
+}
   // =====================================================
   // Children dialog
   // =====================================================
