@@ -11,6 +11,7 @@ import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_attendance_tab/parent_permission/parent_permission_view.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_dashboard_view.dart';
 import 'package:tamdansers_lv2/screens/student/ask_permission_screen/ask_permission_screen_view.dart';
+import 'package:tamdansers_lv2/screens/student/attendance_scan/attendance_scan_view.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
 import 'package:tamdansers_lv2/screens/student/result_screen/result_screen_view.dart';
 import 'package:tamdansers_lv2/screens/student/schedule_screen/schedule_screen_view.dart';
@@ -91,6 +92,12 @@ class AppPages {
         page: () => HomeworkView(),
         binding: HomeworkViewBinding(),
         transition: Transition.rightToLeft),
+
+    GetPage(
+      name: AppRoutes.attendanceScan,
+      page: () => const AttendanceScanView(),
+      binding: AttendanceScanBinding(),
+    ),
     ////////////////////////////////
     //Parent
     GetPage(
@@ -105,12 +112,10 @@ class AppPages {
       transition: Transition.rightToLeft,
     ),
     GetPage(
-  name: AppRoutes.parentPermission,
-  page: () =>
-      const ParentPermissionView(),
-  binding:
-      ParentPermissionBinding(),
-),
+      name: AppRoutes.parentPermission,
+      page: () => const ParentPermissionView(),
+      binding: ParentPermissionBinding(),
+    ),
 
     //Notification
     GetPage(
