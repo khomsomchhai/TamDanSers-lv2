@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 import 'package:tamdansers_lv2/firebase_options.dart';
 import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
@@ -37,7 +36,7 @@ Future<void> firebaseMessagingBackgroundHandler(
 
 Future<void> setupLocalNotifications() async {
   const androidSettings =
-      AndroidInitializationSettings('ic_notification');
+      AndroidInitializationSettings('ic_launcher_foreground');
 
   const iosSettings = DarwinInitializationSettings(
     requestAlertPermission: true,
@@ -176,10 +175,9 @@ Future<void> setupFCM() async {
           priority: Priority.max,
           playSound: true,
           enableVibration: true,
-          icon: 'ic_notification',
-          color: AppColors.primary,
+          icon: 'ic_launcher_foreground',
           largeIcon: DrawableResourceAndroidBitmap(
-            '@mipmap/launcher_icon',
+            'ic_launcher_foreground',
           ),
         ),
             iOS: const DarwinNotificationDetails(
