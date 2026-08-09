@@ -40,9 +40,16 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
 
   String _getLocalizedScore(String score) {
     final isKm = Get.locale?.languageCode == 'km';
-    if (!isKm) return score;
-    if (score.toLowerCase() == 'pending') return 'រង់ចាំកែ';
-    if (score.toLowerCase() == 'completed') return 'បានបញ្ចប់';
+    final s = score.toLowerCase().trim();
+    if (s == 'pending') {
+      return isKm ? 'មិនទាន់ផ្ញើ' : 'Not Submitted';
+    }
+    if (s == 'submitted') {
+      return isKm ? 'រង់ចាំកែ' : 'Submitted';
+    }
+    if (s == 'completed') {
+      return isKm ? 'បានបញ្ចប់' : 'Completed';
+    }
     return score;
   }
 
@@ -123,60 +130,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
-              // Student Selector Pill
-              Obx(() {
-                if (controller.students.length <= 1) {
-                  return const SizedBox.shrink();
-                }
-
-                return Container(
-                  height: 38,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[850] : AppColors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      )
-                    ],
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<Map<String, dynamic>>(
-                      value: controller.selectedChild.value,
-                      icon: const Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
-                      dropdownColor:
-                          isDarkMode ? Colors.grey[850] : AppColors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      items: controller.students.map((student) {
-                        return DropdownMenuItem<Map<String, dynamic>>(
-                          value: student,
-                          child: Text(
-                            student['student_name']?.toString() ?? '',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color:
-                                  isDarkMode ? AppColors.white : AppColors.dark,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (child) {
-                        if (child != null) {
-                          controller.selectChild(child);
-                        }
-                      },
-                    ),
-                  ),
-                );
-              }),
             ],
           ),
 

@@ -344,9 +344,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
                   children: [
                     Text(
                       'no_account'.tr,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.hintColor,
-                      ),
+                      style: theme.textTheme.bodyLarge
                     ),
                     const SizedBox(width: 8),
                     Bounceable(

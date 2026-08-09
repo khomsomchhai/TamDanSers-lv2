@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-
 import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
@@ -954,18 +953,9 @@ class ParentProfileTabViewController extends GetxController {
   void logout() {
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Padding(
-          padding:
-              const EdgeInsets.fromLTRB(
-            20,
-            20,
-            20,
-            16,
-          ),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -975,56 +965,24 @@ class ParentProfileTabViewController extends GetxController {
                     width: 46,
                     height: 46,
                     decoration: BoxDecoration(
-                      color: Get
-                          .theme.colorScheme.error
-                          .withValues(
-                            alpha: 0.12,
-                          ),
-                      borderRadius:
-                          BorderRadius.circular(
-                        14,
-                      ),
+                      color: Get.theme.colorScheme.error.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
                       PhosphorIconsRegular.signOut,
-                      color: Get
-                          .theme.colorScheme.error,
+                      color: Get.theme.colorScheme.error,
                       size: 22,
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
                   Expanded(
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'logout_action'.tr,
-                          style: Get
-                              .textTheme.titleMedium
-                              ?.copyWith(
-                            fontWeight:
-                                FontWeight.w700,
-                          ),
-                        ),
-
-                        const SizedBox(height: 2),
-
-                        Text(
-                          'sign_out_account'.tr,
-                          style: Get
-                              .textTheme.bodySmall
-                              ?.copyWith(
-                            color: Get
-                                .theme
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(
-                                  alpha: 0.70,
-                                ),
+                          style: Get.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
@@ -1032,60 +990,34 @@ class ParentProfileTabViewController extends GetxController {
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
-
               Text(
                 'are_sure_logout'.tr,
                 textAlign: TextAlign.center,
-                style: Get
-                    .textTheme.bodyMedium
-                    ?.copyWith(
-                  color: Get
-                      .theme
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(
-                        alpha: 0.70,
-                      ),
-                ),
+                style: Get.textTheme.bodyMedium?.copyWith(color: Get.theme.textTheme.bodySmall?.color?.withOpacity(0.7)),
               ),
-
               const SizedBox(height: 16),
-
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: Get.back,
-                      style:
-                          OutlinedButton.styleFrom(
-                        padding:
-                            const EdgeInsets.symmetric(
-                          vertical: 12,
-                        ),
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            12,
-                          ),
-                        ),
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Get.theme.dividerColor),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       child: Text(
                         'no'.tr,
+                        style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 10),
-
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         userController.clearUser();
-
                         linkedChildren.clear();
                         pickedImagePath.value = null;
 
@@ -1096,30 +1028,15 @@ class ParentProfileTabViewController extends GetxController {
                           AppRoutes.loginScreen,
                         );
                       },
-                      style:
-                          ElevatedButton.styleFrom(
-                        backgroundColor: Get
-                            .theme
-                            .colorScheme
-                            .error,
-                        foregroundColor: Get
-                            .theme
-                            .colorScheme
-                            .onError,
-                        padding:
-                            const EdgeInsets.symmetric(
-                          vertical: 12,
-                        ),
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(
-                            12,
-                          ),
-                        ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Get.theme.colorScheme.error,
+                        foregroundColor: Get.theme.colorScheme.onError,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       child: Text(
                         'yes'.tr,
+                        style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: Get.theme.colorScheme.onError),
                       ),
                     ),
                   ),
@@ -1129,7 +1046,7 @@ class ParentProfileTabViewController extends GetxController {
           ),
         ),
       ),
-      barrierDismissible: true,
+      barrierDismissible: true
     );
   }
 

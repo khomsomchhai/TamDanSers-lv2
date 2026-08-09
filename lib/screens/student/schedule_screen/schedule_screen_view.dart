@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
+import 'package:tamdansers_lv2/app/themes/skeleton_theme.dart';
 import 'package:tamdansers_lv2/core/api/services/schedule_api.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/subject_ui.dart';
@@ -195,7 +195,7 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                                         : theme.textTheme.bodyLarge?.color?.withOpacity(0.75),
                                   ),
                                   child: Text(
-                                    controller.days[index],
+                                    controller.dayLabels[index].tr,
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -355,8 +355,8 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: AppColors.skeletonBaseColor,
-          highlightColor: AppColors.skeletonHighlightColor,
+          baseColor: Get.theme.skeletonBaseColor,
+          highlightColor: Get.theme.skeletonHighlightColor,
           child: Container(
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),

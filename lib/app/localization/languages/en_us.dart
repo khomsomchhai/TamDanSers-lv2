@@ -80,13 +80,19 @@ Map<String, String> enUs = {
   'create_parent_account': 'Create parent account',
   'create_parent_password': 'Set up your parent password',
   'create_password_description':
-      'Create a password so you can access the parent account for your child.',
+      'Create a password so you can access the parent account.',
   'link_account_child':
       'Link your account to your child using their student ID.',
   'parent_dashboard': 'Parent Dashboard',
   'parent_dashboard_description':
       'Monitor your child’s academic life, attendance, and school updates from one place.',
   'your_child': 'Your Child',
+  'monday': 'Mon',
+  'tuesday': 'Tue',
+  'wednesday': 'Wed',
+  'thursday': 'Thu',
+  'friday': 'Fri',
+  'saturday': 'Sat',
   'morning': 'Morning',
   'afternoon': 'Afternoon',
   'Homework Details' : 'Homework Details',
@@ -170,7 +176,7 @@ Map<String, String> enUs = {
   'change_app_language': 'Change app language',
   'faq': 'FAQ',
   'read_frequently_asked_questions': 'Read frequently asked questions',
-  'legal_section': 'LEGAL',
+  'account_section': 'ACCOUNT',
   'logout_action': 'Logout',
   'sign_out_account': 'Sign out of your account',
   'parent_account': 'Parent account',
@@ -349,4 +355,9 @@ Map<String, String> enUs = {
 
   //parent
   'hello_parent': 'Hello, Guardian!',
+  'parent_information' : 'Parent Information',
+  'view_your_information' : 'View your information',
+  'children_information' : 'Children Information',
+  'view_linked_children' : 'View linked children',
+  'phone_number' : 'Phone number',
 };

@@ -32,3 +32,15 @@ class SkeletonTheme extends ThemeExtension<SkeletonTheme> {
     );
   }
 }
+
+extension SkeletonThemeData on ThemeData {
+  Color get skeletonBaseColor {
+    final theme = extension<SkeletonTheme>();
+    return theme!.baseColor;
+  }
+
+  Color get skeletonHighlightColor {
+    final theme = extension<SkeletonTheme>();
+    return theme!.highlightColor;
+  }
+}

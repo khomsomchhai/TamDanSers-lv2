@@ -18,6 +18,15 @@ class ScheduleScreenViewController extends GetxController
     'Sat',
   ];
 
+  final dayLabels = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+  ];
+
   final Map<String, String> fullDayNames = {
     'Mon': 'Monday',
     'Tue': 'Tuesday',

@@ -17,8 +17,7 @@ import 'package:tamdansers_lv2/screens/parent/parent_dashboard/'
 part 'parent_permission_binding.dart';
 part 'parent_permission_controller.dart';
 
-class ParentPermissionView
-    extends GetView<ParentPermissionController> {
+class ParentPermissionView extends GetView<ParentPermissionController> {
   const ParentPermissionView({
     super.key,
   });
@@ -278,19 +277,17 @@ class ParentPermissionView
             initialValue: controller.selectedRequestType.value,
             isExpanded: true,
             style: _dropdownTextStyle(),
-            items: controller.requestTypes.map(
-              (type) {
-                return DropdownMenuItem<String>(
-                  value: type,
-                  child: Text(
-                    controller.requestTypeLabel(type),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: _dropdownTextStyle(),
-                  ),
-                );
-              },
-            ).toList(),
+            items: controller.requestTypes.map((type) {
+              return DropdownMenuItem<String>(
+                value: type,
+                child: Text(
+                  controller.requestTypeLabel(type),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _dropdownTextStyle(),
+                ),
+              );
+            }).toList(),
             onChanged: (value) {
               if (value != null) {
                 controller.changeRequestType(value);
@@ -310,21 +307,75 @@ class ParentPermissionView
     );
   }
 
+  // SCHEDULE FIELD WITH MON-SAT DAY FILTER BAR & CLEAN TIME DISPLAY
   Widget _buildScheduleField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildFieldLabel('ask_permission_subject'.tr),
-        const SizedBox(height: 7),
+        const SizedBox(height: 8),
+
+        // MON - SAT DAY SELECTION BAR
         Obx(() {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: controller.days.map((day) {
+                final isSelected = controller.selectedDay.value == day;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: InkWell(
+                    onTap: () {
+                      controller.selectedDay.value = day;
+                      controller.selectedScheduleId.value = null;
+                    },
+                    borderRadius: BorderRadius.circular(10),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.lightBackground,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color:
+                              isSelected ? AppColors.primary : AppColors.border,
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        day,
+                        style: TextStyle(
+                          color: isSelected ? AppColors.white : AppColors.dark,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.w500,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        }),
+
+        const SizedBox(height: 10),
+
+        // FILTERED SCHEDULE DROPDOWN
+        Obx(() {
+          final scheduleList = controller.filteredSchedules;
           final selectedId = controller.selectedScheduleId.value;
-          final hasSelected = controller.schedules.any(
-            (schedule) =>
-                controller.parseId(schedule['id']) == selectedId,
+          final hasSelected = scheduleList.any(
+            (schedule) => controller.parseId(schedule['id']) == selectedId,
           );
 
           return DropdownButtonFormField<int>(
-            key: ValueKey(selectedId),
+            key: ValueKey('${controller.selectedDay.value}_$selectedId'),
             initialValue: hasSelected ? selectedId : null,
             isExpanded: true,
             style: _dropdownTextStyle(),
@@ -332,26 +383,21 @@ class ParentPermissionView
               'ask_permission_select_subject'.tr,
               style: _hintTextStyle(),
             ),
-            items: controller.schedules
-                .map(
-                  (schedule) {
-                    final id = controller.parseId(schedule['id']);
+            items: scheduleList
+                .map((schedule) {
+                  final id = controller.parseId(schedule['id']);
+                  if (id == null) return null;
 
-                    if (id == null) {
-                      return null;
-                    }
-
-                    return DropdownMenuItem<int>(
-                      value: id,
-                      child: Text(
-                        controller.scheduleLabel(schedule),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: _dropdownTextStyle(),
-                      ),
-                    );
-                  },
-                )
+                  return DropdownMenuItem<int>(
+                    value: id,
+                    child: Text(
+                      controller.scheduleLabel(schedule),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _dropdownTextStyle(),
+                    ),
+                  );
+                })
                 .whereType<DropdownMenuItem<int>>()
                 .toList(),
             onChanged: (value) {
@@ -390,17 +436,15 @@ class ParentPermissionView
               'ask_permission_select_permission_type'.tr,
               style: _hintTextStyle(),
             ),
-            items: controller.permissionTypes.map(
-              (type) {
-                return DropdownMenuItem<String>(
-                  value: type,
-                  child: Text(
-                    controller.permissionTypeLabel(type),
-                    style: _dropdownTextStyle(),
-                  ),
-                );
-              },
-            ).toList(),
+            items: controller.permissionTypes.map((type) {
+              return DropdownMenuItem<String>(
+                value: type,
+                child: Text(
+                  controller.permissionTypeLabel(type),
+                  style: _dropdownTextStyle(),
+                ),
+              );
+            }).toList(),
             onChanged: (value) {
               controller.selectedPermissionType.value = value ?? '';
             },
@@ -569,8 +613,7 @@ class ParentPermissionView
               request.subjectName.isNotEmpty)
             _historyRow(
               icon: Icons.menu_book_rounded,
-              label:
-                  '${'ask_permission_subject'.tr}: ${request.subjectName}',
+              label: '${'ask_permission_subject'.tr}: ${request.subjectName}',
             ),
           _historyRow(
             icon: Icons.label_outline_rounded,
@@ -594,8 +637,7 @@ class ParentPermissionView
   }
 
   Widget _buildPermissionActions(PermissionModel request) {
-    if (request.attendanceSaved ||
-        (!request.canEdit && !request.canDelete)) {
+    if (request.attendanceSaved || (!request.canEdit && !request.canDelete)) {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(
@@ -643,7 +685,7 @@ class ParentPermissionView
                 color: AppColors.primary,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-              )
+              ),
             ),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(42),

@@ -96,9 +96,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     if (submission == null) {
       Get.snackbar(
         _isKhmer ? 'កំហុស' : 'Error',
-        _isKhmer
-            ? 'រកមិនឃើញកិច្ចការដែលបានប្រគល់'
-            : 'Submission not found',
+        _isKhmer ? 'រកមិនឃើញកិច្ចការដែលបានប្រគល់' : 'Submission not found',
       );
       return;
     }
@@ -145,37 +143,36 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     }
   }
 
-Future<void> _pickPdf() async {
-  try {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['pdf'],
-      allowMultiple: true,
-    );
+  Future<void> _pickPdf() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['pdf'],
+        allowMultiple: true,
+      );
 
-    if (result == null) return;
+      if (result == null) return;
 
-    final files = result.files
-        .where((file) => file.path != null)
-        .map((file) => XFile(file.path!))
-        .toList();
+      final files = result.files
+          .where((file) => file.path != null)
+          .map((file) => XFile(file.path!))
+          .toList();
 
-    if (files.isEmpty) return;
+      if (files.isEmpty) return;
 
-    setState(() {
-      _selectedFiles.addAll(files);
-    });
-  } catch (error) {
-    Get.snackbar(
-      Get.locale?.languageCode == 'km'
-          ? 'កំហុស'
-          : 'Error',
-      Get.locale?.languageCode == 'km'
-          ? 'មិនអាចជ្រើសរើស PDF បានទេ៖ $error'
-          : 'Failed to pick PDF: $error',
-    );
+      setState(() {
+        _selectedFiles.addAll(files);
+      });
+    } catch (error) {
+      Get.snackbar(
+        Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
+        Get.locale?.languageCode == 'km'
+            ? 'មិនអាចជ្រើសរើស PDF បានទេ៖ $error'
+            : 'Failed to pick PDF: $error',
+      );
+    }
   }
-}
+
   void _showUploadSourceSheet() {
     Get.bottomSheet(
       Container(
@@ -558,9 +555,8 @@ Future<void> _pickPdf() async {
             Text(
               item.description,
               style: TextStyle(
-                color: isLight
-                    ? const Color(0xff475569)
-                    : const Color(0xff94A3B8),
+                color:
+                    isLight ? const Color(0xff475569) : const Color(0xff94A3B8),
                 fontSize: 13.5,
                 height: 1.45,
               ),

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:shimmer/shimmer.dart';
-
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/'
@@ -111,7 +110,7 @@ class ParentProfileTabView
                     const SizedBox(height: 24),
 
                     _buildSectionTitle(
-                      'legal_section'.tr,
+                      'account_section'.tr,
                     ),
 
                     const SizedBox(height: 12),
@@ -901,45 +900,8 @@ void _showFullImageViewer(
         ),
         MapEntry(
           'phone_number'.tr,
-          _firstNotEmpty(
-            [
-              _read(
-                () => profile.phone,
-              ),
-              _read(
-                () => profile.phoneNumber,
-              ),
-              _read(
-                () =>
-                    profile.guardianPhone,
-              ),
-            ],
-          ),
-        ),
-        MapEntry(
-          'gender'.tr,
           _read(
-            () => profile.gender,
-          ),
-        ),
-        MapEntry(
-          'relationship'.tr,
-          _firstNotEmpty(
-            [
-              _read(
-                () =>
-                    profile.relationship,
-              ),
-              _read(
-                () => profile.relation,
-              ),
-            ],
-          ),
-        ),
-        MapEntry(
-          'address'.tr,
-          _read(
-            () => profile.address,
+            () => profile.guardianPhone,
           ),
         ),
       ],
@@ -1083,6 +1045,9 @@ void _showFullImageViewer(
                       ),
                       child: Text(
                         'close_button'.tr,
+                        style: Get.textTheme.bodyLarge!.copyWith(
+                          color: Get.theme.colorScheme.onPrimary
+                        ),
                       ),
                     ),
                   ),
@@ -1587,6 +1552,9 @@ void _showFullImageViewer(
                     ),
                     child: Text(
                       'close_button'.tr,
+                      style: Get.textTheme.bodyLarge!.copyWith(
+                        color: Get.theme.colorScheme.onPrimary
+                      ),
                     ),
                   ),
                 ),
@@ -1642,23 +1610,6 @@ void _showFullImageViewer(
                 ),
               ),
 
-              const SizedBox(height: 2),
-
-              Text(
-                subtitle,
-                style: Get
-                    .textTheme.bodySmall
-                    ?.copyWith(
-                  color: Get
-                      .theme
-                      .textTheme
-                      .bodySmall
-                      ?.color
-                      ?.withValues(
-                        alpha: 0.70,
-                      ),
-                ),
-              ),
             ],
           ),
         ),
@@ -1722,7 +1673,6 @@ void _showFullImageViewer(
       style:
           Get.textTheme.titleSmall?.copyWith(
         fontWeight: FontWeight.w700,
-        letterSpacing: 1.1,
         color:
             Get.theme.colorScheme.primary,
       ),

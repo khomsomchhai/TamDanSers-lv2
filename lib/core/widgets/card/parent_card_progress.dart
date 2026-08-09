@@ -15,20 +15,12 @@ class ParentCardProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
-  return _buildShimmerCards();
-}
+        return _buildShimmerCards();
+      }
 
-      final dashboard = controller.dashboard.value;
-      final rankData = dashboard?.rank;
-
-      final totalScore =
-          controller.formatNumber(rankData?.totalScore);
-
-      final rank =
-          rankData?.rank?.toString() ?? '-';
-
-      final average =
-          controller.formatNumber(rankData?.average);
+      final totalScore = controller.displayTotalScore;
+      final rank = controller.displayRank;
+      final average = controller.displayAverage;
 
       return Row(
         children: [
@@ -39,20 +31,15 @@ class ParentCardProgress extends StatelessWidget {
               icon: Icons.stars_rounded,
             ),
           ),
-
           const SizedBox(width: 10),
-
           Expanded(
             child: _buildCard(
               title: 'rank'.tr,
-              
               value: rank,
               icon: Icons.emoji_events_rounded,
             ),
           ),
-
           const SizedBox(width: 10),
-
           Expanded(
             child: _buildCard(
               title: 'average'.tr,
@@ -64,70 +51,65 @@ class ParentCardProgress extends StatelessWidget {
       );
     });
   }
-Widget _buildShimmerCards() {
-  return Row(
-    children: [
-      Expanded(child: _buildShimmerCard()),
-      const SizedBox(width: 10),
-      Expanded(child: _buildShimmerCard()),
-      const SizedBox(width: 10),
-      Expanded(child: _buildShimmerCard()),
-    ],
-  );
-}
 
-Widget _buildShimmerCard() {
-  return Shimmer.fromColors(
-    baseColor: Colors.white.withOpacity(0.15),
-    highlightColor: Colors.white.withOpacity(0.35),
-    child: Container(
-      height: 118,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 6,
-        vertical: 12,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
+  Widget _buildShimmerCards() {
+    return Row(
+      children: [
+        Expanded(child: _buildShimmerCard()),
+        const SizedBox(width: 10),
+        Expanded(child: _buildShimmerCard()),
+        const SizedBox(width: 10),
+        Expanded(child: _buildShimmerCard()),
+      ],
+    );
+  }
+
+  Widget _buildShimmerCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.white.withValues(alpha: 0.15),
+      highlightColor: Colors.white.withValues(alpha: 0.35),
+      child: Container(
+        height: 118,
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-          ),
-
-          const SizedBox(height: 10),
-
-          Container(
-            width: 60,
-            height: 12,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
+            const SizedBox(height: 10),
+            Container(
+              width: 60,
+              height: 12,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(6),
+              ),
             ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Container(
-            width: 40,
-            height: 24,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 24,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildCard({
     required String title,
     required String value,
@@ -155,9 +137,7 @@ Widget _buildShimmerCard() {
             color: AppColors.white,
             size: 22,
           ),
-
           const SizedBox(height: 7),
-
           Text(
             title,
             maxLines: 1,
@@ -165,12 +145,9 @@ Widget _buildShimmerCard() {
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyLarge.copyWith(
               color: AppColors.white.withValues(alpha: 0.82),
-              
             ),
           ),
-
           const SizedBox(height: 6),
-
           Text(
             value,
             maxLines: 1,
