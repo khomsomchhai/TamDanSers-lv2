@@ -213,30 +213,3 @@ class _FieldLabel extends StatelessWidget {
     );
   }
 }
-
-class _PrivacyNotice extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(
-          PhosphorIconsRegular.shieldCheck,
-          color: theme.colorScheme.primary,
-          size: 19,
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            'privacy_notice'.tr,
-            style: Get.textTheme.bodySmall?.copyWith(
-              color: theme.hintColor,
-              height: 1.4,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
