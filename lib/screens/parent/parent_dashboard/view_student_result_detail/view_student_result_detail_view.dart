@@ -109,6 +109,8 @@ class _ViewStudentResultDetailViewState
             );
           }
 
+          final isKm = Get.locale?.languageCode == 'km';
+
           // ==================================================
           // ERROR / EMPTY
           // ==================================================
@@ -135,7 +137,7 @@ class _ViewStudentResultDetailViewState
                   ),
                   Center(
                     child: Text(
-                      'មិនមានលទ្ធផលសិក្សា',
+                      isKm ? 'មិនមានលទ្ធផលសិក្សា' : 'No Academic Results',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
@@ -148,7 +150,9 @@ class _ViewStudentResultDetailViewState
                   ),
                   Center(
                     child: Text(
-                      'អូសចុះក្រោមដើម្បីផ្ទុកឡើងវិញ',
+                      isKm
+                          ? 'អូសចុះក្រោមដើម្បីផ្ទុកឡើងវិញ'
+                          : 'Pull down to refresh',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade500,
@@ -201,11 +205,13 @@ class _ViewStudentResultDetailViewState
       ),
     );
   }
+
 // ============================================================
   // BLUE 3-CARD SUMMARY ROW
   // ============================================================
 
   Widget _buildSummaryCardsRow() {
+    final isKm = Get.locale?.languageCode == 'km';
     final double totalScore = controller.totalScore.value;
     final int rank = controller.rank.value;
     final double average = controller.average.value;
@@ -224,7 +230,7 @@ class _ViewStudentResultDetailViewState
           Expanded(
             child: _buildSummaryCardItem(
               icon: Icons.star_rounded,
-              title: 'ពិន្ទុសរុប',
+              title: isKm ? 'ពិន្ទុសរុប' : 'Total Score',
               value: controller.formatNumber(totalScore),
             ),
           ),
@@ -237,7 +243,7 @@ class _ViewStudentResultDetailViewState
           Expanded(
             child: _buildSummaryCardItem(
               icon: Icons.emoji_events_rounded,
-              title: 'ចំណាត់ថ្នាក់',
+              title: isKm ? 'ចំណាត់ថ្នាក់' : 'Rank',
               value: rank > 0 ? '$rank' : '-',
             ),
           ),
@@ -250,7 +256,7 @@ class _ViewStudentResultDetailViewState
           Expanded(
             child: _buildSummaryCardItem(
               icon: Icons.bar_chart_rounded,
-              title: 'មធ្យមភាគ',
+              title: isKm ? 'មធ្យមភាគ' : 'Average',
               value: controller.formatNumber(average),
             ),
           ),

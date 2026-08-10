@@ -528,11 +528,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
       final totalDays = attendanceController.totalDays;
 
-      final presentDays = attendanceController.presentDays.value;
-
-      final absentDays = attendanceController.absentDays.value;
-
-      final permissionDays = attendanceController.permissionDays.value;
+      final presentSubjects = attendanceController.presentSubjects.value;
+      final absentSubjects = attendanceController.absentSubjects.value;
+      final permissionSubjects = attendanceController.permissionSubjects.value;
 
       final isKm = Get.locale?.languageCode == 'km';
 
@@ -703,8 +701,10 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
               Expanded(
                 child: _buildHomeStatSquareCard(
                   mainTitle: isKm ? 'វត្តមាន' : 'Present',
-                  count: presentDays,
-                  unit: isKm ? 'ថ្ងៃ' : (presentDays == 1 ? 'Day' : 'Days'),
+                  count: presentSubjects,
+                  unit: isKm
+                      ? 'មុខវិជ្ជា'
+                      : (presentSubjects == 1 ? 'Subject' : 'Subjects'),
                   icon: Icons.check_circle_rounded,
                   color: const Color(0xFF10B981),
                   bgColor: const Color(0xFFF0FDF4),
@@ -715,8 +715,10 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
               Expanded(
                 child: _buildHomeStatSquareCard(
                   mainTitle: isKm ? 'អវត្តមាន' : 'Absent',
-                  count: absentDays,
-                  unit: isKm ? 'ថ្ងៃ' : (absentDays == 1 ? 'Day' : 'Days'),
+                  count: absentSubjects,
+                  unit: isKm
+                      ? 'មុខវិជ្ជា'
+                      : (absentSubjects == 1 ? 'Subject' : 'Subjects'),
                   icon: Icons.cancel_rounded,
                   color: const Color(0xFFEF4444),
                   bgColor: const Color(0xFFFEF2F2),
@@ -727,8 +729,10 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
               Expanded(
                 child: _buildHomeStatSquareCard(
                   mainTitle: isKm ? 'សុំច្បាប់' : 'Leave',
-                  count: permissionDays,
-                  unit: isKm ? 'ថ្ងៃ' : (permissionDays == 1 ? 'Day' : 'Days'),
+                  count: permissionSubjects,
+                  unit: isKm
+                      ? 'មុខវិជ្ជា'
+                      : (permissionSubjects == 1 ? 'Subject' : 'Subjects'),
                   icon: Icons.assignment_rounded,
                   color: const Color(0xFFF59E0B),
                   bgColor: const Color(0xFFFFFBEB),
@@ -2121,12 +2125,81 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
     );
   }
 
+  String _translatePointItem(String item, bool isKm) {
+    if (isKm) return item;
+    final map = {
+      'ខិតខំបន្ថែម': 'Extra Effort',
+      'គណិតវិទ្យា': 'Mathematics',
+      'ភាសាខ្មែរ': 'Khmer',
+      'ខ្មែរ': 'Khmer',
+      'រូបវិទ្យា': 'Physics',
+      'គីមីវិទ្យា': 'Chemistry',
+      'ជីវវិទ្យា': 'Biology',
+      'ផែនដីវិទ្យា': 'Earth Science',
+      'ប្រវត្តិវិទ្យា': 'History',
+      'ភូមិវិទ្យា': 'Geography',
+      'ភាសាអង់គ្លេស': 'English',
+      'សីលធម៌ ពលរដ្ឋ': 'Civics & Morals',
+      'គ្មាន': 'None',
+      'គ្មានចំណុចខ្លាំង': 'None',
+      'គ្មានចំណុចត្រូវកែលម្អ': 'None',
+      'វត្តមានល្អ': 'Good Attendance',
+      'វត្តមាន': 'Attendance',
+      'ពិន្ទុខ្ពស់': 'High Score',
+      'ការចូលរួមល្អ': 'Good Participation',
+    };
+
+    final trimmed = item.trim();
+    if (map.containsKey(trimmed)) {
+      return map[trimmed]!;
+    }
+
+    var result = item;
+    map.forEach((key, val) {
+      result = result.replaceAll(key, val);
+    });
+    return result;
+  }
+
+  String _translateResultType(String type, bool isKm) {
+    if (isKm) return type;
+    if (type == 'ប្រចាំខែ') return 'Monthly';
+    if (type.contains('ឆមាស')) return 'Semester';
+    if (type == 'ប្រចាំឆ្នាំ') return 'Yearly';
+    return type;
+  }
+
+  String _translateSubResult(String sub, bool isKm) {
+    if (isKm) return sub;
+    final monthsKmMap = {
+      'ខែមករា': 'January', 'មករា': 'January',
+      'ខែកុម្ភៈ': 'February', 'កុម្ភៈ': 'February',
+      'ខែមីនា': 'March', 'មីនា': 'March',
+      'ខែមេសា': 'April', 'មេសា': 'April',
+      'ខែឧសភា': 'May', 'ឧសភា': 'May',
+      'ខែមិថុនា': 'June', 'មិថុនា': 'June',
+      'ខែកក្កដា': 'July', 'កក្កដា': 'July',
+      'ខែសីហា': 'August', 'សីហា': 'August',
+      'ខែកញ្ញា': 'September', 'កញ្ញា': 'September',
+      'ខែតុលា': 'October', 'តុលា': 'October',
+      'ខែវិច្ឆិកា': 'November', 'វិច្ឆិកា': 'November',
+      'ខែធ្នូ': 'December', 'ធ្នូ': 'December',
+    };
+    if (monthsKmMap.containsKey(sub)) {
+      return monthsKmMap[sub]!;
+    }
+    if (sub == 'ឆមាស ១') return 'Semester 1';
+    if (sub == 'ឆមាស ២') return 'Semester 2';
+    return sub;
+  }
+
 // =====================================================
 // ACADEMIC PROGRESS SECTION
 // WITH COLLAPSED CARD VIEW
 // =====================================================
   Widget _buildAcademicProgressSection() {
     return Obx(() {
+      final isKm = Get.locale?.languageCode == 'km';
       final isExpanded = controller.isAcademicProgressExpanded.value;
 
       return Column(
@@ -2139,7 +2212,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'លទ្ធផលសិក្សា',
+                isKm ? 'លទ្ធផលសិក្សា' : 'Academic Results',
                 style: AppTextStyles.titleSmall.copyWith(
                   color: AppColors.dark,
                   fontWeight: FontWeight.bold,
@@ -2158,7 +2231,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        isExpanded ? 'លាក់' : 'បង្ហាញ',
+                        isExpanded
+                            ? (isKm ? 'លាក់' : 'Hide')
+                            : (isKm ? 'បង្ហាញ' : 'Show'),
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
@@ -2203,9 +2278,12 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 // =====================================================
   Widget _buildCollapsedAcademicCard() {
     return Obx(() {
+      final isKm = Get.locale?.languageCode == 'km';
       final selectedType = controller.selectedResultType.value;
-
       final selectedSub = controller.selectedSubResult.value;
+
+      final typeStr = _translateResultType(selectedType, isKm);
+      final subStr = _translateSubResult(selectedSub, isKm);
 
       return InkWell(
         onTap: controller.toggleAcademicProgressExpanded,
@@ -2226,9 +2304,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
           ),
           child: Row(
             children: [
-              // =================================================
-              // ICON
-              // =================================================
               Container(
                 width: 42,
                 height: 42,
@@ -2247,15 +2322,12 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
               const SizedBox(width: 12),
 
-              // =================================================
-              // TITLE + FILTER
-              // =================================================
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'លទ្ធផលសិក្សា',
+                      isKm ? 'លទ្ធផលសិក្សា' : 'Academic Results',
                       style: AppTextStyles.titleMedium.copyWith(
                         color: AppColors.dark,
                         fontWeight: FontWeight.bold,
@@ -2264,8 +2336,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'របាយការណ៍សង្ខេប '
-                      '$selectedType • $selectedSub',
+                      isKm
+                          ? 'របាយការណ៍សង្ខេប $selectedType • $selectedSub'
+                          : 'Summary Report $typeStr • $subStr',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.hintColor,
                         fontSize: 12,
@@ -2293,9 +2366,12 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 // =====================================================
   Widget _buildAcademicResultCard() {
     return Obx(() {
+      final isKm = Get.locale?.languageCode == 'km';
       final selectedType = controller.selectedResultType.value;
-
       final selectedSub = controller.selectedSubResult.value;
+
+      final typeStr = _translateResultType(selectedType, isKm);
+      final subStr = _translateSubResult(selectedSub, isKm);
 
       return Container(
         width: double.infinity,
@@ -2314,9 +2390,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // =================================================
-            // HEADER
-            // =================================================
             Row(
               children: [
                 Container(
@@ -2340,7 +2413,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'លទ្ធផលសិក្សា',
+                        isKm ? 'លទ្ធផលសិក្សា' : 'Academic Results',
                         style: AppTextStyles.titleMedium.copyWith(
                           color: AppColors.dark,
                           fontWeight: FontWeight.bold,
@@ -2348,8 +2421,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                         ),
                       ),
                       Text(
-                        'របាយការណ៍សង្ខេប '
-                        '$selectedType • $selectedSub',
+                        isKm
+                            ? 'របាយការណ៍សង្ខេប $selectedType • $selectedSub'
+                            : 'Summary Report $typeStr • $subStr',
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.hintColor,
                           fontSize: 11.5,
@@ -2374,22 +2448,13 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
             const SizedBox(height: 16),
 
-            // =================================================
-            // SCORE GRAPH
-            // =================================================
             _buildScoreLevelGraphBox(),
 
             const SizedBox(height: 14),
 
-            // =================================================
-            // STRENGTHS + IMPROVEMENTS
-            // =================================================
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // =================================================
-                // STRENGTHS
-                // =================================================
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -2403,20 +2468,24 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.trending_up_rounded,
                               size: 16,
                               color: Color(0xFF16A34A),
                             ),
-                            SizedBox(width: 5),
-                            Text(
-                              'ចំណុចខ្លាំង',
-                              style: TextStyle(
-                                color: Color(0xFF16A34A),
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.bold,
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                isKm ? 'ចំណុចខ្លាំង' : 'Strengths',
+                                style: const TextStyle(
+                                  color: Color(0xFF16A34A),
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -2428,7 +2497,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                               bottom: 3,
                             ),
                             child: Text(
-                              '• $item',
+                              '• ${_translatePointItem(item, isKm)}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -2446,9 +2515,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
                 const SizedBox(width: 10),
 
-                // =================================================
-                // IMPROVEMENTS
-                // =================================================
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -2462,20 +2528,24 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.track_changes_rounded,
                               size: 16,
                               color: Color(0xFFD97706),
                             ),
-                            SizedBox(width: 5),
-                            Text(
-                              'ចំណុចត្រូវកែលម្អ',
-                              style: TextStyle(
-                                color: Color(0xFFD97706),
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.bold,
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                isKm ? 'ចំណុចត្រូវកែលម្អ' : 'Improvements',
+                                style: const TextStyle(
+                                  color: Color(0xFFD97706),
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -2487,7 +2557,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                               bottom: 3,
                             ),
                             child: Text(
-                              '• $item',
+                              '• ${_translatePointItem(item, isKm)}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -2507,9 +2577,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
             const SizedBox(height: 16),
 
-            // =================================================
-            // VIEW DETAIL BUTTON
-            // =================================================
             SizedBox(
               width: double.infinity,
               height: 44,
@@ -2527,7 +2594,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                   ),
                 ),
                 child: Text(
-                  'មើលរបាយការណ៍លម្អិត',
+                  isKm ? 'មើលរបាយការណ៍លម្អិត' : 'View Detailed Report',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,
@@ -2544,158 +2611,67 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
 // =====================================================
 // SCORE LEVEL GRAPH BOX
-//
-// IMPORTANT FIX:
-// Use selectedSubResult as the source of truth.
-//
-// Example:
-// selectedSubResult = "ខែធ្នូ"
-//
-// The graph becomes:
-//
-// កញ្ញា | តុលា | វិច្ឆិកា | ធ្នូ
-//                              ↑
-//                             39
-//
-// The graph does NOT use attendanceController.selectedMonth
-// anymore.
 // =====================================================
   Widget _buildScoreLevelGraphBox() {
+    final isKm = Get.locale?.languageCode == 'km';
     final type = controller.selectedResultType.value;
-
     final sub = controller.selectedSubResult.value;
-
     final averageScore = controller.displayAverage;
 
     List<Widget> items = [];
 
-    // =====================================================
-    // MONTHLY
-    // =====================================================
     if (type == 'ប្រចាំខែ') {
       const khmerMonths = [
-        'ខែមករា',
-        'ខែកុម្ភៈ',
-        'ខែមីនា',
-        'ខែមេសា',
-        'ខែឧសភា',
-        'ខែមិថុនា',
-        'ខែកក្កដា',
-        'ខែសីហា',
-        'ខែកញ្ញា',
-        'ខែតុលា',
-        'ខែវិច្ឆិកា',
-        'ខែធ្នូ',
+        'ខែមករា', 'ខែកុម្ភៈ', 'ខែមីនា', 'ខែមេសា', 'ខែឧសភា', 'ខែមិថុនា',
+        'ខែកក្កដា', 'ខែសីហា', 'ខែកញ្ញា', 'ខែតុលា', 'ខែវិច្ឆិកា', 'ខែធ្នូ',
       ];
-
       const khmerShortMonths = [
-        'មករា',
-        'កុម្ភៈ',
-        'មីនា',
-        'មេសា',
-        'ឧសភា',
-        'មិថុនា',
-        'កក្កដា',
-        'សីហា',
-        'កញ្ញា',
-        'តុលា',
-        'វិច្ឆិកា',
-        'ធ្នូ',
+        'មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា',
+        'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ',
+      ];
+      const englishShortMonths = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
       ];
 
-      // ===================================================
-      // FIND SELECTED MONTH FROM selectedSubResult
-      //
-      // Examples:
-      //
-      // "ខែធ្នូ"    -> 11
-      // "ខែសីហា"   -> 7
-      // "ខែមករា"   -> 0
-      // ===================================================
       int selectedIdx = khmerMonths.indexOf(sub);
-
-      // ===================================================
-      // FALLBACK
-      //
-      // In case selectedSubResult is already a short month:
-      //
-      // "ធ្នូ" -> 11
-      // "សីហា" -> 7
-      // ===================================================
       if (selectedIdx < 0) {
         selectedIdx = khmerShortMonths.indexOf(sub);
       }
-
-      // ===================================================
-      // FALLBACK FOR "ខែ" PREFIX
-      //
-      // Example:
-      // "ខែធ្នូ" -> "ធ្នូ"
-      // ===================================================
       if (selectedIdx < 0) {
         final cleanSub = sub.replaceAll('ខែ', '').trim();
-
         selectedIdx = khmerShortMonths.indexOf(cleanSub);
       }
-
-      // ===================================================
-      // FINAL FALLBACK
-      //
-      // If nothing matches, use current month.
-      // ===================================================
       if (selectedIdx < 0) {
         selectedIdx = DateTime.now().month - 1;
       }
-
-      // Make sure index is always valid.
       selectedIdx = selectedIdx.clamp(0, 11);
 
-      // ===================================================
-      // DISPLAY 4 MONTHS
-      //
-      // Example:
-      // selected = December
-      //
-      // កញ្ញា | តុលា | វិច្ឆិកា | ធ្នូ
-      //
-      // Example:
-      // selected = August
-      //
-      // ឧសភា | មិថុនា | កក្កដា | សីហា
-      // ===================================================
-      final displayShortMonths = [
-        khmerShortMonths[(selectedIdx - 3 + 12) % 12],
-        khmerShortMonths[(selectedIdx - 2 + 12) % 12],
-        khmerShortMonths[(selectedIdx - 1 + 12) % 12],
-        khmerShortMonths[selectedIdx],
+      final displayMonthIndices = [
+        (selectedIdx - 3 + 12) % 12,
+        (selectedIdx - 2 + 12) % 12,
+        (selectedIdx - 1 + 12) % 12,
+        selectedIdx,
       ];
 
-      // ===================================================
-      // BUILD GRAPH ITEMS
-      // ===================================================
-      items = displayShortMonths.map((month) {
-        final isSelected = month == khmerShortMonths[selectedIdx];
+      items = displayMonthIndices.map((idx) {
+        final monthLabel =
+            isKm ? khmerShortMonths[idx] : englishShortMonths[idx];
+        final isSelected = idx == selectedIdx;
 
         return _buildGraphItem(
-          month,
+          monthLabel,
           isSelected ? averageScore : '',
           isSelected,
         );
       }).toList();
-    }
-
-    // =====================================================
-    // SEMESTER
-    // =====================================================
-    else if (type.contains('ឆមាស')) {
-      const semesters = [
-        'ឆមាស ១',
-        'ឆមាស ២',
-      ];
+    } else if (type.contains('ឆមាស')) {
+      final semesters = isKm ? ['ឆមាស ១', 'ឆមាស ២'] : ['Sem 1', 'Sem 2'];
 
       items = semesters.map((semester) {
-        final isSelected =
-            sub.contains('២') ? semester == 'ឆមាស ២' : semester == 'ឆមាស ១';
+        final isSelected = sub.contains('២')
+            ? (semester == 'ឆមាស ២' || semester == 'Sem 2')
+            : (semester == 'ឆមាស ១' || semester == 'Sem 1');
 
         return _buildGraphItem(
           semester,
@@ -2703,13 +2679,10 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
           isSelected,
         );
       }).toList();
-    }
-
-    // =====================================================
-    // YEARLY
-    // =====================================================
-    else {
-      final currentYearLabel = 'ឆ្នាំ ${DateTime.now().year}';
+    } else {
+      final currentYearLabel = isKm
+          ? 'ឆ្នាំ ${DateTime.now().year}'
+          : 'Year ${DateTime.now().year}';
 
       items = [
         _buildGraphItem(
@@ -2720,9 +2693,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
       ];
     }
 
-    // =====================================================
-    // GRAPH CONTAINER
-    // =====================================================
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -2733,21 +2703,18 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // =================================================
-          // GRAPH HEADER
-          // =================================================
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'កម្រិតពិន្ទុមធ្យម',
+                isKm ? 'កម្រិតពិន្ទុមធ្យម' : 'Average Score Level',
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.hintColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
-                'មធ្យមភាគ: $averageScore',
+                isKm ? 'មធ្យមភាគ: $averageScore' : 'Average: $averageScore',
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
@@ -2758,9 +2725,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
           const SizedBox(height: 16),
 
-          // =================================================
-          // GRAPH ITEMS
-          // =================================================
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: items,

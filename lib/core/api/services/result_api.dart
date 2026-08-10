@@ -383,6 +383,7 @@ class ResultApi {
     required int studentId,
     String? type,
     dynamic filter,
+    int? semester,
   }) async {
     final List<String> queryParams = <String>[];
 
@@ -406,6 +407,12 @@ class ResultApi {
           'year=$filter',
         );
       }
+    }
+
+    if (semester != null && semester > 0) {
+      queryParams.add(
+        'semester=$semester',
+      );
     }
 
     String endpoint = '/parents/dashboard/$studentId';
@@ -657,13 +664,17 @@ class ResultApi {
             );
 
             final String key = result.subjectName.trim().toLowerCase();
-            final double maxScore = result.maxScore;
+            final double maxScore =
+                result.maxScore > 0 ? result.maxScore : 100.0;
 
-            if (key.isEmpty || maxScore <= 0) {
+            if (key.isEmpty) {
               continue;
             }
 
-            final double percentage = (result.totalScore / maxScore) * 100;
+            final double scoreValue =
+                result.score > 0 ? result.score : result.totalScore;
+
+            final double percentage = (scoreValue / maxScore) * 100;
 
             percentagesBySubject
                 .putIfAbsent(key, () => <double>[])

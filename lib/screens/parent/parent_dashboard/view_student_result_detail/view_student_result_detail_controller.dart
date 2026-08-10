@@ -244,8 +244,16 @@ class ViewStudentResultDetailController extends GetxController {
       // PARSE SUBJECT RESULTS
       // ========================================================
 
-      final List<SubjectResultDetailModel> parsedResults =
+      List<SubjectResultDetailModel> parsedResults =
           _parseSubjectResults(data);
+
+      if (parsedResults.isEmpty && filter.type == 'yearly') {
+        debugPrint(
+          'RESULT DETAIL: Yearly API returned no subjects, fetching semester details fallback...',
+        );
+
+        parsedResults = await _fetchYearlySubjectFallback(studentId);
+      }
 
       subjectResults.assignAll(
         parsedResults,
@@ -972,6 +980,156 @@ class ViewStudentResultDetailController extends GetxController {
     }
 
     return value.toStringAsFixed(1);
+  }
+
+  // ============================================================
+  // YEARLY SUBJECT FALLBACK
+  // ============================================================
+  //
+  // The backend API for /parents/results/$studentId/yearly
+  // returns overall summary data but no subject list array.
+  // We fetch semester 1 and 2 subject details and calculate
+  // the annual subject percentage average.
+  //
+  // ============================================================
+
+  Future<List<SubjectResultDetailModel>> _fetchYearlySubjectFallback(
+    int studentId,
+  ) async {
+    final List<Map<String, dynamic>> allMonthSubjects =
+        <Map<String, dynamic>>[];
+
+    for (final int sem in <int>[1, 2]) {
+      try {
+        final dynamic semResp = await resultApi.baseApiService.get(
+          endpoint: '/parents/results/$studentId/semester/$sem',
+        );
+
+        final dynamic semData = _unwrapResponse(semResp);
+
+        if (semData is Map) {
+          final dynamic monthlyResults = semData['monthly_results'];
+
+          if (monthlyResults is List) {
+            for (final dynamic mItem in monthlyResults) {
+              if (mItem is Map) {
+                final dynamic mSubjects =
+                    mItem['results'] ?? mItem['subject_results'];
+
+                if (mSubjects is List) {
+                  for (final dynamic s in mSubjects) {
+                    if (s is Map) {
+                      allMonthSubjects.add(
+                        Map<String, dynamic>.from(s),
+                      );
+                    }
+                  }
+                }
+              }
+            }
+          } else {
+            final dynamic semResults =
+                semData['results'] ?? semData['subject_results'];
+
+            if (semResults is List) {
+              for (final dynamic s in semResults) {
+                if (s is Map) {
+                  allMonthSubjects.add(
+                    Map<String, dynamic>.from(s),
+                  );
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint(
+          'YEARLY FALLBACK SEMESTER $sem ERROR: $e',
+        );
+      }
+    }
+
+    if (allMonthSubjects.isEmpty) {
+      return <SubjectResultDetailModel>[];
+    }
+
+    final Map<String, List<Map<String, dynamic>>> grouped =
+        <String, List<Map<String, dynamic>>>{};
+
+    for (final Map<String, dynamic> item in allMonthSubjects) {
+      final String name = item['subject_name']?.toString().trim() ??
+          item['subject']?.toString().trim() ??
+          item['name']?.toString().trim() ??
+          '';
+
+      final String id =
+          (item['subject_id'] ?? item['subjectId'] ?? item['id'] ?? '')
+              .toString();
+
+      final String key = name.isNotEmpty ? name.toLowerCase() : id;
+
+      if (key.isEmpty) {
+        continue;
+      }
+
+      grouped.putIfAbsent(key, () => <Map<String, dynamic>>[]).add(item);
+    }
+
+    final List<SubjectResultDetailModel> list = <SubjectResultDetailModel>[];
+
+    grouped.forEach((String key, List<Map<String, dynamic>> items) {
+      double totalPercentage = 0;
+      int count = 0;
+      String subjectName = '';
+      int subjectId = 0;
+
+      for (final Map<String, dynamic> item in items) {
+        if (subjectName.isEmpty) {
+          subjectName = item['subject_name']?.toString().trim() ??
+              item['subject']?.toString().trim() ??
+              item['name']?.toString().trim() ??
+              '';
+        }
+
+        if (subjectId == 0) {
+          subjectId = _parseInt(
+            item['subject_id'] ?? item['subjectId'] ?? item['id'],
+          );
+        }
+
+        final double sc = _parseDouble(
+          item['total_score'] ??
+              item['score'] ??
+              item['monthly_average'] ??
+              item['average'] ??
+              0,
+        );
+
+        final double mx = _parseDouble(
+          item['max_score'] ?? item['total_max'] ?? item['max'] ?? 100,
+        );
+
+        final double effectiveMax = mx > 0 ? mx : 100.0;
+
+        totalPercentage += (sc / effectiveMax) * 100;
+        count++;
+      }
+
+      if (count > 0 && subjectName.isNotEmpty) {
+        final double avgPercent = totalPercentage / count;
+
+        list.add(
+          SubjectResultDetailModel(
+            subjectId: subjectId,
+            subjectName: subjectName,
+            score: double.parse(avgPercent.toStringAsFixed(1)),
+            maxScore: 100.0,
+          ),
+        );
+      }
+    });
+
+    return list;
   }
 }
 

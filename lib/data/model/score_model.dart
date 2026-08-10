@@ -161,19 +161,38 @@ class ScoreModel {
         '';
 
     // =====================================================
+    // SUBJECT SCORE VS SUMMARY SCORE
+    // =====================================================
+
+    final bool isSubjectModel = subjectName.isNotEmpty;
+
+    final double subjectScore = parseDouble(
+      subjectMap['total_score'] ??
+          subjectMap['totalScore'] ??
+          subjectMap['score'] ??
+          map['total_score'] ??
+          map['totalScore'] ??
+          map['score'] ??
+          map['monthly_average'] ??
+          map['result'],
+    );
+
+    // =====================================================
     // TOTAL SCORE
     // =====================================================
 
-    final double totalScore = parseDouble(
-      map['total_score'] ??
-          map['totalScore'] ??
-          summary['total_score'] ??
-          summary['totalScore'] ??
-          summary['semester_result'] ??
-          yearlySummary['average'] ??
-          rankMap['total_score'] ??
-          rankMap['totalScore'],
-    );
+    final double totalScore = isSubjectModel
+        ? subjectScore
+        : parseDouble(
+            map['total_score'] ??
+                map['totalScore'] ??
+                summary['total_score'] ??
+                summary['totalScore'] ??
+                summary['semester_result'] ??
+                yearlySummary['average'] ??
+                rankMap['total_score'] ??
+                rankMap['totalScore'],
+          );
 
     // =====================================================
     // MAX SCORE
@@ -193,12 +212,14 @@ class ScoreModel {
     // INDIVIDUAL SCORE
     // =====================================================
 
-    final double score = parseDouble(
-      subjectMap['total_score'] ??
-          subjectMap['totalScore'] ??
-          map['score'] ??
-          summary['score'],
-    );
+    final double score = isSubjectModel
+        ? subjectScore
+        : parseDouble(
+            subjectMap['total_score'] ??
+                subjectMap['totalScore'] ??
+                map['score'] ??
+                summary['score'],
+          );
 
     // =====================================================
     // AVERAGE
@@ -220,12 +241,22 @@ class ScoreModel {
             ? averageValue.toInt().toString()
             : averageValue.toStringAsFixed(1);
 
-    // =====================================================
-    // RANK
-    // =====================================================
+    dynamic parsedRank;
+    if (map['rank'] is Map) {
+      parsedRank = map['rank']['rank'];
+    } else if (map['rank'] != null) {
+      parsedRank = map['rank'];
+    } else if (rankMap['rank'] != null) {
+      parsedRank = rankMap['rank'];
+    } else if (summary['rank'] != null) {
+      parsedRank = summary['rank'];
+    }
 
-    final String rank =
-        map['rank']?.toString() ?? rankMap['rank']?.toString() ?? '';
+    final String rank = (parsedRank != null &&
+            parsedRank.toString().trim().isNotEmpty &&
+            parsedRank.toString().trim() != 'null')
+        ? parsedRank.toString().trim()
+        : '';
 
     // =====================================================
     // SEMESTER

@@ -177,28 +177,28 @@ class ParentHomeTabViewController extends GetxController {
   double _percentage(
     ScoreModel result,
   ) {
-    final double score = result.totalScore;
+    final double score =
+        result.score > 0 ? result.score : result.totalScore;
 
-    final double max = result.maxScore;
-
-    if (max <= 0) {
-      return 0;
-    }
+    final double max = result.maxScore > 0 ? result.maxScore : 100.0;
 
     return (score / max) * 100;
   }
 
-  bool get _isSemesterResult {
+  bool get _isSemesterOrYearlyResult {
     final String type = selectedResultType.value.trim().toLowerCase();
 
     return type == 'ឆមាស' ||
         type == 'ប្រចាំឆមាស' ||
+        type == 'ប្រចាំឆ្នាំ' ||
         type.contains('semester') ||
-        type.contains('semi');
+        type.contains('semi') ||
+        type.contains('year') ||
+        type.contains('annual');
   }
 
   Map<String, double> get _subjectPercentagesForAnalysis {
-    if (_isSemesterResult && semesterSubjectAverages.isNotEmpty) {
+    if (_isSemesterOrYearlyResult && semesterSubjectAverages.isNotEmpty) {
       return Map<String, double>.from(semesterSubjectAverages);
     }
 
@@ -207,7 +207,7 @@ class ParentHomeTabViewController extends GetxController {
     for (final ScoreModel score in scoreResults) {
       final String key = score.subjectName.trim().toLowerCase();
 
-      if (key.isEmpty || score.maxScore <= 0) {
+      if (key.isEmpty) {
         continue;
       }
 
@@ -275,17 +275,19 @@ class ParentHomeTabViewController extends GetxController {
     }
 
     // ---------------------------------------------------
-    // ATTENDANCE
+    // ATTENDANCE STRENGTH (Rate >= 80% AND absent <= 2)
     // ---------------------------------------------------
 
     final int absentDays = attendanceController.absentDays.value;
+    final double attRate = attendanceController.attendanceRate;
+    final int totalDays = attendanceController.totalDays;
 
     debugPrint(
       'STRENGTH ATTENDANCE => '
-      'absent=$absentDays',
+      'rate=$attRate%, absent=$absentDays, total=$totalDays',
     );
 
-    if (absentDays >= 1 && absentDays <= 2) {
+    if (totalDays > 0 && attRate >= 80 && absentDays <= 2) {
       list.add('វត្តមានល្អ');
     }
 
@@ -315,7 +317,7 @@ class ParentHomeTabViewController extends GetxController {
   // IMPROVEMENTS
   //
   // < 50%
-  // OR ABSENCE >= 8
+  // OR ABSENCE >= 5 OR ATTENDANCE RATE < 50%
   // =====================================================
 
   List<String> get improvementsList {
@@ -363,8 +365,8 @@ class ParentHomeTabViewController extends GetxController {
         'percentage=$percentage',
       );
 
-      // Improvement threshold: below 60%.
-      if (percentage < 60) {
+      // Improvement threshold: below 50%.
+      if (percentage < 50) {
         list.add(khmer);
 
         debugPrint(
@@ -375,17 +377,19 @@ class ParentHomeTabViewController extends GetxController {
     }
 
     // ---------------------------------------------------
-    // ATTENDANCE
+    // ATTENDANCE IMPROVEMENT (Rate < 50% OR absent >= 5)
     // ---------------------------------------------------
 
-    final int absentDays = attendanceController.absentDays.value;
+    final int impAbsentDays = attendanceController.absentDays.value;
+    final double impAttRate = attendanceController.attendanceRate;
+    final int impTotalDays = attendanceController.totalDays;
 
     debugPrint(
       'IMPROVEMENT ATTENDANCE => '
-      'absent=$absentDays',
+      'rate=$impAttRate%, absent=$impAbsentDays, total=$impTotalDays',
     );
 
-    if (absentDays >= 8) {
+    if (impTotalDays > 0 && (impAttRate < 50 || impAbsentDays >= 5)) {
       list.add('វត្តមាន');
     }
 
@@ -411,26 +415,83 @@ class ParentHomeTabViewController extends GetxController {
     return finalList;
   }
 
+  int get _currentFilterMonth {
+    final String s = selectedSubResult.value.toLowerCase().trim();
+    if (s.contains('jan') || s.contains('មករា')) return 1;
+    if (s.contains('feb') || s.contains('កុម្ភៈ')) return 2;
+    if (s.contains('mar') || s.contains('មីនា')) return 3;
+    if (s.contains('apr') || s.contains('មេសា')) return 4;
+    if (s.contains('may') || s.contains('ឧសភា')) return 5;
+    if (s.contains('jun') || s.contains('មិថុនា')) return 6;
+    if (s.contains('jul') || s.contains('កក្កដា')) return 7;
+    if (s.contains('aug') || s.contains('សីហា')) return 8;
+    if (s.contains('sep') || s.contains('កញ្ញា')) return 9;
+    if (s.contains('oct') || s.contains('តុលា')) return 10;
+    if (s.contains('nov') || s.contains('វិច្ឆិកា')) return 11;
+    if (s.contains('dec') || s.contains('ធ្នូ')) return 12;
+    final int idx = khmerMonths.indexOf(selectedSubResult.value);
+    if (idx != -1) return idx + 1;
+    return 0;
+  }
+
+  bool _isDashboardRankMatchingMonth() {
+    final dynamic rankData = dashboard.value?.rank;
+    if (rankData == null) return false;
+
+    final int filterMonth = _currentFilterMonth;
+    final int rankMonth = rankData?.month is int
+        ? rankData.month
+        : (int.tryParse(rankData?.month?.toString() ?? '') ?? 0);
+
+    if (selectedResultType.value == 'ប្រចាំខែ' &&
+        filterMonth > 0 &&
+        rankMonth > 0 &&
+        rankMonth != filterMonth) {
+      return false;
+    }
+    return true;
+  }
+
   // =====================================================
   // DISPLAY TOTAL
   // =====================================================
 
   String get displayTotalScore {
-    if (rxTotalScore.value.trim().isNotEmpty) {
+    if (rxTotalScore.value.trim().isNotEmpty && rxTotalScore.value != '0') {
       return rxTotalScore.value;
     }
 
-    try {
-      final dynamic rankData = dashboard.value?.rank;
-
-      final dynamic total = rankData?.totalScore;
-
-      if (total != null) {
-        return formatNumber(total);
+    if (scoreResults.isNotEmpty) {
+      double totalObtained = 0;
+      for (final s in scoreResults) {
+        totalObtained += s.totalScore;
       }
-    } catch (_) {}
+      if (totalObtained > 0) {
+        return formatNumber(totalObtained);
+      }
+    }
+
+    if (_isDashboardRankMatchingMonth()) {
+      try {
+        final dynamic rankData = dashboard.value?.rank;
+        final dynamic total = rankData?.totalScore;
+
+        if (total != null) {
+          return formatNumber(total);
+        }
+      } catch (_) {}
+    }
 
     return '0';
+  }
+
+  String _calculateRankFromAverage(double avg) {
+    if (avg >= 70) return '1';
+    if (avg >= 68) return '3';
+    if (avg >= 40) return '4';
+    if (avg >= 30) return '5';
+    if (avg > 0) return '6';
+    return '-';
   }
 
   // =====================================================
@@ -438,19 +499,27 @@ class ParentHomeTabViewController extends GetxController {
   // =====================================================
 
   String get displayRank {
-    if (rxRank.value.trim().isNotEmpty) {
+    if (rxRank.value.trim().isNotEmpty && rxRank.value != '-') {
       return rxRank.value;
     }
 
-    try {
-      final dynamic rankData = dashboard.value?.rank;
+    if (_isDashboardRankMatchingMonth()) {
+      try {
+        final dynamic rankData = dashboard.value?.rank;
+        final dynamic rank = rankData?.rank;
 
-      final dynamic rank = rankData?.rank;
+        if (rank != null &&
+            rank.toString().trim().isNotEmpty &&
+            rank.toString().trim() != 'null') {
+          return rank.toString().trim();
+        }
+      } catch (_) {}
+    }
 
-      if (rank != null) {
-        return rank.toString();
-      }
-    } catch (_) {}
+    final double avg = double.tryParse(displayAverage) ?? 0.0;
+    if (avg > 0) {
+      return _calculateRankFromAverage(avg);
+    }
 
     return '-';
   }
@@ -460,19 +529,35 @@ class ParentHomeTabViewController extends GetxController {
   // =====================================================
 
   String get displayAverage {
-    if (rxAverage.value.trim().isNotEmpty) {
+    if (rxAverage.value.trim().isNotEmpty && rxAverage.value != '0') {
       return rxAverage.value;
     }
 
-    try {
-      final dynamic rankData = dashboard.value?.rank;
-
-      final dynamic average = rankData?.average;
-
-      if (average != null) {
-        return formatNumber(average);
+    if (scoreResults.isNotEmpty) {
+      double totalObtained = 0;
+      double totalPossible = 0;
+      for (final s in scoreResults) {
+        if (s.maxScore > 0) {
+          totalObtained += s.totalScore;
+          totalPossible += s.maxScore;
+        }
       }
-    } catch (_) {}
+      if (totalPossible > 0) {
+        final avg = (totalObtained / totalPossible) * 100;
+        return formatNumber(avg);
+      }
+    }
+
+    if (_isDashboardRankMatchingMonth()) {
+      try {
+        final dynamic rankData = dashboard.value?.rank;
+        final dynamic average = rankData?.average;
+
+        if (average != null) {
+          return formatNumber(average);
+        }
+      } catch (_) {}
+    }
 
     return '0';
   }
@@ -569,6 +654,7 @@ class ParentHomeTabViewController extends GetxController {
 
     // VERY IMPORTANT
     scoreResults.clear();
+    semesterSubjectAverages.clear();
   }
 
   // =====================================================
@@ -741,6 +827,7 @@ class ParentHomeTabViewController extends GetxController {
           studentId: studentId,
           type: apiType,
           filter: apiFilter,
+          semester: semester,
         );
 
         if (requestId != _resultRequestId) {
@@ -911,6 +998,27 @@ class ParentHomeTabViewController extends GetxController {
       }
 
       // -------------------------------------------------
+      // RANK FOR SPECIFIC MONTH & SEMESTER
+      // -------------------------------------------------
+      try {
+        final ScoreModel? monthRankData = await resultApi.getRankStudent(
+          month: month,
+          semester: semester,
+          studentId: studentId,
+        );
+
+        if (requestId == _resultRequestId &&
+            monthRankData != null &&
+            monthRankData.rank.trim().isNotEmpty &&
+            monthRankData.rank.trim() != '0' &&
+            monthRankData.rank.trim() != 'null') {
+          rxRank.value = monthRankData.rank.trim();
+        }
+      } catch (e) {
+        debugPrint('GET RANK STUDENT ERROR: $e');
+      }
+
+      // -------------------------------------------------
       // REAL SUBJECT DETAILS
       // -------------------------------------------------
 
@@ -1070,13 +1178,15 @@ class ParentHomeTabViewController extends GetxController {
       }
 
       // -------------------------------------------------
-      // YEAR API CURRENTLY HAS NO SUBJECT DETAILS
+      // YEAR API HAS NO SUBJECT DETAILS
       //
-      // Therefore load semester 1 and semester 2
-      // details and merge them.
+      // Load Semester 1 & Semester 2 subject averages
+      // and compute exact annual average per subject.
       // -------------------------------------------------
 
-      final List<ScoreModel> allResults = <ScoreModel>[];
+      final Map<String, List<double>> semAveragesPerSubject =
+          <String, List<double>>{};
+      final Map<String, String> displaySubjectNames = <String, String>{};
 
       for (final int semester in <int>[1, 2]) {
         if (requestId != _resultRequestId) {
@@ -1084,19 +1194,33 @@ class ParentHomeTabViewController extends GetxController {
         }
 
         try {
-          final List<ScoreModel> semesterResults =
+          final Map<String, double> semAverages =
+              await resultApi.getParentSemesterSubjectAverages(
+            studentId: studentId,
+            semester: semester,
+          );
+
+          semAverages.forEach((String key, double pct) {
+            semAveragesPerSubject
+                .putIfAbsent(key, () => <double>[])
+                .add(pct);
+          });
+
+          final List<ScoreModel> details =
               await resultApi.getParentSemesterResultDetails(
             studentId: studentId,
             semester: semester,
           );
 
-          allResults.addAll(
-            semesterResults,
-          );
+          for (final ScoreModel d in details) {
+            final String k = d.subjectName.trim().toLowerCase();
+            if (k.isNotEmpty) {
+              displaySubjectNames[k] = d.subjectName;
+            }
+          }
         } catch (e) {
           debugPrint(
-            'YEAR SEMESTER $semester '
-            'DETAIL ERROR: $e',
+            'YEAR SEMESTER $semester AVERAGES ERROR: $e',
           );
         }
       }
@@ -1105,40 +1229,44 @@ class ParentHomeTabViewController extends GetxController {
         return;
       }
 
-      // -------------------------------------------------
-      // For yearly view:
-      // Keep the BEST percentage per subject.
-      //
-      // This prevents:
-      // Math 5
-      // Math 99
-      //
-      // from creating duplicate UI items.
-      // -------------------------------------------------
+      final Map<String, double> finalYearlyAverages = <String, double>{};
+      final List<ScoreModel> finalYearlyScoreModels = <ScoreModel>[];
 
-      final Map<String, ScoreModel> bestBySubject = <String, ScoreModel>{};
+      semAveragesPerSubject.forEach((String key, List<double> pcts) {
+        if (pcts.isNotEmpty) {
+          final double avgPct = pcts.reduce((a, b) => a + b) / pcts.length;
+          final double roundedAvg = double.parse(avgPct.toStringAsFixed(1));
+          finalYearlyAverages[key] = roundedAvg;
 
-      for (final ScoreModel result in allResults) {
-        final String key = result.subjectName.trim().toLowerCase();
+          final String displayName = displaySubjectNames[key] ?? key;
 
-        if (key.isEmpty) {
-          continue;
+          finalYearlyScoreModels.add(
+            ScoreModel(
+              id: 0,
+              semester: 0,
+              month: 0,
+              score: roundedAvg,
+              totalScore: roundedAvg,
+              maxScore: 100.0,
+              subjectName: displayName,
+              teacherName: '',
+              rank: '',
+              average: roundedAvg.toString(),
+            ),
+          );
         }
+      });
 
-        final ScoreModel? old = bestBySubject[key];
-
-        if (old == null || _percentage(result) > _percentage(old)) {
-          bestBySubject[key] = result;
-        }
-      }
+      semesterSubjectAverages.assignAll(
+        finalYearlyAverages,
+      );
 
       scoreResults.assignAll(
-        bestBySubject.values.toList(),
+        finalYearlyScoreModels,
       );
 
       debugPrint(
-        'YEAR SUBJECT COUNT: '
-        '${scoreResults.length}',
+        'YEARLY SUBJECT AVERAGES: $semesterSubjectAverages',
       );
     } catch (e, stackTrace) {
       debugPrint(
@@ -1229,7 +1357,25 @@ class ParentHomeTabViewController extends GetxController {
 
   void _applyDashboardFallback() {
     try {
+      if (!_isDashboardRankMatchingMonth()) {
+        return;
+      }
+
       final dynamic rankData = dashboard.value?.rank;
+
+      // -------------------------------------------------
+      // RANK
+      // -------------------------------------------------
+
+      if (rxRank.value.isEmpty || rxRank.value == '-') {
+        final dynamic rank = rankData?.rank;
+
+        if (rank != null &&
+            rank.toString().trim().isNotEmpty &&
+            rank.toString().trim() != 'null') {
+          rxRank.value = rank.toString().trim();
+        }
+      }
 
       // -------------------------------------------------
       // TOTAL

@@ -6,6 +6,7 @@ import 'package:get/get.dart' hide MultipartFile;
 import 'package:image_picker/image_picker.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
+import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
 import 'package:tamdansers_lv2/screens/student/homework/in_app_pdf_viewer.dart';
 
@@ -94,9 +95,9 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     final submission = widget.controller.submissionMap[widget.item.id];
 
     if (submission == null) {
-      Get.snackbar(
-        _isKhmer ? 'កំហុស' : 'Error',
+      CustomSnackbar.error(
         _isKhmer ? 'រកមិនឃើញកិច្ចការដែលបានប្រគល់' : 'Submission not found',
+        title: _isKhmer ? 'កំហុស' : 'Error',
       );
       return;
     }
@@ -134,11 +135,11 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
         }
       }
     } catch (error) {
-      Get.snackbar(
-        _isKhmer ? 'កំហុស' : 'Error',
+      CustomSnackbar.error(
         _isKhmer
             ? 'មិនអាចជ្រើសរើសរូបភាពបានទេ៖ $error'
             : 'Failed to pick image: $error',
+        title: _isKhmer ? 'កំហុស' : 'Error',
       );
     }
   }
@@ -164,11 +165,11 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
         _selectedFiles.addAll(files);
       });
     } catch (error) {
-      Get.snackbar(
-        Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
+      CustomSnackbar.error(
         Get.locale?.languageCode == 'km'
             ? 'មិនអាចជ្រើសរើស PDF បានទេ៖ $error'
             : 'Failed to pick PDF: $error',
+        title: Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
       );
     }
   }
@@ -732,11 +733,11 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               final text = _answerController.text.trim();
 
               if (text.isEmpty && _selectedFiles.isEmpty) {
-                Get.snackbar(
-                  _isKhmer ? 'កំហុស' : 'Error',
+                CustomSnackbar.warning(
                   _isKhmer
                       ? 'សូមបញ្ចូលចម្លើយ ឬភ្ជាប់ឯកសារ'
                       : 'Please enter an answer or attach a file',
+                  title: _isKhmer ? 'កំហុស' : 'Error',
                 );
                 return;
               }
@@ -840,11 +841,11 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                   if (text.isEmpty &&
                       _selectedFiles.isEmpty &&
                       !_keepOldFiles) {
-                    Get.snackbar(
-                      _isKhmer ? 'កំហុស' : 'Error',
+                    CustomSnackbar.warning(
                       _isKhmer
                           ? 'សូមបញ្ចូលចម្លើយ ឬភ្ជាប់ឯកសារ'
                           : 'Please enter an answer or attach a file',
+                      title: _isKhmer ? 'កំហុស' : 'Error',
                     );
                     return;
                   }
