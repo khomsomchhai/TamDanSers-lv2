@@ -17,7 +17,7 @@ class AskPermissionScreenViewController
       Get.find<UserController>();
 
   final selectedRequestType =
-      'By Subject'.obs;
+      'subject'.obs;
 
   final selectedScheduleId =
       RxnInt();
@@ -38,8 +38,8 @@ class AskPermissionScreenViewController
       Rxn<PermissionModel>();
 
   final requestTypes = const [
-    'By Subject',
-    'Full Day',
+    'subject',
+    'full_day',
   ];
 
   final List<String> permissionTypes = const [
@@ -53,7 +53,7 @@ class AskPermissionScreenViewController
 
   bool get isBySubject =>
       selectedRequestType.value ==
-      'By Subject';
+      'subject';
 
   bool get isEditing =>
       editingPermission.value != null;
@@ -86,7 +86,7 @@ class AskPermissionScreenViewController
   void _onRequestTypeChanged(
     String value,
   ) {
-    if (value == 'By Subject' &&
+    if (value == 'subject' &&
         schedules.isEmpty) {
       fetchTodaySchedules();
     }
@@ -349,8 +349,8 @@ class AskPermissionScreenViewController
     selectedRequestType.value =
         permission.requestType ==
                 'subject'
-            ? 'By Subject'
-            : 'Full Day';
+            ? 'subject'
+            : 'full_day';
 
     selectedPermissionType.value =
         permission.type;
@@ -376,7 +376,7 @@ class AskPermissionScreenViewController
     editingPermission.value = null;
 
     selectedRequestType.value =
-        'By Subject';
+        'subject';
 
     selectedScheduleId.value = null;
 
@@ -495,7 +495,8 @@ Future<void> confirmDeletePermission(
                     ),
                     child: Text(
                       'cancel'.tr,
-                      style: const TextStyle(
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.hintColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -525,7 +526,8 @@ Future<void> confirmDeletePermission(
                     ),
                     child: Text(
                       'delete'.tr,
-                      style: const TextStyle(
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -798,12 +800,12 @@ Future<void> confirmDeletePermission(
   String requestTypeLabel(
     String value,
   ) {
-    switch (value) {
-      case 'By Subject':
+    switch (value.toLowerCase()) {
+      case 'subject':
         return 'ask_permission_request_type_by_subject'
             .tr;
 
-      case 'Full Day':
+      case 'full_day':
         return 'ask_permission_request_type_full_day'
             .tr;
 
