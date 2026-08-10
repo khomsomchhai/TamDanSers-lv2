@@ -18,10 +18,8 @@ import 'package:tamdansers_lv2/core/widgets/header/custom_header_placeholder.dar
 import 'package:tamdansers_lv2/core/widgets/subject_ui.dart';
 
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
-import 'package:tamdansers_lv2/data/model/parent_model.dart';
 import 'package:tamdansers_lv2/data/model/schedule_model.dart';
 import 'package:tamdansers_lv2/data/model/score_model.dart';
-import 'package:tamdansers_lv2/data/model/student_model.dart';
 
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_attendance_tab/parent_attendance_tab_controller.dart';
 
@@ -229,7 +227,10 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
           }),
         ),
         const SizedBox(width: 12),
-        const CustomHeaderAction(),
+        const CustomHeaderAction(
+          iconColor:
+              Colors.white, // Sets the notification bell icon color to white
+        ),
       ],
     );
   }
@@ -342,14 +343,27 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
   Widget _buildSelectedChild(
     Map<String, dynamic> student,
   ) {
-    final name = _getStudentName(student);
-    final code = _getStudentCode(student);
+    final name = student['student_name']?.toString() ?? '-';
+
+    final code = student['student_code']?.toString() ?? '-';
+
+    final imageUrl = student['profile_image']?.toString().trim() ?? '';
 
     return Row(
       children: [
-        _buildStudentAvatar(
-          student,
-          radius: 19,
+        CircleAvatar(
+          radius: 18,
+          backgroundColor: AppColors.info.withValues(
+            alpha: 0.12,
+          ),
+          backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+          child: imageUrl.isEmpty
+              ? const Icon(
+                  Icons.person_outline_rounded,
+                  color: AppColors.info,
+                  size: 21,
+                )
+              : null,
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -386,24 +400,36 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
   Widget _buildDropdownChild(
     Map<String, dynamic> student,
   ) {
-    final name = _getStudentName(student);
-    final code = _getStudentCode(student);
+    final name = student['student_name']?.toString() ?? '-';
 
-    final selectedId = _parseStudentId(controller.selectedChild.value);
+    final code = student['student_code']?.toString() ?? '-';
 
-    final currentId = _parseStudentId(student);
+    final imageUrl = student['profile_image']?.toString().trim() ?? '';
 
-    final isSelected =
-        selectedId != null && currentId != null && selectedId == currentId;
+    final selectedId = controller.selectedChild.value?['id'];
+
+    final isSelected = selectedId?.toString() == student['id']?.toString();
 
     return SizedBox(
       height: 58,
       child: Row(
         children: [
-          _buildStudentAvatar(
-            student,
+          CircleAvatar(
             radius: 19,
-            isSelected: isSelected,
+            backgroundColor: isSelected
+                ? AppColors.info
+                : AppColors.info.withValues(
+                    alpha: 0.12,
+                  ),
+            backgroundImage:
+                imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+            child: imageUrl.isEmpty
+                ? Icon(
+                    Icons.person_outline_rounded,
+                    color: isSelected ? AppColors.white : AppColors.info,
+                    size: 21,
+                  )
+                : null,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -444,132 +470,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
     );
   }
 
-  String _getStudentName(
-    Map<String, dynamic> student,
-  ) {
-    return student['student_name']?.toString() ??
-        student['name']?.toString() ??
-        student['full_name']?.toString() ??
-        '-';
-  }
-
-  String _getStudentCode(
-    Map<String, dynamic> student,
-  ) {
-    return student['student_code']?.toString() ??
-        student['code']?.toString() ??
-        '-';
-  }
-
-  // =====================================================
-  // STUDENT AVATAR
-  // =====================================================
-
-  Widget _buildStudentAvatar(
-    Map<String, dynamic> student, {
-    double radius = 18,
-    bool isSelected = false,
-  }) {
-    final name = _getStudentName(student);
-
-    return Obx(() {
-      final candidateUrls = _getStudentCandidateUrls(student);
-
-      return _StudentAvatarWidget(
-        candidateUrls: candidateUrls,
-        radius: radius,
-        isSelected: isSelected,
-        headers: _getImageHeaders(),
-        name: name,
-      );
-    });
-  }
-
-  // =====================================================
-  // IMAGE HELPERS
-  // =====================================================
-
-  String _formatImageUrl(String url) {
-    final cleanUrl = url.trim();
-
-    if (cleanUrl.isEmpty || cleanUrl == 'null' || cleanUrl == 'None') {
-      return '';
-    }
-
-    if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
-      return cleanUrl;
-    }
-
-    const baseUrl = 'https://tamdansers-1fvbe1msgz9hki.sabay.com';
-
-    final formattedPath = cleanUrl.startsWith('/') ? cleanUrl : '/$cleanUrl';
-
-    return '$baseUrl$formattedPath';
-  }
-
-  String _extractImageFromMap(dynamic data) {
-    if (data == null) {
-      return '';
-    }
-
-    if (data is StudentModel) {
-      if (data.profileImage.isNotEmpty) {
-        return _formatImageUrl(
-          data.profileImage,
-        );
-      }
-
-      return '';
-    }
-
-    if (data is String) {
-      final value = data.trim();
-
-      if (value.isNotEmpty && value != 'null') {
-        return _formatImageUrl(value);
-      }
-
-      return '';
-    }
-
-    if (data is Map) {
-      const knownKeys = [
-        'profile_image',
-        'profileImage',
-        'profile_photo',
-        'student_image',
-        'studentImage',
-        'avatar_url',
-        'avatarUrl',
-        'avatar',
-        'photo_url',
-        'photoUrl',
-        'image',
-        'image_url',
-        'imageUrl',
-      ];
-
-      for (final key in knownKeys) {
-        if (data.containsKey(key) && data[key] != null) {
-          final value = data[key].toString().trim();
-
-          if (value.isNotEmpty && value != 'null') {
-            return _formatImageUrl(value);
-          }
-        }
-      }
-
-      // Nested student object
-      if (data['student'] != null) {
-        return _extractImageFromMap(
-          data['student'],
-        );
-      }
-    }
-
-    return '';
-  }
-
   int? _parseStudentId(dynamic value) {
     if (value == null) {
       return null;
@@ -605,73 +505,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
     return int.tryParse(
       value.toString(),
     );
-  }
-
-  List<String> _getStudentCandidateUrls(
-    Map<String, dynamic> student,
-  ) {
-    final urls = <String>[];
-
-    final directUrl = _extractImageFromMap(student);
-
-    if (directUrl.isNotEmpty) {
-      urls.add(directUrl);
-    }
-
-    final id = _parseStudentId(student);
-
-    if (id != null && controller.studentImages.containsKey(id)) {
-      final cachedUrl = controller.studentImages[id];
-
-      if (cachedUrl != null) {
-        final formatted = _formatImageUrl(
-          cachedUrl.toString(),
-        );
-
-        if (formatted.isNotEmpty) {
-          urls.add(formatted);
-        }
-      }
-    }
-
-    final dashboard = controller.dashboard.value;
-
-    if (dashboard != null) {
-      final dashboardStudentId = _parseStudentId(
-        dashboard.student,
-      );
-
-      if (id != null &&
-          dashboardStudentId != null &&
-          id == dashboardStudentId) {
-        final dashboardUrl = _formatImageUrl(
-          dashboard.student.profileImage,
-        );
-
-        if (dashboardUrl.isNotEmpty) {
-          urls.add(dashboardUrl);
-        }
-      }
-    }
-
-    return urls
-        .where(
-          (url) => url.trim().isNotEmpty,
-        )
-        .toSet()
-        .toList();
-  }
-
-  Map<String, String>? _getImageHeaders() {
-    final token = GetStorage().read('token');
-
-    if (token != null && token.toString().trim().isNotEmpty) {
-      return {
-        'Authorization': 'Bearer ${token.toString().trim()}',
-      };
-    }
-
-    return null;
   }
 
   // =====================================================

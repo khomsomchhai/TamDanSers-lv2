@@ -1893,6 +1893,10 @@ class ParentHomeTabViewController extends GetxController {
     return 'dont_have_child'.tr;
   }
 
+  String get childProfileImage {
+    return selectedChild.value?['profile_image']?.toString() ?? '';
+  }
+
   // =====================================================
   // CHILD CODE
   // =====================================================
