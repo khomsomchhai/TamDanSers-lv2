@@ -75,15 +75,16 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                       );
                     }
 
-                    final morningSchedules = schedulesList.where((item) {
-                      final hour = int.parse(
-                          item['start_time'].toString().split(':')[0]);
+                    final sortedSchedules = controller.sortSchedulesByTime(schedulesList);
+                    final morningSchedules = sortedSchedules.where((item) {
+                      final time = item['start_time']?.toString() ?? '00:00';
+                      final hour = int.parse(time.split(':')[0]);
                       return hour < 12;
                     }).toList();
 
-                    final afternoonSchedules = schedulesList.where((item) {
-                      final hour = int.parse(
-                          item['start_time'].toString().split(':')[0]);
+                    final afternoonSchedules = sortedSchedules.where((item) {
+                      final time = item['start_time']?.toString() ?? '00:00';
+                      final hour = int.parse(time.split(':')[0]);
                       return hour >= 12;
                     }).toList();
 
@@ -313,7 +314,10 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
-                          "${controller.formatTime(item['start_time'] ?? '')} - ${controller.formatTime(item['end_time'] ?? '')}",
+                          controller.formatTimeRange(
+                            item['start_time'] ?? '',
+                            item['end_time'] ?? '',
+                          ),
                           style: AppTextStyles.bodySmall.copyWith(
                             color: accentTextColor,
                             fontWeight: FontWeight.w700,
