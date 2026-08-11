@@ -24,108 +24,80 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
         title: "attendance".tr,
         showBackButton: false,
       ),
-     body: RefreshIndicator(
-  onRefresh: controller.fetchAttendance,
-  child: Obx(() {
-    if (
-      controller.isLoading.value &&
-      controller.attendanceList.isEmpty
-    ) {
-      return ListView(
-        physics:
-            const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(
-          AppNumbers.screenPadding,
-        ),
-        children: [
-          _buildAttendanceSkeleton(),
-        ],
-      );
-    }
-
-    final items =
-        controller.displayedAttendance;
-
-    return ListView(
-      physics:
-          const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(
-        AppNumbers.screenPadding,
-      ),
-      children: [
-        _buildDateSelector(
-          context,
-        ),
-
-        const SizedBox(
-          height:
-              AppNumbers.spacingMedium,
-        ),
-
-        _buildScanButton(),
-
-        const SizedBox(
-          height:
-              AppNumbers.spacingMedium,
-        ),
-
-        if (items.isEmpty)
-          SizedBox(
-            height: 260,
-            child: Column(
-              mainAxisAlignment:
-                  MainAxisAlignment.center,
+      body: RefreshIndicator(
+        onRefresh: controller.fetchAttendance,
+        child: Obx(() {
+          if (controller.isLoading.value && controller.attendanceList.isEmpty) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(
+                AppNumbers.screenPadding,
+              ),
               children: [
-                const Icon(
-                  Icons
-                      .calendar_month_outlined,
-                  size: 52,
-                  color:
-                      AppColors.grey,
-                ),
-
-                const SizedBox(
-                  height:
-                      AppNumbers.spacingSmall,
-                ),
-
-                Text(
-                  'attendance_no_records'.tr,
-                  style:
-                      Get.textTheme.bodyMedium,
-                  textAlign:
-                      TextAlign.center,
-                ),
+                _buildAttendanceSkeleton(),
               ],
+            );
+          }
+
+          final items = controller.displayedAttendance;
+
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(
+              AppNumbers.screenPadding,
             ),
-          )
-        else
-          ...items.map(
-            (item) => Padding(
-              padding:
-                  const EdgeInsets.only(
-                bottom:
-                    AppNumbers.spacingMedium,
+            children: [
+              _buildDateSelector(
+                context,
               ),
-              child: AttendanceCard(
-                item: item,
-                mapStatus:
-                    controller.mapStatus,
-                statusColor:
-                    controller.statusColor,
-                formatDate:
-                    controller.formatDate,
-                formatTimeRange:
-                    controller
-                        .formatTimeRange,
+              const SizedBox(
+                height: AppNumbers.spacingMedium,
               ),
-            ),
-          ),
-      ],
-    );
-  }),
-),
-    
+              _buildScanButton(),
+              const SizedBox(
+                height: AppNumbers.spacingMedium,
+              ),
+              if (items.isEmpty)
+                SizedBox(
+                  height: 260,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.calendar_month_outlined,
+                        size: 52,
+                        color: AppColors.grey,
+                      ),
+                      const SizedBox(
+                        height: AppNumbers.spacingSmall,
+                      ),
+                      Text(
+                        'attendance_no_records'.tr,
+                        style: Get.textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              else
+                ...items.map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: AppNumbers.spacingMedium,
+                    ),
+                    child: AttendanceCard(
+                      item: item,
+                      mapStatus: controller.mapStatus,
+                      statusColor: controller.statusColor,
+                      formatDate: controller.formatDate,
+                      formatTimeRange: controller.formatTimeRange,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        }),
+      ),
     );
   }
 
@@ -199,72 +171,72 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
       ),
     );
   }
-Widget _buildScanButton() {
-  return InkWell(
-    onTap: () async {
-      final result = await Get.toNamed(
-        '/student/attendance-scan',
-      );
 
-      if (result == true) {
-        await controller.fetchAttendance();
-      }
-    },
-    borderRadius: BorderRadius.circular(
-      AppNumbers.radiusMedium,
-    ),
-    child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppNumbers.spacingMedium,
-        vertical: 14,
+  Widget _buildScanButton() {
+    return InkWell(
+      onTap: () async {
+        final result = await Get.toNamed(
+          '/student/attendance-scan',
+        );
+
+        if (result == true) {
+          await controller.fetchAttendance();
+        }
+      },
+      borderRadius: BorderRadius.circular(
+        AppNumbers.radiusMedium,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(
-          AppNumbers.radiusMedium,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppNumbers.spacingMedium,
+          vertical: 14,
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(
-              0,
-              0,
-              0,
-              0.08,
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(
+            AppNumbers.radiusMedium,
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Color.fromRGBO(
+                0,
+                0,
+                0,
+                0.08,
+              ),
+              blurRadius: AppNumbers.shadowBlur,
+              offset: Offset(
+                0,
+                6,
+              ),
             ),
-            blurRadius: AppNumbers.shadowBlur,
-            offset: Offset(
-              0,
-              6,
-            ),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.qr_code_scanner_rounded,
-            color: Colors.white,
-            size: AppNumbers.iconLarge,
-          ),
-
-          const SizedBox(
-            width: AppNumbers.spacingSmall,
-          ),
-
-          Text(
-            'attendance_scan'.tr,
-            style: Get.textTheme.bodyLarge?.copyWith(
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.qr_code_scanner_rounded,
               color: Colors.white,
-              fontWeight: FontWeight.w700,
+              size: AppNumbers.iconLarge,
             ),
-          ),
-        ],
+            const SizedBox(
+              width: AppNumbers.spacingSmall,
+            ),
+            Text(
+              'attendance_scan'.tr,
+              style: Get.textTheme.bodyLarge?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildDateSelector(BuildContext context) {
     return Obx(() {
       final hasDate = controller.selectedDate.value != null;

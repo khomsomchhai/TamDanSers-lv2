@@ -575,6 +575,7 @@ class HomeworkViewController extends GetxController {
       Get.back(); // close details screen page
 
       CustomSnackbar.success(
+      CustomSnackbar.success(
         Get.locale?.languageCode == 'km'
             ? 'កិច្ចការផ្ទះត្រូវបានប្រគល់ដោយជោគជ័យ!'
             : 'Homework submitted successfully!',
@@ -585,6 +586,7 @@ class HomeworkViewController extends GetxController {
       fetchHomework();
     } catch (e) {
       Get.back(); // close loading
+      CustomSnackbar.error(
       CustomSnackbar.error(
         Get.locale?.languageCode == 'km'
             ? 'មិនអាចប្រគល់កិច្ចការផ្ទះបានទេ៖ $e'
