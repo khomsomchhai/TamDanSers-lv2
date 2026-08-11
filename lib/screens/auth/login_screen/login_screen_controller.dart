@@ -61,9 +61,9 @@ class LoginScreenViewController extends GetxController {
               password: currentPwdCtrl.text,
             );
 
-      debugPrint(
-        'LOGIN RESPONSE: $response',
-      );
+      // debugPrint(
+      //   'LOGIN RESPONSE: $response',
+      // );
 
       final String token = response['access_token']?.toString().trim() ?? '';
 
@@ -107,9 +107,9 @@ class LoginScreenViewController extends GetxController {
         );
       }
 
-      debugPrint(
-        'NAVIGATING TO ROLE: $role',
-      );
+      // debugPrint(
+      //   'NAVIGATING TO ROLE: $role',
+      // );
 
       _navigateByRole(
         role,
@@ -183,9 +183,9 @@ class LoginScreenViewController extends GetxController {
       students,
     );
 
-    debugPrint(
-      'SAVED STUDENTS COUNT: ${students.length}',
-    );
+    // debugPrint(
+    //   'SAVED STUDENTS COUNT: ${students.length}',
+    // );
   }
 
   void _navigateByRole(String role) {
@@ -245,9 +245,9 @@ class LoginScreenViewController extends GetxController {
 
       final String? fcmToken = await FirebaseMessaging.instance.getToken();
 
-      debugPrint(
-        'FCM TOKEN: $fcmToken',
-      );
+      // debugPrint(
+      //   'FCM TOKEN: $fcmToken',
+      // );
 
       if (fcmToken == null || fcmToken.isEmpty) {
         debugPrint(
@@ -268,9 +268,9 @@ class LoginScreenViewController extends GetxController {
         'SAVE FCM STATUS: ${e.response?.statusCode}',
       );
 
-      debugPrint(
-        'SAVE FCM RESPONSE: ${e.response?.data}',
-      );
+      // debugPrint(
+      //   'SAVE FCM RESPONSE: ${e.response?.data}',
+      // );
 
       // Do not rethrow. FCM must not block or close the app.
     } catch (e) {
