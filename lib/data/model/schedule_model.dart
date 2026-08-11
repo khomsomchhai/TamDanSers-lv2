@@ -40,6 +40,20 @@ class ScheduleModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'class_id': classId,
+      'class_name': className,
+      'subject_name': subjectName,
+      'day': day,
+      'start_time': startTime,
+      'end_time': endTime,
+      'teacher_name': teacherName,
+      'room': room,
+    };
+  }
+
   static int? _asInt(dynamic value) {
     if (value is int) {
       return value;

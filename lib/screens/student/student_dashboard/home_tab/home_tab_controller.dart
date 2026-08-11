@@ -87,13 +87,32 @@ class HomeTabViewController extends GetxController {
       ? Get.find<NotificationController>()
       : Get.put(NotificationController());
 
+  Worker? _profileWorker;
+
   @override
   void onInit() {
     super.onInit();
     if (userController.user == null && userController.profile == null) {
-      userController.getProfile();
+      userController.getProfile().then((_) {
+        fetchTodaySchedules();
+        fetchRecentAttendance();
+      });
     }
+
+    _profileWorker = ever(userController.isLoading, (bool loading) {
+      if (!loading && (userController.user != null || userController.profile != null)) {
+        fetchTodaySchedules();
+        fetchRecentAttendance();
+      }
+    });
+
     notificationController.loadNotifications();
+  }
+
+  @override
+  void onClose() {
+    _profileWorker?.dispose();
+    super.onClose();
   }
 
   @override
@@ -106,6 +125,10 @@ class HomeTabViewController extends GetxController {
   Future<void> fetchTodaySchedules() async {
     isLoadingSchedule.value = true;
     try {
+      if (userController.profile == null && userController.user == null) {
+        await userController.getProfile();
+      }
+
       final classId = userController.profile?.classId;
       final schedules = await scheduleServices.fetchSchedules(
         classId: classId != null && classId > 0 ? classId : null,

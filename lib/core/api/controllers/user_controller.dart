@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:get/state_manager.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:tamdansers_lv2/core/api/services/user_services.dart';
 import 'package:tamdansers_lv2/data/model/profile_model.dart';
 import 'package:tamdansers_lv2/data/model/user_model.dart';
@@ -33,6 +34,10 @@ class UserController extends GetxController {
       profile = profileJson is Map
           ? ProfileModel.fromJson(Map<String, dynamic>.from(profileJson))
           : null;
+
+      if (profile != null) {
+        GetStorage().write('student_id', profile!.id);
+      }
     } finally {
       isLoading.value = false;
     }

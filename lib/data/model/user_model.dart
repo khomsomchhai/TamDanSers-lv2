@@ -19,6 +19,11 @@ class UserModel {
     this.phone,
   });
 
+  String get displayName =>
+      fullName.isNotEmpty ? fullName : '$firstName $lastName'.trim();
+
+  String get name => displayName;
+
   factory UserModel.fromJson(Map<String, dynamic>? json) {
     final data = json ?? <String, dynamic>{};
 

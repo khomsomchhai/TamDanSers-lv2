@@ -272,9 +272,9 @@ Map<String, String> kmKh = {
 'attendance_history': 'ប្រវត្តិវត្តមាន',
 'attendance_today': 'វត្តមានថ្ងៃនេះ',
 
-'present_days': 'ថ្ងៃវត្តមាន',
-'absent_days': 'ថ្ងៃអវត្តមាន',
-'permission_days': 'ថ្ងៃសុំច្បាប់',
+'present_days': 'វត្តមាន',
+'absent_days': 'អវត្តមាន',
+'permission_days': 'សុំច្បាប់',
 'attendance_total_days': 'ចំនួនថ្ងៃសរុប',
 'subjects': 'មុខវិជ្ជា',
 'days': 'ថ្ងៃ',

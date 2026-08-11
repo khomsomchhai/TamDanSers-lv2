@@ -105,6 +105,17 @@ class LoginScreenViewController extends GetxController {
         await box.remove(
           'students',
         );
+
+        final dynamic profileData = response['profile'];
+        if (profileData is Map) {
+          final dynamic sId = profileData['id'] ?? profileData['student_id'];
+          if (sId != null) {
+            final int? id = int.tryParse(sId.toString());
+            if (id != null) {
+              await box.write('student_id', id);
+            }
+          }
+        }
       }
 
       // debugPrint(

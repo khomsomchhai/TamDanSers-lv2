@@ -309,93 +309,92 @@ class ParentAttendanceTabView
     );
   }
 
-Widget _buildAskPermissionCard(
-  BuildContext context,
-) {
-  return Material(
-    color: Colors.transparent,
-    borderRadius: BorderRadius.circular(
-      AppNumbers.radiusLarge,
-    ),
-    child: InkWell(
+  Widget _buildAskPermissionCard(
+    BuildContext context,
+  ) {
+    return Material(
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(
         AppNumbers.radiusLarge,
       ),
-      onTap: () {
-        Get.toNamed(
-          AppRoutes.parentPermission,
-        );
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(
-          16,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(
+          AppNumbers.radiusLarge,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(
-            alpha: 0.10,
+        onTap: () {
+          Get.toNamed(
+            AppRoutes.parentPermission,
+          );
+        },
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(
+            16,
           ),
-          borderRadius: BorderRadius.circular(
-            AppNumbers.radiusLarge,
-          ),
-          border: Border.all(
+          decoration: BoxDecoration(
             color: AppColors.primary.withValues(
-              alpha: 0.18,
+              alpha: 0.10,
+            ),
+            borderRadius: BorderRadius.circular(
+              AppNumbers.radiusLarge,
+            ),
+            border: Border.all(
+              color: AppColors.primary.withValues(
+                alpha: 0.18,
+              ),
             ),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(
-                  AppNumbers.radiusMedium,
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(
+                    AppNumbers.radiusMedium,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.edit_calendar_rounded,
+                  color: AppColors.white,
+                  size: 27,
                 ),
               ),
-              child: const Icon(
-                Icons.edit_calendar_rounded,
-                color: AppColors.white,
-                size: 27,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'ask_permission'.tr,
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.dark,
-                      fontWeight: FontWeight.bold,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ask_permission'.tr,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: AppColors.dark,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    'ask_permission_my_requests'.tr,
-                    style: AppTextStyles.bodySmall,
-                  ),
-                ],
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      'ask_permission_my_requests'.tr,
+                      style: AppTextStyles.bodySmall,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 18,
-              color: AppColors.primary,
-            ),
-          ],
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 18,
+                color: AppColors.primary,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   String _formatTimeRange(
     String startTime,
@@ -488,36 +487,8 @@ Widget _buildAskPermissionCard(
           const SizedBox(
             height: 7,
           ),
-          
         ],
       ),
     );
-  }
-
-  String _getShortStatus(
-    dynamic status,
-  ) {
-    final value = controller.normalizeStatus(
-      status,
-    );
-
-    switch (value) {
-      case 'p':
-      case 'present':
-        return 'P';
-
-      case 'a':
-      case 'absent':
-        return 'A';
-
-      case 'l':
-      case 'leave':
-      case 'permission':
-      case 'permitted':
-        return 'L';
-
-      default:
-        return '-';
-    }
   }
 }
