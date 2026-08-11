@@ -44,9 +44,22 @@ class ParentHomeTabViewController extends GetxController {
 
   final List<String> resultTypes = <String>[
     'ប្រចាំខែ',
-    'ឆមាស',
     'ប្រចាំឆមាស',
     'ប្រចាំឆ្នាំ',
+  ];
+
+  final List<String> semester1Months = <String>[
+    'ខែមករា',
+    'ខែកុម្ភៈ',
+    'ខែមីនា',
+    'ខែមេសា',
+  ];
+
+  final List<String> semester2Months = <String>[
+    'ខែមិថុនា',
+    'ខែកក្កដា',
+    'ខែសីហា',
+    'ខែកញ្ញា',
   ];
 
   final List<String> khmerMonths = <String>[
@@ -66,8 +79,21 @@ class ParentHomeTabViewController extends GetxController {
 
   final RxString selectedResultType = 'ប្រចាំខែ'.obs;
 
-  late final RxString selectedSubResult =
-      khmerMonths[DateTime.now().month - 1].obs;
+  late final RxInt selectedMonthlySemester =
+      (DateTime.now().month >= 6 ? 2 : 1).obs;
+
+  late final RxString selectedSubResult = () {
+    final int m = DateTime.now().month;
+    if (m >= 1 && m <= 4) {
+      return semester1Months[m - 1].obs;
+    } else if (m >= 6 && m <= 9) {
+      return semester2Months[m - 6].obs;
+    } else if (m <= 5) {
+      return semester1Months.first.obs;
+    } else {
+      return semester2Months.first.obs;
+    }
+  }();
 
   final RxBool isResultExpanded = false.obs;
 
@@ -115,6 +141,19 @@ class ParentHomeTabViewController extends GetxController {
   // =====================================================
 
   final RxList<ScheduleModel> todaySchedule = <ScheduleModel>[].obs;
+
+  final RxBool isScheduleExpanded = false.obs;
+
+  void toggleScheduleExpand() {
+    isScheduleExpanded.value = !isScheduleExpanded.value;
+  }
+
+  List<ScheduleModel> get visibleTodaySchedules {
+    if (isScheduleExpanded.value || todaySchedule.length <= 2) {
+      return todaySchedule;
+    }
+    return todaySchedule.take(2).toList();
+  }
 
   // =====================================================
   // ATTENDANCE
@@ -177,8 +216,7 @@ class ParentHomeTabViewController extends GetxController {
   double _percentage(
     ScoreModel result,
   ) {
-    final double score =
-        result.score > 0 ? result.score : result.totalScore;
+    final double score = result.score > 0 ? result.score : result.totalScore;
 
     final double max = result.maxScore > 0 ? result.maxScore : 100.0;
 
@@ -275,19 +313,25 @@ class ParentHomeTabViewController extends GetxController {
     }
 
     // ---------------------------------------------------
-    // ATTENDANCE STRENGTH (Rate >= 80% AND absent <= 2)
+    // ATTENDANCE STRENGTH (Rate >= 80% AND absent <= 1)
     // ---------------------------------------------------
 
     final int absentDays = attendanceController.absentDays.value;
+    final int absentSubjects = attendanceController.absentSubjects.value;
     final double attRate = attendanceController.attendanceRate;
-    final int totalDays = attendanceController.totalDays;
+    final int totalRecords = attendanceController.presentSubjects.value +
+        attendanceController.absentSubjects.value +
+        attendanceController.permissionSubjects.value;
 
     debugPrint(
       'STRENGTH ATTENDANCE => '
-      'rate=$attRate%, absent=$absentDays, total=$totalDays',
+      'rate=$attRate%, absentDays=$absentDays, absentSubjects=$absentSubjects, totalRecords=$totalRecords',
     );
 
-    if (totalDays > 0 && attRate >= 80 && absentDays <= 2) {
+    if ((totalRecords > 0 || attendanceController.totalDays > 0) &&
+        attRate >= 80 &&
+        absentSubjects <= 1 &&
+        absentDays <= 1) {
       list.add('វត្តមានល្អ');
     }
 
@@ -316,8 +360,8 @@ class ParentHomeTabViewController extends GetxController {
   // =====================================================
   // IMPROVEMENTS
   //
-  // < 50%
-  // OR ABSENCE >= 5 OR ATTENDANCE RATE < 50%
+  // < 50% for subject scores
+  // OR ATTENDANCE RATE < 80% OR ABSENT SUBJECTS >= 2
   // =====================================================
 
   List<String> get improvementsList {
@@ -377,19 +421,23 @@ class ParentHomeTabViewController extends GetxController {
     }
 
     // ---------------------------------------------------
-    // ATTENDANCE IMPROVEMENT (Rate < 50% OR absent >= 5)
+    // ATTENDANCE IMPROVEMENT (Rate < 80% OR absentSubjects >= 2)
     // ---------------------------------------------------
 
     final int impAbsentDays = attendanceController.absentDays.value;
+    final int impAbsentSubjects = attendanceController.absentSubjects.value;
     final double impAttRate = attendanceController.attendanceRate;
-    final int impTotalDays = attendanceController.totalDays;
+    final int impTotalRecords = attendanceController.presentSubjects.value +
+        attendanceController.absentSubjects.value +
+        attendanceController.permissionSubjects.value;
 
     debugPrint(
       'IMPROVEMENT ATTENDANCE => '
-      'rate=$impAttRate%, absent=$impAbsentDays, total=$impTotalDays',
+      'rate=$impAttRate%, absentDays=$impAbsentDays, absentSubjects=$impAbsentSubjects, totalRecords=$impTotalRecords',
     );
 
-    if (impTotalDays > 0 && (impAttRate < 50 || impAbsentDays >= 5)) {
+    if ((impTotalRecords > 0 || attendanceController.totalDays > 0) &&
+        (impAttRate < 80 || impAbsentSubjects >= 2 || impAbsentDays >= 2)) {
       list.add('វត្តមាន');
     }
 
@@ -434,22 +482,29 @@ class ParentHomeTabViewController extends GetxController {
     return 0;
   }
 
-  bool _isDashboardRankMatchingMonth() {
+  bool _isDashboardRankMatchingFilter() {
     final dynamic rankData = dashboard.value?.rank;
     if (rankData == null) return false;
 
-    final int filterMonth = _currentFilterMonth;
-    final int rankMonth = rankData?.month is int
-        ? rankData.month
-        : (int.tryParse(rankData?.month?.toString() ?? '') ?? 0);
-
-    if (selectedResultType.value == 'ប្រចាំខែ' &&
-        filterMonth > 0 &&
-        rankMonth > 0 &&
-        rankMonth != filterMonth) {
+    if (selectedResultType.value != 'ប្រចាំខែ') {
       return false;
     }
-    return true;
+
+    final int filterMonth = _currentFilterMonth;
+    final int rankMonth = rankData.month is int
+        ? rankData.month
+        : (int.tryParse(rankData.month?.toString() ?? '') ?? 0);
+
+    return filterMonth > 0 && rankMonth > 0 && rankMonth == filterMonth;
+  }
+
+  String _calculateRankFromAverage(double avg) {
+    if (avg >= 70) return '1';
+    if (avg >= 68) return '3';
+    if (avg >= 40) return '4';
+    if (avg > 30) return '5';
+    if (avg > 0) return '6';
+    return '-';
   }
 
   // =====================================================
@@ -471,7 +526,7 @@ class ParentHomeTabViewController extends GetxController {
       }
     }
 
-    if (_isDashboardRankMatchingMonth()) {
+    if (_isDashboardRankMatchingFilter()) {
       try {
         final dynamic rankData = dashboard.value?.rank;
         final dynamic total = rankData?.totalScore;
@@ -485,15 +540,6 @@ class ParentHomeTabViewController extends GetxController {
     return '0';
   }
 
-  String _calculateRankFromAverage(double avg) {
-    if (avg >= 70) return '1';
-    if (avg >= 68) return '3';
-    if (avg >= 40) return '4';
-    if (avg >= 30) return '5';
-    if (avg > 0) return '6';
-    return '-';
-  }
-
   // =====================================================
   // DISPLAY RANK
   // =====================================================
@@ -503,14 +549,15 @@ class ParentHomeTabViewController extends GetxController {
       return rxRank.value;
     }
 
-    if (_isDashboardRankMatchingMonth()) {
+    if (_isDashboardRankMatchingFilter()) {
       try {
         final dynamic rankData = dashboard.value?.rank;
         final dynamic rank = rankData?.rank;
 
         if (rank != null &&
             rank.toString().trim().isNotEmpty &&
-            rank.toString().trim() != 'null') {
+            rank.toString().trim() != 'null' &&
+            rank.toString().trim() != '0') {
           return rank.toString().trim();
         }
       } catch (_) {}
@@ -548,7 +595,7 @@ class ParentHomeTabViewController extends GetxController {
       }
     }
 
-    if (_isDashboardRankMatchingMonth()) {
+    if (_isDashboardRankMatchingFilter()) {
       try {
         final dynamic rankData = dashboard.value?.rank;
         final dynamic average = rankData?.average;
@@ -569,13 +616,9 @@ class ParentHomeTabViewController extends GetxController {
   List<String> get currentSubOptions {
     switch (selectedResultType.value) {
       case 'ប្រចាំខែ':
-        return khmerMonths;
-
-      case 'ឆមាស':
-        return <String>[
-          'ឆមាស ១',
-          'ឆមាស ២',
-        ];
+        return selectedMonthlySemester.value == 1
+            ? semester1Months
+            : semester2Months;
 
       case 'ប្រចាំឆមាស':
         return <String>[
@@ -592,6 +635,22 @@ class ParentHomeTabViewController extends GetxController {
   }
 
   // =====================================================
+  // SELECT MONTHLY SEMESTER (ឆមាស ១ / ឆមាស ២ for ប្រចាំខែ)
+  // =====================================================
+
+  void selectMonthlySemester(int semester) {
+    if (selectedMonthlySemester.value == semester) return;
+
+    selectedMonthlySemester.value = semester;
+    final List<String> options =
+        semester == 1 ? semester1Months : semester2Months;
+
+    if (!options.contains(selectedSubResult.value)) {
+      selectSubResult(options.first);
+    }
+  }
+
+  // =====================================================
   // SELECT RESULT TYPE
   // =====================================================
 
@@ -604,7 +663,12 @@ class ParentHomeTabViewController extends GetxController {
 
     if (options.isNotEmpty) {
       if (type == 'ប្រចាំខែ') {
-        selectedSubResult.value = khmerMonths[DateTime.now().month - 1];
+        final List<String> validMonths = selectedMonthlySemester.value == 1
+            ? semester1Months
+            : semester2Months;
+        if (!validMonths.contains(selectedSubResult.value)) {
+          selectedSubResult.value = validMonths.first;
+        }
       } else {
         selectedSubResult.value = options.first;
       }
@@ -1010,8 +1074,7 @@ class ParentHomeTabViewController extends GetxController {
         if (requestId == _resultRequestId &&
             monthRankData != null &&
             monthRankData.rank.trim().isNotEmpty &&
-            monthRankData.rank.trim() != '0' &&
-            monthRankData.rank.trim() != 'null') {
+            monthRankData.rank.trim().toLowerCase() != 'null') {
           rxRank.value = monthRankData.rank.trim();
         }
       } catch (e) {
@@ -1086,6 +1149,25 @@ class ParentHomeTabViewController extends GetxController {
         _applyScoreSummary(
           summary,
         );
+      }
+
+      // -------------------------------------------------
+      // SEMESTER RANK
+      // -------------------------------------------------
+      try {
+        final ScoreModel? semRankData = await resultApi.getSemesterResult(
+          semester: semester,
+          studentId: studentId,
+        );
+
+        if (requestId == _resultRequestId &&
+            semRankData != null &&
+            semRankData.rank.trim().isNotEmpty &&
+            semRankData.rank.trim().toLowerCase() != 'null') {
+          rxRank.value = semRankData.rank.trim();
+        }
+      } catch (e) {
+        debugPrint('GET SEMESTER RANK ERROR: $e');
       }
 
       // -------------------------------------------------
@@ -1178,6 +1260,26 @@ class ParentHomeTabViewController extends GetxController {
       }
 
       // -------------------------------------------------
+      // YEAR RANK
+      // -------------------------------------------------
+      try {
+        final int currentYear = DateTime.now().year;
+        final ScoreModel? yearRankData = await resultApi.getYearRank(
+          year: currentYear,
+          studentId: studentId,
+        );
+
+        if (requestId == _resultRequestId &&
+            yearRankData != null &&
+            yearRankData.rank.trim().isNotEmpty &&
+            yearRankData.rank.trim().toLowerCase() != 'null') {
+          rxRank.value = yearRankData.rank.trim();
+        }
+      } catch (e) {
+        debugPrint('GET YEAR RANK ERROR: $e');
+      }
+
+      // -------------------------------------------------
       // YEAR API HAS NO SUBJECT DETAILS
       //
       // Load Semester 1 & Semester 2 subject averages
@@ -1201,9 +1303,7 @@ class ParentHomeTabViewController extends GetxController {
           );
 
           semAverages.forEach((String key, double pct) {
-            semAveragesPerSubject
-                .putIfAbsent(key, () => <double>[])
-                .add(pct);
+            semAveragesPerSubject.putIfAbsent(key, () => <double>[]).add(pct);
           });
 
           final List<ScoreModel> details =
@@ -1357,7 +1457,7 @@ class ParentHomeTabViewController extends GetxController {
 
   void _applyDashboardFallback() {
     try {
-      if (!_isDashboardRankMatchingMonth()) {
+      if (!_isDashboardRankMatchingFilter()) {
         return;
       }
 
@@ -1442,10 +1542,58 @@ class ParentHomeTabViewController extends GetxController {
   void onInit() {
     super.onInit();
 
+    _loadFromStorageEarly();
     loadStudents();
 
     if (userController.user == null && userController.profile == null) {
       userController.getProfile();
+    }
+  }
+
+  void _loadFromStorageEarly() {
+    try {
+      final dynamic cachedData = box.read('students');
+      if (cachedData is List && cachedData.isNotEmpty) {
+        final List<Map<String, dynamic>> cachedStudents = [];
+        for (final item in cachedData) {
+          if (item is Map) {
+            cachedStudents.add(Map<String, dynamic>.from(item));
+          }
+        }
+        if (cachedStudents.isNotEmpty) {
+          students.assignAll(cachedStudents);
+          selectedChild.value = cachedStudents.first;
+          isLoading.value = false;
+
+          final int? studentId = _parseStudentId(cachedStudents.first);
+          if (studentId != null) {
+            _loadCachedSchedule(studentId);
+            attendanceController.loadAttendanceByStudent(studentId);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('EARLY STORAGE LOAD ERROR: $e');
+    }
+  }
+
+  void _loadCachedSchedule(int studentId) {
+    try {
+      final cached = box.read('today_schedule_$studentId');
+      if (cached is List && cached.isNotEmpty && todaySchedule.isEmpty) {
+        final List<ScheduleModel> cachedList = [];
+        for (final item in cached) {
+          if (item is Map) {
+            cachedList.add(ScheduleModel.fromJson(Map<String, dynamic>.from(item)));
+          }
+        }
+        if (cachedList.isNotEmpty) {
+          todaySchedule.assignAll(cachedList);
+          isScheduleLoading.value = false;
+        }
+      }
+    } catch (e) {
+      debugPrint('LOAD CACHED SCHEDULE ERROR: $e');
     }
   }
 
@@ -1455,7 +1603,9 @@ class ParentHomeTabViewController extends GetxController {
 
   Future<void> loadStudents() async {
     try {
-      isLoading.value = true;
+      if (students.isEmpty) {
+        isLoading.value = true;
+      }
 
       errorMessage.value = '';
 
@@ -1791,44 +1941,45 @@ class ParentHomeTabViewController extends GetxController {
     int studentId,
   ) async {
     try {
-      isScheduleLoading.value = true;
-
+      _loadCachedSchedule(studentId);
+      if (todaySchedule.isEmpty) {
+        isScheduleLoading.value = true;
+      }
       scheduleError.value = '';
 
       final dynamic response = await scheduleApi.getParentSchedule(
         studentId,
       );
 
-      dynamic responseData;
-
-      if (response is Map) {
-        responseData = Map<String, dynamic>.from(
-          response,
-        );
-      } else {
-        try {
-          responseData = response.data;
-        } catch (_) {
-          responseData = null;
+      if (response == null) {
+        if (todaySchedule.isEmpty) {
+          todaySchedule.clear();
         }
-      }
-
-      if (responseData is! Map) {
-        todaySchedule.clear();
-
         return;
       }
 
-      final Map<String, dynamic> responseMap = Map<String, dynamic>.from(
-        responseData,
-      );
+      List<dynamic> schedulesData = <dynamic>[];
 
-      final dynamic schedulesData =
-          responseMap['schedules'] ?? responseMap['data'];
+      if (response is List) {
+        schedulesData = response;
+      } else if (response is Map) {
+        final Map<String, dynamic> responseMap =
+            Map<String, dynamic>.from(response);
 
-      if (schedulesData is! List) {
-        todaySchedule.clear();
+        final dynamic data = responseMap['schedules'] ??
+            responseMap['data'] ??
+            responseMap['results'] ??
+            responseMap['permissions'];
 
+        if (data is List) {
+          schedulesData = data;
+        }
+      }
+
+      if (schedulesData.isEmpty) {
+        if (todaySchedule.isEmpty) {
+          todaySchedule.clear();
+        }
         return;
       }
 
@@ -1841,60 +1992,95 @@ class ParentHomeTabViewController extends GetxController {
 
         try {
           final ScheduleModel schedule = ScheduleModel.fromJson(
-            Map<String, dynamic>.from(
-              item,
-            ),
+            Map<String, dynamic>.from(item),
           );
-
-          schedules.add(
-            schedule,
-          );
+          schedules.add(schedule);
         } catch (e) {
-          debugPrint(
-            'INVALID SCHEDULE ITEM: '
-            '$e',
-          );
+          debugPrint('INVALID SCHEDULE ITEM: $e');
         }
       }
 
-      schedules.sort(
-        (
-          ScheduleModel first,
-          ScheduleModel second,
-        ) {
-          return _timeToMinutes(
-            first.startTime,
-          ).compareTo(
-            _timeToMinutes(
-              second.startTime,
-            ),
-          );
+      // ---------------------------------------------------------
+      // Filter for Today (Day of Week)
+      // ---------------------------------------------------------
+      final String todayFull = _getTodayDayName();
+      final String todayShort = _getTodayShortDayName();
+
+      final List<ScheduleModel> todayOnly = schedules.where((item) {
+        if (item.day.isEmpty) return true;
+        final String dayLower = item.day.trim().toLowerCase();
+        return dayLower == todayFull.toLowerCase() ||
+            dayLower == todayShort.toLowerCase() ||
+            dayLower.contains(todayShort.toLowerCase());
+      }).toList();
+
+      final List<ScheduleModel> finalSchedules =
+          todayOnly.isNotEmpty ? todayOnly : schedules;
+
+      finalSchedules.sort(
+        (ScheduleModel first, ScheduleModel second) {
+          return _timeToMinutes(first.startTime)
+              .compareTo(_timeToMinutes(second.startTime));
         },
       );
 
-      todaySchedule.assignAll(
-        schedules,
+      todaySchedule.assignAll(finalSchedules);
+
+      await box.write(
+        'today_schedule_$studentId',
+        finalSchedules.map((s) => s.toJson()).toList(),
       );
 
-      debugPrint(
-        'TODAY SCHEDULE COUNT: '
-        '${todaySchedule.length}',
-      );
+      debugPrint('TODAY SCHEDULE COUNT: ${todaySchedule.length}');
     } catch (e, stackTrace) {
-      todaySchedule.clear();
-
-      scheduleError.value = e.toString();
-
-      debugPrint(
-        'GET TODAY SCHEDULE ERROR: '
-        '$e',
-      );
-
-      debugPrintStack(
-        stackTrace: stackTrace,
-      );
+      if (todaySchedule.isEmpty) {
+        todaySchedule.clear();
+        scheduleError.value = e.toString();
+      }
+      debugPrint('GET TODAY SCHEDULE ERROR: $e');
+      debugPrintStack(stackTrace: stackTrace);
     } finally {
       isScheduleLoading.value = false;
+    }
+  }
+
+  String _getTodayDayName() {
+    switch (DateTime.now().weekday) {
+      case DateTime.monday:
+        return 'Monday';
+      case DateTime.tuesday:
+        return 'Tuesday';
+      case DateTime.wednesday:
+        return 'Wednesday';
+      case DateTime.thursday:
+        return 'Thursday';
+      case DateTime.friday:
+        return 'Friday';
+      case DateTime.saturday:
+        return 'Saturday';
+      case DateTime.sunday:
+      default:
+        return 'Sunday';
+    }
+  }
+
+  String _getTodayShortDayName() {
+    switch (DateTime.now().weekday) {
+      case DateTime.monday:
+        return 'Mon';
+      case DateTime.tuesday:
+        return 'Tue';
+      case DateTime.wednesday:
+        return 'Wed';
+      case DateTime.thursday:
+        return 'Thu';
+      case DateTime.friday:
+        return 'Fri';
+      case DateTime.saturday:
+        return 'Sat';
+      case DateTime.sunday:
+      default:
+        return 'Sun';
     }
   }
 

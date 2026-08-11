@@ -629,7 +629,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        '${rate.toStringAsFixed(0)}%',
+                        rate % 1 == 0
+                            ? '${rate.toInt()}%'
+                            : '${rate.toStringAsFixed(1)}%',
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: const Color(0xFF059669),
                           fontWeight: FontWeight.bold,
@@ -1032,45 +1034,73 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Text(
-                  'attendance_today'.tr,
-                  style: AppTextStyles.titleSmall.copyWith(
-                    color: AppColors.dark,
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'attendance_today'.tr,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.dark,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
               ),
               if (canExpand)
                 InkWell(
-                  borderRadius: BorderRadius.circular(
-                    10,
-                  ),
                   onTap: controller.toggleAttendanceExpanded,
-                  child: Padding(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: 12,
                       vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(
+                        alpha: 0.08,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        20,
+                      ),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(
+                          alpha: 0.20,
+                        ),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          isExpanded ? 'បង្ហាញតិច' : 'មើលទាំងអស់',
+                          isExpanded
+                              ? (Get.locale?.languageCode == 'km'
+                                  ? 'បង្រួម'
+                                  : 'Show Less')
+                              : (Get.locale?.languageCode == 'km'
+                                  ? 'មើលទាំងអស់'
+                                  : 'View All'),
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(
-                          width: 4,
-                        ),
+                        const SizedBox(width: 4),
                         Icon(
                           isExpanded
                               ? Icons.keyboard_arrow_up_rounded
                               : Icons.keyboard_arrow_down_rounded,
-                          size: 20,
+                          size: 16,
                           color: AppColors.primary,
                         ),
                       ],
@@ -1436,17 +1466,13 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.circular(
-                  16,
-                ),
+                borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: 0.04,
-                    ),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
@@ -1462,31 +1488,21 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                         final isTypeSelected = type == selectedType;
 
                         return Padding(
-                          padding: const EdgeInsets.only(
-                            right: 6,
-                          ),
+                          padding: const EdgeInsets.only(right: 5),
                           child: InkWell(
-                            onTap: () => controller.selectResultType(
-                              type,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              14,
-                            ),
+                            onTap: () => controller.selectResultType(type),
+                            borderRadius: BorderRadius.circular(10),
                             child: AnimatedContainer(
-                              duration: const Duration(
-                                milliseconds: 150,
-                              ),
+                              duration: const Duration(milliseconds: 150),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
+                                horizontal: 10,
+                                vertical: 4,
                               ),
                               decoration: BoxDecoration(
                                 color: isTypeSelected
                                     ? AppColors.primary
                                     : AppColors.lightBackground,
-                                borderRadius: BorderRadius.circular(
-                                  14,
-                                ),
+                                borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: isTypeSelected
                                       ? AppColors.primary
@@ -1502,7 +1518,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                                   fontWeight: isTypeSelected
                                       ? FontWeight.bold
                                       : FontWeight.w500,
-                                  fontSize: 12,
+                                  fontSize: 11,
                                 ),
                               ),
                             ),
@@ -1511,104 +1527,223 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                       }).toList(),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Text(
                     'ជ្រើសរើស $selectedType:',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: AppColors.hintColor,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   if (selectedType == 'ប្រចាំខែ')
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: subOptions.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        childAspectRatio: 2.5,
-                        crossAxisSpacing: 6,
-                        mainAxisSpacing: 6,
-                      ),
-                      itemBuilder: (context, index) {
-                        final monthName = subOptions[index];
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Compact Segmented Control for Semester Selection
+                        Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      controller.selectMonthlySemester(1),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 180),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                    ),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: controller.selectedMonthlySemester
+                                                  .value ==
+                                              1
+                                          ? AppColors.primary
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: controller
+                                                  .selectedMonthlySemester
+                                                  .value ==
+                                              1
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.25),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 1),
+                                              )
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Text(
+                                      'ឆមាស ១',
+                                      style: TextStyle(
+                                        color: controller
+                                                    .selectedMonthlySemester
+                                                    .value ==
+                                                1
+                                            ? Colors.white
+                                            : const Color(0xFF64748B),
+                                        fontWeight: controller
+                                                    .selectedMonthlySemester
+                                                    .value ==
+                                                1
+                                            ? FontWeight.bold
+                                            : FontWeight.w600,
+                                        fontSize: 11.5,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      controller.selectMonthlySemester(2),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 180),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                    ),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: controller.selectedMonthlySemester
+                                                  .value ==
+                                              2
+                                          ? AppColors.primary
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: controller
+                                                  .selectedMonthlySemester
+                                                  .value ==
+                                              2
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.25),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 1),
+                                              )
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Text(
+                                      'ឆមាស ២',
+                                      style: TextStyle(
+                                        color: controller
+                                                    .selectedMonthlySemester
+                                                    .value ==
+                                                2
+                                            ? Colors.white
+                                            : const Color(0xFF64748B),
+                                        fontWeight: controller
+                                                    .selectedMonthlySemester
+                                                    .value ==
+                                                2
+                                            ? FontWeight.bold
+                                            : FontWeight.w600,
+                                        fontSize: 11.5,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        // Ultra-tight Single Row for 4 Months
+                        Row(
+                          children: subOptions.map((monthName) {
+                            final isSubSelected = monthName == selectedSub;
 
-                        final isSubSelected = monthName == selectedSub;
-
-                        return InkWell(
-                          onTap: () => controller.selectSubResult(
-                            monthName,
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            10,
-                          ),
-                          child: AnimatedContainer(
-                            duration: const Duration(
-                              milliseconds: 150,
-                            ),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: isSubSelected
-                                  ? AppColors.primary
-                                  : AppColors.lightBackground,
-                              borderRadius: BorderRadius.circular(
-                                10,
+                            return Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 2),
+                                child: InkWell(
+                                  onTap: () => controller.selectSubResult(
+                                    monthName,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(
+                                      milliseconds: 180,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                    ),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: isSubSelected
+                                          ? AppColors.primary
+                                          : const Color(0xFFF8FAFC),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isSubSelected
+                                            ? AppColors.primary
+                                            : const Color(0xFFE2E8F0),
+                                        width: isSubSelected ? 1.2 : 1,
+                                      ),
+                                      boxShadow: isSubSelected
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.2),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 1),
+                                              )
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Text(
+                                      monthName,
+                                      style: TextStyle(
+                                        color: isSubSelected
+                                            ? Colors.white
+                                            : const Color(0xFF334155),
+                                        fontWeight: isSubSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.w600,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              border: Border.all(
-                                color: isSubSelected
-                                    ? AppColors.primary
-                                    : AppColors.border,
-                              ),
-                            ),
-                            child: Text(
-                              monthName,
-                              style: TextStyle(
-                                color: isSubSelected
-                                    ? Colors.white
-                                    : AppColors.dark,
-                                fontWeight: isSubSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                                fontSize: 11.5,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+                            );
+                          }).toList(),
+                        ),
+                      ],
                     )
                   else
                     Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
+                      spacing: 5,
+                      runSpacing: 5,
                       children: subOptions.map(
                         (opt) {
                           final isSubSelected = opt == selectedSub;
 
                           return InkWell(
-                            onTap: () => controller.selectSubResult(
-                              opt,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ),
+                            onTap: () => controller.selectSubResult(opt),
+                            borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
-                              duration: const Duration(
-                                milliseconds: 150,
-                              ),
+                              duration: const Duration(milliseconds: 150),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 7,
+                                horizontal: 10,
+                                vertical: 5,
                               ),
                               decoration: BoxDecoration(
                                 color: isSubSelected
                                     ? AppColors.primary
                                     : AppColors.lightBackground,
-                                borderRadius: BorderRadius.circular(
-                                  10,
-                                ),
+                                borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: isSubSelected
                                       ? AppColors.primary
@@ -1627,16 +1762,14 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                                       fontWeight: isSubSelected
                                           ? FontWeight.bold
                                           : FontWeight.w500,
-                                      fontSize: 12,
+                                      fontSize: 11,
                                     ),
                                   ),
                                   if (isSubSelected) ...[
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
+                                    const SizedBox(width: 4),
                                     const Icon(
                                       Icons.check_circle_rounded,
-                                      size: 14,
+                                      size: 13,
                                       color: Colors.white,
                                     ),
                                   ],
@@ -1675,10 +1808,16 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
       }
 
       final totalSessions = controller.todaySchedule.length;
+      final isExpanded = controller.isScheduleExpanded.value;
+      final isKm = Get.locale?.languageCode == 'km';
 
-      final sessionText = Get.locale?.languageCode == 'km'
-          ? '$totalSessions វគ្គ'
-          : '$totalSessions session';
+      final String headerText = totalSessions <= 2
+          ? (isKm
+              ? '$totalSessions វគ្គ'
+              : '$totalSessions session${totalSessions > 1 ? 's' : ''}')
+          : (isExpanded
+              ? (isKm ? 'បង្រួម' : 'Show Less')
+              : (isKm ? 'មើលបន្ថែម' : 'Show More'));
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1707,47 +1846,58 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(
-                    alpha: 0.08,
+              InkWell(
+                onTap: totalSessions > 2
+                    ? controller.toggleScheduleExpand
+                    : null,
+                borderRadius: BorderRadius.circular(20),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
-                  borderRadius: BorderRadius.circular(
-                    20,
-                  ),
-                  border: Border.all(
+                  decoration: BoxDecoration(
                     color: AppColors.primary.withValues(
-                      alpha: 0.20,
+                      alpha: 0.08,
                     ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.class_outlined,
-                      size: 14,
-                      color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(
+                      20,
                     ),
-                    const SizedBox(width: 5),
-                    Text(
-                      sessionText,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
+                    border: Border.all(
+                      color: AppColors.primary.withValues(
+                        alpha: 0.20,
                       ),
                     ),
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        totalSessions <= 2
+                            ? Icons.class_outlined
+                            : (isExpanded
+                                ? Icons.keyboard_arrow_up_rounded
+                                : Icons.keyboard_arrow_down_rounded),
+                        size: 16,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        headerText,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 14),
-          ...controller.todaySchedule.map(scheduleCard),
+          ...controller.visibleTodaySchedules.map(scheduleCard),
         ],
       );
     });
@@ -2172,18 +2322,30 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
   String _translateSubResult(String sub, bool isKm) {
     if (isKm) return sub;
     final monthsKmMap = {
-      'ខែមករា': 'January', 'មករា': 'January',
-      'ខែកុម្ភៈ': 'February', 'កុម្ភៈ': 'February',
-      'ខែមីនា': 'March', 'មីនា': 'March',
-      'ខែមេសា': 'April', 'មេសា': 'April',
-      'ខែឧសភា': 'May', 'ឧសភា': 'May',
-      'ខែមិថុនា': 'June', 'មិថុនា': 'June',
-      'ខែកក្កដា': 'July', 'កក្កដា': 'July',
-      'ខែសីហា': 'August', 'សីហា': 'August',
-      'ខែកញ្ញា': 'September', 'កញ្ញា': 'September',
-      'ខែតុលា': 'October', 'តុលា': 'October',
-      'ខែវិច្ឆិកា': 'November', 'វិច្ឆិកា': 'November',
-      'ខែធ្នូ': 'December', 'ធ្នូ': 'December',
+      'ខែមករា': 'January',
+      'មករា': 'January',
+      'ខែកុម្ភៈ': 'February',
+      'កុម្ភៈ': 'February',
+      'ខែមីនា': 'March',
+      'មីនា': 'March',
+      'ខែមេសា': 'April',
+      'មេសា': 'April',
+      'ខែឧសភា': 'May',
+      'ឧសភា': 'May',
+      'ខែមិថុនា': 'June',
+      'មិថុនា': 'June',
+      'ខែកក្កដា': 'July',
+      'កក្កដា': 'July',
+      'ខែសីហា': 'August',
+      'សីហា': 'August',
+      'ខែកញ្ញា': 'September',
+      'កញ្ញា': 'September',
+      'ខែតុលា': 'October',
+      'តុលា': 'October',
+      'ខែវិច្ឆិកា': 'November',
+      'វិច្ឆិកា': 'November',
+      'ខែធ្នូ': 'December',
+      'ធ្នូ': 'December',
     };
     if (monthsKmMap.containsKey(sub)) {
       return monthsKmMap[sub]!;
@@ -2211,21 +2373,47 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                isKm ? 'លទ្ធផលសិក្សា' : 'Academic Results',
-                style: AppTextStyles.titleSmall.copyWith(
-                  color: AppColors.dark,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    isKm ? 'លទ្ធផលសិក្សា' : 'Academic Results',
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.dark,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
               ),
               InkWell(
-                borderRadius: BorderRadius.circular(10),
                 onTap: controller.toggleAcademicProgressExpanded,
-                child: Padding(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                    horizontal: 12,
                     vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(
+                      alpha: 0.08,
+                    ),
+                    borderRadius: BorderRadius.circular(
+                      20,
+                    ),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(
+                        alpha: 0.20,
+                      ),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -2244,7 +2432,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                         isExpanded
                             ? Icons.keyboard_arrow_up_rounded
                             : Icons.keyboard_arrow_down_rounded,
-                        size: 20,
+                        size: 16,
                         color: AppColors.primary,
                       ),
                     ],
@@ -2319,9 +2507,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                   size: 24,
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -2349,7 +2535,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                   ],
                 ),
               ),
-
               const Icon(
                 Icons.more_horiz_rounded,
                 color: AppColors.hintColor,
@@ -2445,13 +2630,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
             _buildScoreLevelGraphBox(),
-
             const SizedBox(height: 14),
-
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -2512,9 +2693,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 10),
-
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -2574,9 +2753,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
             SizedBox(
               width: double.infinity,
               height: 44,
@@ -2622,16 +2799,46 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
     if (type == 'ប្រចាំខែ') {
       const khmerMonths = [
-        'ខែមករា', 'ខែកុម្ភៈ', 'ខែមីនា', 'ខែមេសា', 'ខែឧសភា', 'ខែមិថុនា',
-        'ខែកក្កដា', 'ខែសីហា', 'ខែកញ្ញា', 'ខែតុលា', 'ខែវិច្ឆិកា', 'ខែធ្នូ',
+        'ខែមករា',
+        'ខែកុម្ភៈ',
+        'ខែមីនា',
+        'ខែមេសា',
+        'ខែឧសភា',
+        'ខែមិថុនា',
+        'ខែកក្កដា',
+        'ខែសីហា',
+        'ខែកញ្ញា',
+        'ខែតុលា',
+        'ខែវិច្ឆិកា',
+        'ខែធ្នូ',
       ];
       const khmerShortMonths = [
-        'មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា',
-        'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ',
+        'មករា',
+        'កុម្ភៈ',
+        'មីនា',
+        'មេសា',
+        'ឧសភា',
+        'មិថុនា',
+        'កក្កដា',
+        'សីហា',
+        'កញ្ញា',
+        'តុលា',
+        'វិច្ឆិកា',
+        'ធ្នូ',
       ];
       const englishShortMonths = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ];
 
       int selectedIdx = khmerMonths.indexOf(sub);
@@ -2680,9 +2887,8 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
         );
       }).toList();
     } else {
-      final currentYearLabel = isKm
-          ? 'ឆ្នាំ ${DateTime.now().year}'
-          : 'Year ${DateTime.now().year}';
+      final currentYearLabel =
+          isKm ? 'ឆ្នាំ ${DateTime.now().year}' : 'Year ${DateTime.now().year}';
 
       items = [
         _buildGraphItem(
@@ -2722,9 +2928,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
               ),
             ],
           ),
-
           const SizedBox(height: 16),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: items,

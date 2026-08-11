@@ -103,7 +103,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     }
 
     setState(() {
-      _answerController.text = submission.answerText ?? '';
+      _answerController.text = submission.answerText;
       _selectedFiles.clear();
       _keepOldFiles = true;
       _isEditing = true;
@@ -331,9 +331,15 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               foregroundColor: Colors.white,
               elevation: 0,
             ),
-            onPressed: () {
+            onPressed: () async {
               Get.back();
-              widget.controller.executeDeleteSubmission(
+              setState(() {
+                _answerController.clear();
+                _selectedFiles.clear();
+                _isEditing = false;
+                _keepOldFiles = false;
+              });
+              await widget.controller.executeDeleteSubmission(
                 submissionId: submissionId,
               );
             },

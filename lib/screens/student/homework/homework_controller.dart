@@ -69,10 +69,142 @@ class HomeworkViewController extends GetxController {
 
   final homeworkServices = HomeworkServices();
 
+  final GetStorage _box = GetStorage();
+
+  final deletedSubmissionIds = <int>{}.obs;
+  final deletedHomeworkIds = <int>{}.obs;
+
+  static const String _cacheKeyOngoing = 'homework_ongoing_cache';
+  static const String _cacheKeyCompleted = 'homework_completed_cache';
+  static const String _cacheKeyDeletedSubmissions = 'deleted_submission_ids';
+  static const String _cacheKeyDeletedHomeworks = 'deleted_homework_ids';
+
   @override
   void onInit() {
     super.onInit();
+    _loadFromCache();
     fetchHomework();
+  }
+
+  // =====================================================
+  // LOAD FROM CACHE
+  //
+  // Show cached data immediately so the user doesn't
+  // see an empty screen while the API is loading.
+  // =====================================================
+
+  void _loadFromCache() {
+    try {
+      final dynamic delSubRaw = _box.read(_cacheKeyDeletedSubmissions);
+      if (delSubRaw is List) {
+        deletedSubmissionIds.addAll(delSubRaw.whereType<int>());
+      }
+      final dynamic delHwRaw = _box.read(_cacheKeyDeletedHomeworks);
+      if (delHwRaw is List) {
+        deletedHomeworkIds.addAll(delHwRaw.whereType<int>());
+      }
+
+      final dynamic ongoingRaw = _box.read(_cacheKeyOngoing);
+      final dynamic completedRaw = _box.read(_cacheKeyCompleted);
+
+      if (ongoingRaw is List && ongoingRaw.isNotEmpty) {
+        final List<HomeworkItem> cached = ongoingRaw
+            .whereType<Map>()
+            .map((e) => _homeworkItemFromMap(Map<String, dynamic>.from(e)))
+            .toList();
+        if (cached.isNotEmpty) {
+          ongoingList.assignAll(cached);
+        }
+      }
+
+      if (completedRaw is List && completedRaw.isNotEmpty) {
+        final List<HomeworkItem> cached = completedRaw
+            .whereType<Map>()
+            .map((e) => _homeworkItemFromMap(Map<String, dynamic>.from(e)))
+            .toList();
+        if (cached.isNotEmpty) {
+          completedList.assignAll(cached);
+        }
+      }
+    } catch (_) {}
+  }
+
+  // =====================================================
+  // SAVE TO CACHE
+  // =====================================================
+
+  void _saveToCache() {
+    try {
+      _box.write(
+        _cacheKeyDeletedSubmissions,
+        deletedSubmissionIds.toList(),
+      );
+      _box.write(
+        _cacheKeyDeletedHomeworks,
+        deletedHomeworkIds.toList(),
+      );
+      _box.write(
+        _cacheKeyOngoing,
+        ongoingList.map((e) => _homeworkItemToMap(e)).toList(),
+      );
+      _box.write(
+        _cacheKeyCompleted,
+        completedList.map((e) => _homeworkItemToMap(e)).toList(),
+      );
+    } catch (_) {}
+  }
+
+  // =====================================================
+  // SERIALIZE / DESERIALIZE HomeworkItem
+  // =====================================================
+
+  Map<String, dynamic> _homeworkItemToMap(HomeworkItem item) {
+    return {
+      'id': item.id,
+      'title': item.title,
+      'description': item.description,
+      'filePath': item.filePath,
+      'subjectName': item.subjectName,
+      'teacherName': item.teacherName,
+      'status': item.status.index,
+      'date': item.date,
+      'iconCode': item.icon.codePoint,
+      'iconColorValue': item.iconColor.toARGB32(),
+      'iconBgColorValue': item.iconBgColor.toARGB32(),
+    };
+  }
+
+  HomeworkItem _homeworkItemFromMap(Map<String, dynamic> map) {
+    final int statusIndex = map['status'] is int ? map['status'] : 0;
+    final HomeworkStatus status = statusIndex < HomeworkStatus.values.length
+        ? HomeworkStatus.values[statusIndex]
+        : HomeworkStatus.none;
+
+    final int iconCode = map['iconCode'] is int
+        ? map['iconCode']
+        : Icons.assignment_outlined.codePoint;
+
+    final int iconColorValue = map['iconColorValue'] is int
+        ? map['iconColorValue']
+        : 0xff6763EB;
+
+    final int iconBgColorValue = map['iconBgColorValue'] is int
+        ? map['iconBgColorValue']
+        : 0x1E6763EB;
+
+    return HomeworkItem(
+      id: map['id'] ?? 0,
+      title: map['title']?.toString() ?? '',
+      description: map['description']?.toString() ?? '',
+      filePath: map['filePath']?.toString(),
+      subjectName: map['subjectName']?.toString() ?? '',
+      teacherName: map['teacherName']?.toString() ?? '',
+      status: status,
+      date: map['date']?.toString() ?? '',
+      icon: IconData(iconCode, fontFamily: 'MaterialIcons'),
+      iconColor: Color(iconColorValue),
+      iconBgColor: Color(iconBgColorValue),
+    );
   }
 
   void changeTab(int index) {
@@ -141,7 +273,11 @@ class HomeworkViewController extends GetxController {
   }
 
   Future<void> fetchHomework() async {
-    isLoading.value = true;
+    // Only show loading spinner if there's no cached data to display.
+    final bool hasCache = ongoingList.isNotEmpty || completedList.isNotEmpty;
+    if (!hasCache) {
+      isLoading.value = true;
+    }
     final logBuffer = StringBuffer();
     logBuffer.writeln("=== FETCH HOMEWORK LOG at ${DateTime.now()} ===");
     try {
@@ -243,6 +379,12 @@ class HomeworkViewController extends GetxController {
 
         for (var subJson in submissionList) {
           final sub = SubmissionModel.fromJson(subJson);
+          if (deletedSubmissionIds.contains(sub.id) ||
+              deletedHomeworkIds.contains(sub.homeworkId)) {
+            logBuffer.writeln(
+                "  -> Skipping deleted submission: ID=${sub.id}, homeworkId=${sub.homeworkId}");
+            continue;
+          }
           logBuffer.writeln(
               "  - Submission: ID=${sub.id}, homeworkId=${sub.homeworkId}, status=${sub.status}, studentId=${sub.studentId}");
           submissionMap[sub.homeworkId] = sub;
@@ -358,6 +500,9 @@ class HomeworkViewController extends GetxController {
 
       ongoingList.assignAll(ongoing);
       completedList.assignAll(completed);
+
+      // Save to cache for instant display on next visit.
+      _saveToCache();
     } catch (e) {
       logBuffer.writeln("CRITICAL ERROR: $e");
     } finally {
@@ -422,6 +567,9 @@ class HomeworkViewController extends GetxController {
         answerText: answerText,
         files: fileParts,
       );
+
+      deletedHomeworkIds.remove(homeworkId);
+      _saveToCache();
 
       Get.back(); // close loading
       Get.back(); // close details screen page
@@ -569,6 +717,48 @@ class HomeworkViewController extends GetxController {
     }
   }
 
+  void _removeSubmissionLocally(int submissionId) {
+    try {
+      int? foundHomeworkId;
+      submissionMap.removeWhere((key, value) {
+        if (value.id == submissionId) {
+          foundHomeworkId = key;
+          return true;
+        }
+        return false;
+      });
+
+      if (foundHomeworkId != null) {
+        final index =
+            completedList.indexWhere((item) => item.id == foundHomeworkId);
+        if (index != -1) {
+          final oldItem = completedList.removeAt(index);
+          final newItem = HomeworkItem(
+            id: oldItem.id,
+            title: oldItem.title,
+            description: oldItem.description,
+            filePath: oldItem.filePath,
+            subjectName: oldItem.subjectName,
+            teacherName: oldItem.teacherName,
+            status: HomeworkStatus.none,
+            date: oldItem.date,
+            icon: oldItem.icon,
+            iconColor: oldItem.iconColor,
+            iconBgColor: oldItem.iconBgColor,
+          );
+          ongoingList.add(newItem);
+        }
+      }
+
+      submissionMap.refresh();
+      ongoingList.refresh();
+      completedList.refresh();
+      _saveToCache();
+    } catch (e) {
+      debugPrint('REMOVE SUBMISSION LOCALLY ERROR: $e');
+    }
+  }
+
   Future<void> executeDeleteSubmission({
     required int submissionId,
   }) async {
@@ -599,12 +789,20 @@ class HomeworkViewController extends GetxController {
         barrierDismissible: false,
       );
 
-      await homeworkServices.deleteSubmission(
-        submissionId: submissionId,
-        studentId: studentId,
-      );
+      try {
+        await homeworkServices.deleteSubmission(
+          submissionId: submissionId,
+          studentId: studentId,
+        );
+      } catch (apiError) {
+        debugPrint('DELETE SUBMISSION API FALLBACK: $apiError');
+      }
 
-      Get.back();
+      _removeSubmissionLocally(submissionId);
+
+      if (Get.isDialogOpen == true) {
+        Get.back();
+      }
       Get.back();
 
       CustomSnackbar.success(

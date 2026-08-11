@@ -181,18 +181,18 @@ class ScoreModel {
     // TOTAL SCORE
     // =====================================================
 
-    final double totalScore = isSubjectModel
-        ? subjectScore
-        : parseDouble(
-            map['total_score'] ??
-                map['totalScore'] ??
-                summary['total_score'] ??
-                summary['totalScore'] ??
-                summary['semester_result'] ??
-                yearlySummary['average'] ??
-                rankMap['total_score'] ??
-                rankMap['totalScore'],
-          );
+    final double totalScore = parseDouble(
+      summary['total_score'] ??
+          summary['totalScore'] ??
+          rankMap['total_score'] ??
+          rankMap['totalScore'] ??
+          (isSubjectModel
+              ? subjectScore
+              : (map['total_score'] ??
+                  map['totalScore'] ??
+                  summary['semester_result'] ??
+                  yearlySummary['average'])),
+    );
 
     // =====================================================
     // MAX SCORE
@@ -250,6 +250,47 @@ class ScoreModel {
       parsedRank = rankMap['rank'];
     } else if (summary['rank'] != null) {
       parsedRank = summary['rank'];
+    } else if (summary['yearly_rank'] != null) {
+      parsedRank = summary['yearly_rank'];
+    } else if (yearlySummary['rank'] != null) {
+      parsedRank = yearlySummary['rank'];
+    } else if (yearlySummary['yearly_rank'] != null) {
+      parsedRank = yearlySummary['yearly_rank'];
+    } else if (map['yearly_rank'] != null) {
+      parsedRank = map['yearly_rank'];
+    }
+
+    // -------------------------------------------------
+    // NEW API: semester_rank as Map
+    // { "rank": 4, "total_students": 6, "ranking": [...] }
+    // -------------------------------------------------
+
+    if (parsedRank == null) {
+      final dynamic semesterRank = map['semester_rank'];
+      if (semesterRank is Map) {
+        parsedRank = semesterRank['rank'];
+      } else if (semesterRank != null) {
+        parsedRank = semesterRank;
+      }
+    }
+
+    // -------------------------------------------------
+    // NEW API: yearly_rank as Map
+    // -------------------------------------------------
+
+    if (parsedRank == null) {
+      final dynamic yearlyRankMap = map['yearly_rank'];
+      if (yearlyRankMap is Map) {
+        parsedRank = yearlyRankMap['rank'];
+      }
+    }
+
+    // -------------------------------------------------
+    // Safety: if parsedRank is a Map, extract 'rank' key
+    // -------------------------------------------------
+
+    if (parsedRank is Map) {
+      parsedRank = parsedRank['rank'];
     }
 
     final String rank = (parsedRank != null &&

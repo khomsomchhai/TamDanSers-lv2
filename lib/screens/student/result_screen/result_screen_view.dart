@@ -980,13 +980,11 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
                             ),
                           ),
                         ),
-
                         Container(
                           width: 1,
                           height: 62,
                           color: Colors.white24,
                         ),
-
                         Expanded(
                           child: Column(
                             children: [
@@ -1300,27 +1298,22 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
               size: 20,
             ),
           ),
-
           const SizedBox(
             width: 12,
           ),
-
           Expanded(
             child: Text(
               title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.bodyMedium.copyWith(
-                fontWeight:
-                    highlight ? FontWeight.w600 : FontWeight.w500,
+                fontWeight: highlight ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
           ),
-
           const SizedBox(
             width: 10,
           ),
-
           Text(
             value.toStringAsFixed(
               2,

@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
+import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/data/model/parent_model.dart';
 import 'package:tamdansers_lv2/data/model/score_model.dart';
 
@@ -26,6 +29,17 @@ class ResultApi {
     // Unwrap data/result/response
     for (int i = 0; i < 5; i++) {
       if (data is Map) {
+        if (data.containsKey('rank') ||
+            data.containsKey('summary') ||
+            data.containsKey('yearly_summary') ||
+            data.containsKey('monthly_results') ||
+            data.containsKey('student') ||
+            data.containsKey('semester_rank') ||
+            data.containsKey('yearly_rank') ||
+            data.containsKey('semester_exam')) {
+          break;
+        }
+
         if (data['data'] != null) {
           data = data['data'];
           continue;
@@ -50,11 +64,70 @@ class ResultApi {
     return data;
   }
 
-  Map<String, dynamic> _unwrapMap(dynamic response) {
-    final dynamic data = _unwrapResponse(response);
+  Map<String, dynamic> _unwrapMap(dynamic response, {int? studentId}) {
+    dynamic data = _unwrapResponse(response);
+
+    int? activeStudentId = studentId;
+    if (activeStudentId == null || activeStudentId == 0) {
+      try {
+        final dynamic storedId = GetStorage().read('student_id');
+        if (storedId != null) {
+          activeStudentId = int.tryParse(storedId.toString()) ?? (storedId as int?);
+        }
+      } catch (_) {}
+      if (activeStudentId == null || activeStudentId == 0) {
+        try {
+          if (Get.isRegistered<UserController>()) {
+            activeStudentId = Get.find<UserController>().profile?.id;
+          }
+        } catch (_) {}
+      }
+    }
+
+    if (data is num || data is String) {
+      return <String, dynamic>{'rank': data.toString()};
+    }
 
     if (data is Map) {
-      return Map<String, dynamic>.from(data);
+      final Map<String, dynamic> result = Map<String, dynamic>.from(data);
+      if (response is Map &&
+          response['rank'] != null &&
+          !result.containsKey('rank')) {
+        result['rank'] = response['rank'];
+      }
+      return result;
+    }
+
+    if (data is List && data.isNotEmpty) {
+      if (activeStudentId != null && activeStudentId > 0) {
+        for (final dynamic item in data) {
+          if (item is Map) {
+            final dynamic sId = item['student_id'] ??
+                item['studentId'] ??
+                item['id'] ??
+                item['user_id'] ??
+                item['userId'];
+
+            if (sId != null &&
+                (sId == activeStudentId ||
+                    sId.toString().trim() == activeStudentId.toString().trim())) {
+              return Map<String, dynamic>.from(item);
+            }
+          }
+        }
+      }
+
+      final dynamic first = data.first;
+      if (first is Map) {
+        return Map<String, dynamic>.from(first);
+      }
+      if (first is num || first is String) {
+        return <String, dynamic>{'rank': first.toString()};
+      }
+    }
+
+    if (response is Map<String, dynamic> && response['rank'] != null) {
+      return <String, dynamic>{'rank': response['rank'].toString()};
     }
 
     return <String, dynamic>{};
@@ -127,7 +200,7 @@ class ResultApi {
       endpoint: endpoint,
     );
 
-    final Map<String, dynamic> data = _unwrapMap(response);
+    final Map<String, dynamic> data = _unwrapMap(response, studentId: studentId);
 
     if (data.isEmpty) {
       return null;
@@ -161,7 +234,7 @@ class ResultApi {
       endpoint: endpoint,
     );
 
-    final Map<String, dynamic> data = _unwrapMap(response);
+    final Map<String, dynamic> data = _unwrapMap(response, studentId: studentId);
 
     if (data.isEmpty) {
       return null;
@@ -195,7 +268,7 @@ class ResultApi {
       endpoint: endpoint,
     );
 
-    final Map<String, dynamic> data = _unwrapMap(response);
+    final Map<String, dynamic> data = _unwrapMap(response, studentId: studentId);
 
     if (data.isEmpty) {
       return null;
@@ -224,10 +297,33 @@ class ResultApi {
       endpoint: endpoint,
     );
 
-    final Map<String, dynamic> data = _unwrapMap(response);
+    final Map<String, dynamic> data = _unwrapMap(response, studentId: studentId);
 
     if (data.isEmpty) {
       return null;
+    }
+
+    // -------------------------------------------------
+    // NEW API: Extract rank from monthly_results[].rank
+    // for the specific requested month.
+    // -------------------------------------------------
+
+    if (data['rank'] == null || (data['rank'] is! Map && data['rank'] is! int)) {
+      final dynamic monthlyResults = data['monthly_results'];
+      if (monthlyResults is List) {
+        for (final dynamic monthItem in monthlyResults) {
+          if (monthItem is Map) {
+            final dynamic mMonth = monthItem['month'];
+            if (mMonth != null && mMonth.toString() == month.toString()) {
+              final dynamic monthRank = monthItem['rank'];
+              if (monthRank is Map) {
+                data['rank'] = Map<String, dynamic>.from(monthRank);
+              }
+              break;
+            }
+          }
+        }
+      }
     }
 
     return ScoreModel.fromMap(data);
@@ -286,10 +382,21 @@ class ResultApi {
       endpoint: endpoint,
     );
 
-    final Map<String, dynamic> data = _unwrapMap(response);
+    final Map<String, dynamic> data = _unwrapMap(response, studentId: studentId);
 
     if (data.isEmpty) {
       return null;
+    }
+
+    // -------------------------------------------------
+    // NEW API: Extract rank from semester_rank
+    // -------------------------------------------------
+
+    if (data['rank'] == null || (data['rank'] is! Map && data['rank'] is! int)) {
+      final dynamic semesterRank = data['semester_rank'];
+      if (semesterRank is Map) {
+        data['rank'] = Map<String, dynamic>.from(semesterRank);
+      }
     }
 
     return ScoreModel.fromMap(data);
@@ -366,10 +473,21 @@ class ResultApi {
       endpoint: endpoint,
     );
 
-    final Map<String, dynamic> data = _unwrapMap(response);
+    final Map<String, dynamic> data = _unwrapMap(response, studentId: studentId);
 
     if (data.isEmpty) {
       return null;
+    }
+
+    // -------------------------------------------------
+    // NEW API: Extract rank from yearly_rank
+    // -------------------------------------------------
+
+    if (data['rank'] == null || (data['rank'] is! Map && data['rank'] is! int)) {
+      final dynamic yearlyRank = data['yearly_rank'];
+      if (yearlyRank is Map) {
+        data['rank'] = Map<String, dynamic>.from(yearlyRank);
+      }
     }
 
     return ScoreModel.fromMap(data);

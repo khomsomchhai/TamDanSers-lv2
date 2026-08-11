@@ -68,7 +68,7 @@ class _ViewStudentResultDetailViewState
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -174,8 +174,7 @@ class _ViewStudentResultDetailViewState
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
-                // _buildSummaryCard(),
-                // _buildSummaryCardsRow(),
+                _buildSummaryCard(),
                 const SizedBox(
                   height: 16,
                 ),
@@ -205,128 +204,27 @@ class _ViewStudentResultDetailViewState
       ),
     );
   }
-
-// ============================================================
-  // BLUE 3-CARD SUMMARY ROW
-  // ============================================================
-
-  Widget _buildSummaryCardsRow() {
-    final isKm = Get.locale?.languageCode == 'km';
-    final double totalScore = controller.totalScore.value;
-    final int rank = controller.rank.value;
-    final double average = controller.average.value;
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF3B52C7), // Blue outer background container
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          // ----------------------------------------------------
-          // 1. TOTAL SCORE (ពិន្ទុសរុប)
-          // ----------------------------------------------------
-          Expanded(
-            child: _buildSummaryCardItem(
-              icon: Icons.star_rounded,
-              title: isKm ? 'ពិន្ទុសរុប' : 'Total Score',
-              value: controller.formatNumber(totalScore),
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // ----------------------------------------------------
-          // 2. RANK (ចំណាត់ថ្នាក់)
-          // ----------------------------------------------------
-          Expanded(
-            child: _buildSummaryCardItem(
-              icon: Icons.emoji_events_rounded,
-              title: isKm ? 'ចំណាត់ថ្នាក់' : 'Rank',
-              value: rank > 0 ? '$rank' : '-',
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // ----------------------------------------------------
-          // 3. AVERAGE (មធ្យមភាគ)
-          // ----------------------------------------------------
-          Expanded(
-            child: _buildSummaryCardItem(
-              icon: Icons.bar_chart_rounded,
-              title: isKm ? 'មធ្យមភាគ' : 'Average',
-              value: controller.formatNumber(average),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryCardItem({
-    required IconData icon,
-    required String title,
-    required String value,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF506CEB), // Inner card blue
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.35),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 26,
-            color: Colors.white,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
   // ============================================================
   // SUMMARY CARD
   // ============================================================
 
   Widget _buildSummaryCard() {
     final double totalScore = controller.totalScore.value;
-
     final double totalMax = controller.totalMaxScore.value;
+    final double avg = controller.average.value;
+    final double pct = controller.percentage.value;
 
-    final double percent =
-        totalMax > 0 ? (totalScore / totalMax).clamp(0.0, 1.0) : 0.0;
+    final double displayPct = totalMax > 0
+        ? (totalScore / totalMax * 100)
+        : (pct > 0 ? pct : avg);
 
-    final double percentValue = percent * 100;
+    final double progressValue = (displayPct / 100.0).clamp(0.0, 1.0);
+
+    final String scoreDisplay = totalMax > 0
+        ? '${controller.formatNumber(totalScore)} / ${controller.formatNumber(totalMax)}'
+        : (totalScore > 0
+            ? controller.formatNumber(totalScore)
+            : '${displayPct.toStringAsFixed(1)}%');
 
     return Container(
       width: double.infinity,
@@ -336,7 +234,7 @@ class _ViewStudentResultDetailViewState
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -371,8 +269,7 @@ class _ViewStudentResultDetailViewState
                 child: _buildSummaryItem(
                   icon: Icons.assessment_outlined,
                   title: 'ពិន្ទុសរុប',
-                  value: '${controller.formatNumber(totalScore)} / '
-                      '${controller.formatNumber(totalMax)}',
+                  value: scoreDisplay,
                 ),
               ),
               const SizedBox(
@@ -382,7 +279,7 @@ class _ViewStudentResultDetailViewState
                 child: _buildSummaryItem(
                   icon: Icons.percent,
                   title: 'ភាគរយ',
-                  value: '${percentValue.toStringAsFixed(1)}%',
+                  value: '${displayPct.toStringAsFixed(1)}%',
                 ),
               ),
             ],
@@ -427,7 +324,7 @@ class _ViewStudentResultDetailViewState
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
-              value: percent,
+              value: progressValue,
               minHeight: 9,
               backgroundColor: Colors.grey.shade200,
             ),
@@ -438,7 +335,7 @@ class _ViewStudentResultDetailViewState
           ),
 
           Text(
-            '${percentValue.toStringAsFixed(1)}%',
+            '${displayPct.toStringAsFixed(1)}%',
             style: TextStyle(
               fontSize: 13,
               color: Colors.grey.shade600,
@@ -527,7 +424,7 @@ class _ViewStudentResultDetailViewState
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -546,8 +443,8 @@ class _ViewStudentResultDetailViewState
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: subject.color.withOpacity(
-                    0.12,
+                  color: subject.color.withValues(
+                    alpha: 0.12,
                   ),
                   borderRadius: BorderRadius.circular(
                     14,
