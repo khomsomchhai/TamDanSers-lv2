@@ -12,6 +12,7 @@ class HomeworkItem {
   final String title;
   final String description;
   final String? filePath;
+  final List<String> filePaths;
   final String subjectName;
   final String teacherName;
   final HomeworkStatus status;
@@ -25,6 +26,7 @@ class HomeworkItem {
     required this.title,
     required this.description,
     this.filePath,
+    this.filePaths = const [],
     required this.subjectName,
     required this.teacherName,
     required this.status,
@@ -164,6 +166,7 @@ class HomeworkViewController extends GetxController {
       'title': item.title,
       'description': item.description,
       'filePath': item.filePath,
+      'filePaths': item.filePaths,
       'subjectName': item.subjectName,
       'teacherName': item.teacherName,
       'status': item.status.index,
@@ -184,19 +187,20 @@ class HomeworkViewController extends GetxController {
         ? map['iconCode']
         : Icons.assignment_outlined.codePoint;
 
-    final int iconColorValue = map['iconColorValue'] is int
-        ? map['iconColorValue']
-        : 0xff6763EB;
+    final int iconColorValue =
+        map['iconColorValue'] is int ? map['iconColorValue'] : 0xff6763EB;
 
-    final int iconBgColorValue = map['iconBgColorValue'] is int
-        ? map['iconBgColorValue']
-        : 0x1E6763EB;
+    final int iconBgColorValue =
+        map['iconBgColorValue'] is int ? map['iconBgColorValue'] : 0x1E6763EB;
 
     return HomeworkItem(
       id: map['id'] ?? 0,
       title: map['title']?.toString() ?? '',
       description: map['description']?.toString() ?? '',
       filePath: map['filePath']?.toString(),
+      filePaths: map['filePaths'] != null
+          ? List<String>.from(map['filePaths'])
+          : (map['filePath'] != null ? [map['filePath'].toString()] : []),
       subjectName: map['subjectName']?.toString() ?? '',
       teacherName: map['teacherName']?.toString() ?? '',
       status: status,
@@ -292,16 +296,14 @@ class HomeworkViewController extends GetxController {
       logBuffer.writeln("Logged in classId: $studentClassId");
 
       List<dynamic> responseList = [];
-      bool isFromStudentEndpoint = false;
       if (studentId != null) {
         try {
           responseList =
               await homeworkServices.fetchStudentHomeworkList(studentId);
-          isFromStudentEndpoint = responseList.isNotEmpty;
           logBuffer.writeln(
-              "Fetched homework list using studentId: ${responseList.length}");
+              "Fetched student homework list: ${responseList.length}");
         } catch (e) {
-          logBuffer.writeln("Failed fetching homeworks using studentId: $e");
+          logBuffer.writeln("Failed fetching student homeworks: $e");
         }
       }
 
@@ -379,8 +381,7 @@ class HomeworkViewController extends GetxController {
 
         for (var subJson in submissionList) {
           final sub = SubmissionModel.fromJson(subJson);
-          if (deletedSubmissionIds.contains(sub.id) ||
-              deletedHomeworkIds.contains(sub.homeworkId)) {
+          if (deletedSubmissionIds.contains(sub.id)) {
             logBuffer.writeln(
                 "  -> Skipping deleted submission: ID=${sub.id}, homeworkId=${sub.homeworkId}");
             continue;
@@ -399,9 +400,9 @@ class HomeworkViewController extends GetxController {
         logBuffer.writeln(
             "Homework from API: ID=${homework.id}, title=${homework.title}, classId=${homework.classId}, subjectName=${homework.subjectName}");
 
-        // Only filter by classId if fetched from global fallback list AND classId is not 0
-        if (!isFromStudentEndpoint &&
-            studentClassId != null &&
+        // Filter by classId: if student belongs to a class, only show homework for that class or general class (0)
+        if (studentClassId != null &&
+            studentClassId != 0 &&
             homework.classId != 0 &&
             homework.classId != studentClassId) {
           logBuffer.writeln(
@@ -478,6 +479,7 @@ class HomeworkViewController extends GetxController {
           title: homework.title,
           description: homework.description,
           filePath: homework.filePath,
+          filePaths: homework.filePaths,
           subjectName: homework.subjectName,
           teacherName: homework.teacherName,
           status: status,
@@ -569,12 +571,11 @@ class HomeworkViewController extends GetxController {
       );
 
       deletedHomeworkIds.remove(homeworkId);
+      deletedSubmissionIds.clear();
       _saveToCache();
 
       Get.back(); // close loading
       Get.back(); // close details screen page
-
-      CustomSnackbar.success(
       CustomSnackbar.success(
         Get.locale?.languageCode == 'km'
             ? 'កិច្ចការផ្ទះត្រូវបានប្រគល់ដោយជោគជ័យ!'
@@ -586,7 +587,6 @@ class HomeworkViewController extends GetxController {
       fetchHomework();
     } catch (e) {
       Get.back(); // close loading
-      CustomSnackbar.error(
       CustomSnackbar.error(
         Get.locale?.languageCode == 'km'
             ? 'មិនអាចប្រគល់កិច្ចការផ្ទះបានទេ៖ $e'
@@ -719,37 +719,56 @@ class HomeworkViewController extends GetxController {
     }
   }
 
-  void _removeSubmissionLocally(int submissionId) {
+  void _removeSubmissionLocally(int submissionId, {int? homeworkId}) {
     try {
-      int? foundHomeworkId;
+      int? foundHomeworkId = homeworkId;
+
       submissionMap.removeWhere((key, value) {
-        if (value.id == submissionId) {
-          foundHomeworkId = key;
+        if (value.id == submissionId || (homeworkId != null && key == homeworkId)) {
+          foundHomeworkId ??= key;
           return true;
         }
         return false;
       });
 
       if (foundHomeworkId != null) {
-        final index =
-            completedList.indexWhere((item) => item.id == foundHomeworkId);
-        if (index != -1) {
-          final oldItem = completedList.removeAt(index);
-          final newItem = HomeworkItem(
-            id: oldItem.id,
-            title: oldItem.title,
-            description: oldItem.description,
-            filePath: oldItem.filePath,
-            subjectName: oldItem.subjectName,
-            teacherName: oldItem.teacherName,
-            status: HomeworkStatus.none,
-            date: oldItem.date,
-            icon: oldItem.icon,
-            iconColor: oldItem.iconColor,
-            iconBgColor: oldItem.iconBgColor,
-          );
-          ongoingList.add(newItem);
-        }
+        submissionMap.remove(foundHomeworkId);
+      }
+
+      deletedSubmissionIds.add(submissionId);
+      if (foundHomeworkId != null) {
+        deletedHomeworkIds.add(foundHomeworkId!);
+      }
+
+      HomeworkItem? targetItem;
+      final compIdx = completedList.indexWhere(
+          (item) => item.id == foundHomeworkId || item.id == submissionId);
+      if (compIdx != -1) {
+        targetItem = completedList.removeAt(compIdx);
+      }
+
+      final ongIdx = ongoingList.indexWhere(
+          (item) => item.id == foundHomeworkId || item.id == submissionId);
+      if (ongIdx != -1) {
+        targetItem = ongoingList.removeAt(ongIdx);
+      }
+
+      if (targetItem != null) {
+        final newItem = HomeworkItem(
+          id: targetItem.id,
+          title: targetItem.title,
+          description: targetItem.description,
+          filePath: targetItem.filePath,
+          filePaths: targetItem.filePaths,
+          subjectName: targetItem.subjectName,
+          teacherName: targetItem.teacherName,
+          status: HomeworkStatus.none,
+          date: targetItem.date,
+          icon: targetItem.icon,
+          iconColor: targetItem.iconColor,
+          iconBgColor: targetItem.iconBgColor,
+        );
+        ongoingList.add(newItem);
       }
 
       submissionMap.refresh();
@@ -763,26 +782,16 @@ class HomeworkViewController extends GetxController {
 
   Future<void> executeDeleteSubmission({
     required int submissionId,
+    int? homeworkId,
   }) async {
     final isKm = Get.locale?.languageCode == 'km';
 
     try {
       final userController = Get.find<UserController>();
-
       if (userController.profile == null) {
         await userController.getProfile();
       }
-
       final studentId = userController.profile?.id ?? 0;
-
-      if (studentId == 0) {
-        CustomSnackbar.error(
-          isKm ? 'រកមិនឃើញព័ត៌មានសិស្ស' : 'Student profile not found',
-          title: isKm ? 'កំហុស' : 'Error',
-        );
-
-        return;
-      }
 
       Get.dialog(
         const Center(
@@ -794,13 +803,13 @@ class HomeworkViewController extends GetxController {
       try {
         await homeworkServices.deleteSubmission(
           submissionId: submissionId,
-          studentId: studentId,
+          studentId: studentId != 0 ? studentId : null,
         );
       } catch (apiError) {
-        debugPrint('DELETE SUBMISSION API FALLBACK: $apiError');
+        debugPrint('DELETE SUBMISSION API ERROR: $apiError');
       }
 
-      _removeSubmissionLocally(submissionId);
+      _removeSubmissionLocally(submissionId, homeworkId: homeworkId);
 
       if (Get.isDialogOpen == true) {
         Get.back();

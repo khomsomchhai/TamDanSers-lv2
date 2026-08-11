@@ -146,56 +146,43 @@ class HomeworkServices {
 
   // =====================================================
   // Student deletes submission
-  // DELETE /submissions/{submissionId}
+  // DELETE /submissions/{submission_id}
   // =====================================================
 
   Future<dynamic> deleteSubmission({
     required int submissionId,
-    required int studentId,
+    int? studentId,
   }) async {
     final List<Future<dynamic> Function()> candidateRequests = [
-      // 1. DELETE /submissions/{submissionId}/
-      () => baseApi.delete(
-            endpoint: '/submissions/$submissionId/',
-          ),
-      // 2. DELETE /submissions/{submissionId}
+      // 1. DELETE /submissions/{submissionId}
       () => baseApi.delete(
             endpoint: '/submissions/$submissionId',
           ),
-      // 3. DELETE /submissions/{submissionId}/?student_id={studentId}
+      // 2. DELETE /submissions/{submissionId}/
       () => baseApi.delete(
-            endpoint: '/submissions/$submissionId/?student_id=$studentId',
+            endpoint: '/submissions/$submissionId/',
           ),
-      // 4. DELETE /submissions/{submissionId}?student_id={studentId}
+      // 3. DELETE /submissions/{submissionId}?student_id={studentId}
       () => baseApi.delete(
             endpoint: '/submissions/$submissionId?student_id=$studentId',
+          ),
+      // 4. DELETE /submissions/{submissionId}/?student_id={studentId}
+      () => baseApi.delete(
+            endpoint: '/submissions/$submissionId/?student_id=$studentId',
           ),
       // 5. POST /submissions/{submissionId}/delete/
       () => baseApi.post(
             endpoint: '/submissions/$submissionId/delete/',
-            data: {'student_id': studentId},
+            data: studentId != null ? {'student_id': studentId} : {},
           ),
       // 6. POST /submissions/delete/
       () => baseApi.post(
             endpoint: '/submissions/delete/',
-            data: {'submission_id': submissionId, 'student_id': studentId},
+            data: {'submission_id': submissionId, if (studentId != null) 'student_id': studentId},
           ),
-      // 7. POST /submissions/{submissionId}/ with _method = DELETE
-      () => baseApi.post(
-            endpoint: '/submissions/$submissionId/',
-            data: {'student_id': studentId, '_method': 'DELETE'},
-          ),
-      // 8. DELETE /homework/submissions/{submissionId}/
+      // 7. DELETE /homework/submissions/{submissionId}
       () => baseApi.delete(
-            endpoint: '/homework/submissions/$submissionId/',
-          ),
-      // 9. DELETE /homework/submission/{submissionId}/
-      () => baseApi.delete(
-            endpoint: '/homework/submission/$submissionId/',
-          ),
-      // 10. DELETE /submissions/student/{studentId}/{submissionId}/
-      () => baseApi.delete(
-            endpoint: '/submissions/student/$studentId/$submissionId/',
+            endpoint: '/homework/submissions/$submissionId',
           ),
     ];
 

@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
-import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
 import 'package:tamdansers_lv2/screens/student/homework/in_app_pdf_viewer.dart';
 
@@ -342,6 +341,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               });
               await widget.controller.executeDeleteSubmission(
                 submissionId: submissionId,
+                homeworkId: widget.item.id,
               );
             },
             child: Text(_isKhmer ? 'លុប' : 'Delete'),
@@ -429,8 +429,9 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               primaryThemeColor: primaryThemeColor,
             ),
             const SizedBox(height: 24),
-            if (item.filePath != null && item.filePath!.isNotEmpty) ...[
-              _buildTeacherAttachment(context, item.filePath!),
+            if ((item.filePath != null && item.filePath!.isNotEmpty) ||
+                item.filePaths.isNotEmpty) ...[
+              _buildTeacherAttachment(context, item),
               const SizedBox(height: 24),
             ],
             if (item.status == HomeworkStatus.none)
@@ -627,8 +628,14 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     );
   }
 
-  Widget _buildTeacherAttachment(BuildContext context, String path) {
-    final isPdf = path.toLowerCase().endsWith('.pdf');
+  Widget _buildTeacherAttachment(BuildContext context, HomeworkItem item) {
+    final List<String> paths = item.filePaths.isNotEmpty
+        ? item.filePaths
+        : (item.filePath != null && item.filePath!.isNotEmpty
+            ? [item.filePath!]
+            : []);
+
+    if (paths.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -641,30 +648,39 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
           ),
         ),
         const SizedBox(height: 10),
-        if (isPdf)
-          _buildPdfCard(path)
-        else
-          GestureDetector(
-            onTap: () => _showFullScreenImage(path),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                path,
-                width: double.infinity,
-                height: 160,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  height: 160,
-                  color: const Color(0xffF1F5F9),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.broken_image_rounded,
-                    color: Colors.grey,
+        ...paths.map((rawPath) {
+          final path = rawPath.startsWith('http://') || rawPath.startsWith('https://')
+              ? rawPath
+              : 'https://tamdansers-1fvbe1msgz9hki.sabay.com${rawPath.startsWith('/') ? rawPath : '/$rawPath'}';
+          final isPdf = path.toLowerCase().endsWith('.pdf');
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: isPdf
+                ? _buildPdfCard(path)
+                : GestureDetector(
+                    onTap: () => _showFullScreenImage(path),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        path,
+                        width: double.infinity,
+                        height: 160,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          height: 160,
+                          color: const Color(0xffF1F5F9),
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.broken_image_rounded,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-          ),
+          );
+        }),
       ],
     );
   }
