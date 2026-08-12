@@ -11,7 +11,8 @@ class AttendanceScanController extends GetxController {
   final AttendanceService attendanceService =
       AttendanceService();
 
-  final MobileScannerController scannerController = MobileScannerController();
+  final MobileScannerController scannerController =
+      MobileScannerController();
 
   final isLoading = false.obs;
   final isScanned = false.obs;
@@ -91,7 +92,8 @@ class AttendanceScanController extends GetxController {
   Future<void> scanQr(
     String rawValue,
   ) async {
-    final String token = rawValue.trim();
+    final String token =
+        rawValue.trim();
 
     if (token.isEmpty) {
       return;
@@ -161,9 +163,16 @@ class AttendanceScanController extends GetxController {
           response['attendance'];
 
       final String subjectName =
-          attendance is Map ? attendance['subject_name']?.toString() ?? '' : '';
+          attendance is Map
+              ? attendance['subject_name']
+                      ?.toString() ??
+                  ''
+              : '';
 
-      final String message = response['message']?.toString() ?? '';
+      final String message =
+          response['message']
+                  ?.toString() ??
+              '';
 
       final dynamic distanceValue =
           response['distance_m'];
@@ -486,6 +495,7 @@ class AttendanceScanController extends GetxController {
               width:
                   double.infinity,
               height: 50,
+
               child:
                   ElevatedButton(
                 onPressed: () {
@@ -624,14 +634,9 @@ class AttendanceScanController extends GetxController {
       return 'attendance_scan_wrong_qr'.tr;
     }
 
-<<<<<<< HEAD
-    // Expired QR
-    if (message.contains(
-=======
     // Expired
     if (
         message.contains(
->>>>>>> limhong
           'qr code has expired',
         ) ||
         message.contains(
@@ -641,14 +646,16 @@ class AttendanceScanController extends GetxController {
     }
 
     // Wrong class
-    if (message.contains(
-      'not for your class',
-    )) {
+    if (
+        message.contains(
+          'not for your class',
+        )) {
       return 'attendance_scan_wrong_class'.tr;
     }
 
     // Already recorded
-    if (message.contains(
+    if (
+        message.contains(
           'attendance already recorded',
         ) ||
         message.contains(
@@ -657,21 +664,9 @@ class AttendanceScanController extends GetxController {
       return 'attendance_scan_already'.tr;
     }
 
-<<<<<<< HEAD
-    // Forbidden
-    if (message.contains(
-      '403',
-    )) {
-      return 'attendance_scan_forbidden'.tr;
-    }
-
-    // Network error
-    if (message.contains(
-=======
     // Network
     if (
         message.contains(
->>>>>>> limhong
           'connection',
         ) ||
         message.contains(
@@ -683,10 +678,7 @@ class AttendanceScanController extends GetxController {
       return 'attendance_scan_network'.tr;
     }
 
-<<<<<<< HEAD
-=======
     // Forbidden
->>>>>>> limhong
     if (
         message.contains(
           '403',
@@ -698,10 +690,7 @@ class AttendanceScanController extends GetxController {
       );
     }
 
-<<<<<<< HEAD
-=======
     // Other errors
->>>>>>> limhong
     return _extractBackendDetail(
       originalMessage,
       fallback:
@@ -785,18 +774,13 @@ class AttendanceScanController extends GetxController {
       return;
     }
 
-    isScanned.value =
-        false;
-
-    scanStatus.value =
-        'Scan the QR code shown by your teacher';
+    isScanned.value = false;
 
     scanStatus.value =
         'Scan the QR code shown by your teacher';
 
     try {
-      await scannerController
-          .start();
+      await scannerController.start();
     } catch (_) {}
   }
 
@@ -806,12 +790,7 @@ class AttendanceScanController extends GetxController {
 
   @override
   void onClose() {
-<<<<<<< HEAD
-    scannerController
-        .dispose();
-=======
     scannerController.dispose();
->>>>>>> limhong
 
     super.onClose();
   }
