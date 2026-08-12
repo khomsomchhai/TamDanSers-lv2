@@ -4,6 +4,7 @@ import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
+import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/card/custom_attendance_card.dart';
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/'
@@ -18,7 +19,8 @@ class ParentAttendanceTabView
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
+      appBar: CustomAppBar(title: "attendance".tr, showBackButton: false,),
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value && controller.attendanceList.isEmpty) {
@@ -38,21 +40,11 @@ class ParentAttendanceTabView
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(
                 20,
-                24,
+                16,
                 20,
                 120,
               ),
               children: [
-                Text(
-                  'attendance'.tr,
-                  style: AppTextStyles.headlineSmall.copyWith(
-                    color: AppColors.dark,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
                 CustomAttendanceCard(
                   totalDays: controller.totalDays,
                   presentDays: controller.presentDays.value,
@@ -309,93 +301,92 @@ class ParentAttendanceTabView
     );
   }
 
-Widget _buildAskPermissionCard(
-  BuildContext context,
-) {
-  return Material(
-    color: Colors.transparent,
-    borderRadius: BorderRadius.circular(
-      AppNumbers.radiusLarge,
-    ),
-    child: InkWell(
+  Widget _buildAskPermissionCard(
+    BuildContext context,
+  ) {
+    return Material(
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(
         AppNumbers.radiusLarge,
       ),
-      onTap: () {
-        Get.toNamed(
-          AppRoutes.parentPermission,
-        );
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(
-          16,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(
+          AppNumbers.radiusLarge,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(
-            alpha: 0.10,
+        onTap: () {
+          Get.toNamed(
+            AppRoutes.parentPermission,
+          );
+        },
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(
+            16,
           ),
-          borderRadius: BorderRadius.circular(
-            AppNumbers.radiusLarge,
-          ),
-          border: Border.all(
+          decoration: BoxDecoration(
             color: AppColors.primary.withValues(
-              alpha: 0.18,
+              alpha: 0.10,
+            ),
+            borderRadius: BorderRadius.circular(
+              AppNumbers.radiusLarge,
+            ),
+            border: Border.all(
+              color: AppColors.primary.withValues(
+                alpha: 0.18,
+              ),
             ),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(
-                  AppNumbers.radiusMedium,
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(
+                    AppNumbers.radiusMedium,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.edit_calendar_rounded,
+                  color: AppColors.white,
+                  size: 27,
                 ),
               ),
-              child: const Icon(
-                Icons.edit_calendar_rounded,
-                color: AppColors.white,
-                size: 27,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'ask_permission'.tr,
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.dark,
-                      fontWeight: FontWeight.bold,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ask_permission'.tr,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: AppColors.dark,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    'ask_permission_my_requests'.tr,
-                    style: AppTextStyles.bodySmall,
-                  ),
-                ],
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      'ask_permission_my_requests'.tr,
+                      style: AppTextStyles.bodySmall,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              size: 18,
-              color: AppColors.primary,
-            ),
-          ],
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 18,
+                color: AppColors.primary,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   String _formatTimeRange(
     String startTime,
@@ -488,36 +479,8 @@ Widget _buildAskPermissionCard(
           const SizedBox(
             height: 7,
           ),
-          
         ],
       ),
     );
-  }
-
-  String _getShortStatus(
-    dynamic status,
-  ) {
-    final value = controller.normalizeStatus(
-      status,
-    );
-
-    switch (value) {
-      case 'p':
-      case 'present':
-        return 'P';
-
-      case 'a':
-      case 'absent':
-        return 'A';
-
-      case 'l':
-      case 'leave':
-      case 'permission':
-      case 'permitted':
-        return 'L';
-
-      default:
-        return '-';
-    }
   }
 }

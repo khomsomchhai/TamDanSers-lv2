@@ -68,7 +68,7 @@ class _ViewStudentResultDetailViewState
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: Colors.black.withValues(alpha: 0.06),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -109,6 +109,8 @@ class _ViewStudentResultDetailViewState
             );
           }
 
+          final isKm = Get.locale?.languageCode == 'km';
+
           // ==================================================
           // ERROR / EMPTY
           // ==================================================
@@ -135,7 +137,7 @@ class _ViewStudentResultDetailViewState
                   ),
                   Center(
                     child: Text(
-                      'មិនមានលទ្ធផលសិក្សា',
+                      isKm ? 'មិនមានលទ្ធផលសិក្សា' : 'No Academic Results',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
@@ -148,7 +150,9 @@ class _ViewStudentResultDetailViewState
                   ),
                   Center(
                     child: Text(
-                      'អូសចុះក្រោមដើម្បីផ្ទុកឡើងវិញ',
+                      isKm
+                          ? 'អូសចុះក្រោមដើម្បីផ្ទុកឡើងវិញ'
+                          : 'Pull down to refresh',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade500,
@@ -170,8 +174,7 @@ class _ViewStudentResultDetailViewState
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
-                // _buildSummaryCard(),
-                // _buildSummaryCardsRow(),
+                _buildSummaryCard(),
                 const SizedBox(
                   height: 16,
                 ),
@@ -201,126 +204,33 @@ class _ViewStudentResultDetailViewState
       ),
     );
   }
-// ============================================================
-  // BLUE 3-CARD SUMMARY ROW
-  // ============================================================
-
-  Widget _buildSummaryCardsRow() {
-    final double totalScore = controller.totalScore.value;
-    final int rank = controller.rank.value;
-    final double average = controller.average.value;
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF3B52C7), // Blue outer background container
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          // ----------------------------------------------------
-          // 1. TOTAL SCORE (ពិន្ទុសរុប)
-          // ----------------------------------------------------
-          Expanded(
-            child: _buildSummaryCardItem(
-              icon: Icons.star_rounded,
-              title: 'ពិន្ទុសរុប',
-              value: controller.formatNumber(totalScore),
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // ----------------------------------------------------
-          // 2. RANK (ចំណាត់ថ្នាក់)
-          // ----------------------------------------------------
-          Expanded(
-            child: _buildSummaryCardItem(
-              icon: Icons.emoji_events_rounded,
-              title: 'ចំណាត់ថ្នាក់',
-              value: rank > 0 ? '$rank' : '-',
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // ----------------------------------------------------
-          // 3. AVERAGE (មធ្យមភាគ)
-          // ----------------------------------------------------
-          Expanded(
-            child: _buildSummaryCardItem(
-              icon: Icons.bar_chart_rounded,
-              title: 'មធ្យមភាគ',
-              value: controller.formatNumber(average),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryCardItem({
-    required IconData icon,
-    required String title,
-    required String value,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF506CEB), // Inner card blue
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.35),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 26,
-            color: Colors.white,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
   // ============================================================
   // SUMMARY CARD
   // ============================================================
 
   Widget _buildSummaryCard() {
+    final bool isKm = Get.locale?.languageCode == 'km';
+
     final double totalScore = controller.totalScore.value;
-
     final double totalMax = controller.totalMaxScore.value;
+    final double avg = controller.average.value;
+    final double pct = controller.percentage.value;
 
-    final double percent =
-        totalMax > 0 ? (totalScore / totalMax).clamp(0.0, 1.0) : 0.0;
+    // Percentage for the progress bar (totalScore / totalMax * 100)
+    final double displayPct =
+        totalMax > 0 ? (totalScore / totalMax * 100) : (pct > 0 ? pct : avg);
 
-    final double percentValue = percent * 100;
+    // Real average from the API — used for the Average tile.
+    // Falls back to displayPct only when the API returns nothing.
+    final double displayAvg = avg > 0 ? avg : displayPct;
+
+    final double progressValue = (displayPct / 100.0).clamp(0.0, 1.0);
+
+    final String scoreDisplay = totalMax > 0
+        ? '${controller.formatNumber(totalScore)} / ${controller.formatNumber(totalMax)}'
+        : (totalScore > 0
+            ? controller.formatNumber(totalScore)
+            : '${displayPct.toStringAsFixed(1)}%');
 
     return Container(
       width: double.infinity,
@@ -330,7 +240,7 @@ class _ViewStudentResultDetailViewState
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -343,9 +253,9 @@ class _ViewStudentResultDetailViewState
           // TITLE
           // ==================================================
 
-          const Text(
-            'សង្ខេបលទ្ធផល',
-            style: TextStyle(
+          Text(
+            isKm ? 'សង្ខេបលទ្ធផល' : 'Result Summary',
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -364,9 +274,8 @@ class _ViewStudentResultDetailViewState
               Expanded(
                 child: _buildSummaryItem(
                   icon: Icons.assessment_outlined,
-                  title: 'ពិន្ទុសរុប',
-                  value: '${controller.formatNumber(totalScore)} / '
-                      '${controller.formatNumber(totalMax)}',
+                  title: isKm ? 'ពិន្ទុសរុប' : 'Total Score',
+                  value: scoreDisplay,
                 ),
               ),
               const SizedBox(
@@ -374,9 +283,9 @@ class _ViewStudentResultDetailViewState
               ),
               Expanded(
                 child: _buildSummaryItem(
-                  icon: Icons.percent,
-                  title: 'ភាគរយ',
-                  value: '${percentValue.toStringAsFixed(1)}%',
+                  icon: Icons.show_chart,
+                  title: isKm ? 'មធ្យមភាគ' : 'Average',
+                  value: displayAvg.toStringAsFixed(1),
                 ),
               ),
             ],
@@ -391,7 +300,7 @@ class _ViewStudentResultDetailViewState
               Expanded(
                 child: _buildSummaryItem(
                   icon: Icons.school_outlined,
-                  title: 'មុខវិជ្ជា',
+                  title: isKm ? 'មុខវិជ្ជា' : 'Subjects',
                   value: '${controller.subjectResults.length}',
                 ),
               ),
@@ -401,7 +310,7 @@ class _ViewStudentResultDetailViewState
               Expanded(
                 child: _buildSummaryItem(
                   icon: Icons.emoji_events_outlined,
-                  title: 'ចំណាត់ថ្នាក់',
+                  title: isKm ? 'ចំណាត់ថ្នាក់' : 'Rank',
                   value: controller.rank.value > 0
                       ? '${controller.rank.value}'
                       : '-',
@@ -421,7 +330,7 @@ class _ViewStudentResultDetailViewState
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
-              value: percent,
+              value: progressValue,
               minHeight: 9,
               backgroundColor: Colors.grey.shade200,
             ),
@@ -432,7 +341,7 @@ class _ViewStudentResultDetailViewState
           ),
 
           Text(
-            '${percentValue.toStringAsFixed(1)}%',
+            '${displayPct.toStringAsFixed(1)}%',
             style: TextStyle(
               fontSize: 13,
               color: Colors.grey.shade600,
@@ -509,6 +418,8 @@ class _ViewStudentResultDetailViewState
   Widget _buildSubjectCard(
     SubjectResultDetailModel subject,
   ) {
+    final bool isKm = Get.locale?.languageCode == 'km';
+
     final double percent = subject.percentage;
 
     final double percentValue = subject.percentageValue;
@@ -521,7 +432,7 @@ class _ViewStudentResultDetailViewState
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -540,8 +451,8 @@ class _ViewStudentResultDetailViewState
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: subject.color.withOpacity(
-                    0.12,
+                  color: subject.color.withValues(
+                    alpha: 0.12,
                   ),
                   borderRadius: BorderRadius.circular(
                     14,
@@ -573,7 +484,9 @@ class _ViewStudentResultDetailViewState
                       height: 4,
                     ),
                     Text(
-                      'មុខវិជ្ជា #${subject.subjectId}',
+                      isKm
+                          ? 'មុខវិជ្ជា #${subject.subjectId}'
+                          : 'Subject #${subject.subjectId}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade500,
@@ -608,7 +521,7 @@ class _ViewStudentResultDetailViewState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'ពិន្ទុ',
+                isKm ? 'ពិន្ទុ' : 'Score',
                 style: TextStyle(
                   fontSize: 13,
                   color: Colors.grey.shade600,
@@ -650,9 +563,7 @@ class _ViewStudentResultDetailViewState
           ),
 
           Text(
-            _getScoreRemark(
-              percentValue,
-            ),
+            _getScoreRemark(percentValue, isKm),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -668,29 +579,27 @@ class _ViewStudentResultDetailViewState
   // SCORE REMARK
   // ============================================================
 
-  String _getScoreRemark(
-    double percentage,
-  ) {
+  String _getScoreRemark(double percentage, bool isKm) {
     if (percentage >= 90) {
-      return 'ល្អឥតខ្ចោះ';
+      return isKm ? 'ល្អឥតខ្ចោះ' : 'Excellent';
     }
 
     if (percentage >= 80) {
-      return 'ល្អណាស់';
+      return isKm ? 'ល្អណាស់' : 'Very Good';
     }
 
     if (percentage >= 70) {
-      return 'ល្អ';
+      return isKm ? 'ល្អ' : 'Good';
     }
 
     if (percentage >= 60) {
-      return 'មធ្យមល្អ';
+      return isKm ? 'មធ្យមល្អ' : 'Above Average';
     }
 
     if (percentage >= 50) {
-      return 'មធ្យម';
+      return isKm ? 'មធ្យម' : 'Average';
     }
 
-    return 'ត្រូវការកែលម្អ';
+    return isKm ? 'ត្រូវការកែលម្អ' : 'Needs Improvement';
   }
 }

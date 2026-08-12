@@ -5,9 +5,16 @@ class StudentDashboardViewController extends GetxController {
 
   void changeTab(int index) {
     currentIndex.value = index;
+
     if (index == 1) {
       if (Get.isRegistered<HomeworkViewController>()) {
         Get.find<HomeworkViewController>().fetchHomework();
+      }
+    }
+
+    if (index == 2) {
+      if (Get.isRegistered<AttendanceTabViewController>()) {
+        Get.find<AttendanceTabViewController>().fetchAttendance();
       }
     }
   }

@@ -8,11 +8,13 @@ import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 class CustomHeaderAction extends StatelessWidget {
   final VoidCallback? onTapNotification;
   final int unreadCount;
+  final Color? iconColor;
 
   const CustomHeaderAction({
     super.key,
     this.onTapNotification,
     this.unreadCount = 0,
+    this.iconColor,
   });
 
   void _openNotification() {
@@ -38,7 +40,7 @@ class CustomHeaderAction extends StatelessWidget {
             width: 24,
           ),
         ),
-        const SizedBox(width: 6,),
+        const SizedBox(width: 6),
         GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onTapNotification ?? _openNotification,
@@ -52,6 +54,7 @@ class CustomHeaderAction extends StatelessWidget {
                 Icon(
                   PhosphorIconsRegular.bell,
                   size: 28,
+                  color: iconColor, // Bell icon color set to white
                 ),
                 if (unreadCount > 0)
                   Positioned(
@@ -66,7 +69,7 @@ class CustomHeaderAction extends StatelessWidget {
                         horizontal: 4,
                         vertical: 2,
                       ),
-                      decoration:  BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
                       ),

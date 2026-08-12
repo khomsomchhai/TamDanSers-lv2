@@ -24,6 +24,25 @@ class LoginScreenViewController extends GetxController {
 
   final AuthServices authService = AuthServices();
   final GetStorage box = GetStorage();
+  bool _hasAppliedRouteArgs = false;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _applyRouteArguments();
+  }
+
+  void _applyRouteArguments() {
+    if (_hasAppliedRouteArgs) return;
+    _hasAppliedRouteArgs = true;
+
+    final args = Get.arguments as Map<String, dynamic>?;
+    final defaultTab = args?['defaultTab'];
+    if (defaultTab is int && defaultTab >= 0 && defaultTab < 2) {
+      selectedTab.value = defaultTab;
+      previousTab.value = defaultTab;
+    }
+  }
 
   void changeTab(int index) {
     if (selectedTab.value == index) return;
@@ -61,9 +80,9 @@ class LoginScreenViewController extends GetxController {
               password: currentPwdCtrl.text,
             );
 
-      debugPrint(
-        'LOGIN RESPONSE: $response',
-      );
+      // debugPrint(
+      //   'LOGIN RESPONSE: $response',
+      // );
 
       final String token = response['access_token']?.toString().trim() ?? '';
 
@@ -105,11 +124,22 @@ class LoginScreenViewController extends GetxController {
         await box.remove(
           'students',
         );
+
+        final dynamic profileData = response['profile'];
+        if (profileData is Map) {
+          final dynamic sId = profileData['id'] ?? profileData['student_id'];
+          if (sId != null) {
+            final int? id = int.tryParse(sId.toString());
+            if (id != null) {
+              await box.write('student_id', id);
+            }
+          }
+        }
       }
 
-      debugPrint(
-        'NAVIGATING TO ROLE: $role',
-      );
+      // debugPrint(
+      //   'NAVIGATING TO ROLE: $role',
+      // );
 
       _navigateByRole(
         role,
@@ -183,9 +213,9 @@ class LoginScreenViewController extends GetxController {
       students,
     );
 
-    debugPrint(
-      'SAVED STUDENTS COUNT: ${students.length}',
-    );
+    // debugPrint(
+    //   'SAVED STUDENTS COUNT: ${students.length}',
+    // );
   }
 
   void _navigateByRole(String role) {
@@ -245,9 +275,9 @@ class LoginScreenViewController extends GetxController {
 
       final String? fcmToken = await FirebaseMessaging.instance.getToken();
 
-      debugPrint(
-        'FCM TOKEN: $fcmToken',
-      );
+      // debugPrint(
+      //   'FCM TOKEN: $fcmToken',
+      // );
 
       if (fcmToken == null || fcmToken.isEmpty) {
         debugPrint(
@@ -268,9 +298,9 @@ class LoginScreenViewController extends GetxController {
         'SAVE FCM STATUS: ${e.response?.statusCode}',
       );
 
-      debugPrint(
-        'SAVE FCM RESPONSE: ${e.response?.data}',
-      );
+      // debugPrint(
+      //   'SAVE FCM RESPONSE: ${e.response?.data}',
+      // );
 
       // Do not rethrow. FCM must not block or close the app.
     } catch (e) {

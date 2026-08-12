@@ -53,7 +53,7 @@ Map<String, String> kmKh = {
   'change_password_title': 'ប្ដូរពាក្យសម្ងាត់',
   'create_new_password': 'បង្កើតពាក្យសម្ងាត់ថ្មី',
   'otp_instructions':
-      'បញ្ចូលលេខ 6 ខ្ទង់ដែលបានផ្ញើទៅលេខទូរស័ព្ទរបស់អ្នកតាម SMS ហើយជ្រើសរើសពាក្យសម្ងាត់ថ្មី។',
+      'បញ្ចូលលេខ 6 ខ្ទង់ដែលបានផ្ញើទៅលេខទូរស័ព្ទរបស់អ្នកតាម SMS ។',
   'verification_code_otp': 'លេខកូដផ្ទៀងផ្ទាត់ (OTP)',
   'new_password': 'ពាក្យសម្ងាត់ថ្មី',
   'enter_new_password': 'បញ្ចូលពាក្យសម្ងាត់ថ្មី',
@@ -62,7 +62,7 @@ Map<String, String> kmKh = {
   'password_min_length': 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងហោចណាស់ 6 តួរ',
   'passwords_do_not_match': 'ពាក្យសម្ងាត់មិនត្រូវគ្នា',
   'resend_otp': 'ផ្ញើ OTP ម្តងទៀត',
-  'resend_otp_in': 'ផ្ញើ OTP ម្តងទៀតក្នុង',
+  'did_not_receive_otp': 'មិនទទួល OTP មែនទេ?',
   'reset_password': 'កំណត់ពាក្យសម្ងាត់ឡើងវិញ',
   'phone_number_missing': 'បាត់លេខទូរស័ព្ទ។',
   'please_correct_fields': 'សូមកែតម្រូវតំបន់ដែលបានបន្លិច។',
@@ -98,7 +98,7 @@ Map<String, String> kmKh = {
   'account_details': 'ព័ត៌មានគណនី',
   'account_details_hint': 'បញ្ចូលព័ត៌មានដែលបានចុះឈ្មោះជាមួយសាលា។',
   'student_id_label': 'លេខសម្គាល់សិស្ស',
-  'enter_student_id': 'បញ្ចូលលេខសម្គាល់សិស្សរបស់កូនរបស់អ្នក',
+  'enter_student_id': 'បញ្ចូលលេខសម្គាល់សិស្ស',
   'student_id_required': 'លេខសម្គាល់សិស្សចាំបាច់។',
   'enter_valid_student_id': 'បញ្ចូលលេខសម្គាល់សិស្សដែលត្រឹមត្រូវ។',
   'parent_phone_number': 'លេខទូរស័ព្ទឪពុកម្តាយ',
@@ -106,11 +106,9 @@ Map<String, String> kmKh = {
   'enter_valid_phone': 'បញ្ចូលលេខទូរស័ព្ទដែលត្រឹមត្រូវ។',
   'already_have_account': 'មានគណនីរួចហើយ?',
   'sign_in_prompt': 'ចូល',
-  'create_parent_password': 'កំណត់ពាក្យសម្ងាត់ឪពុកម្ដាយ',
+  'create_parent_password': 'កំណត់ពាក្យសម្ងាត់',
   'create_password_description':
-      'បង្កើតពាក្យសម្ងាត់ដើម្បីអាចចូលប្រើគណនីឪពុកម្ដាយ។',
-  'privacy_notice':
-      'ព័ត៌មានរបស់អ្នកត្រូវបានប្រើសម្រាប់ផ្ទៀងផ្ទាត់គណនីឪពុកម្តាយតែប៉ុណ្ណោះ។',
+      'បង្កើតពាក្យសម្ងាត់ដើម្បីអាចចូលប្រើគណនី។',
   'no_account': 'គ្មានគណនី?',
   'register': 'ចុះឈ្មោះ',
   'sign_up': 'ចុះឈ្មោះ',
@@ -267,18 +265,46 @@ Map<String, String> kmKh = {
 'attendance_status_absent': 'អវត្តមាន',
 'attendance_status_late': 'យឺត',
 'attendance_status_permission': 'សុំច្បាប់',
+'attendance_recorded_for': 'បានកត់ត្រាវត្តមានសម្រាប់',
+'attendance_scan_success': 'វត្តមានត្រូវបានកត់ត្រា។',
+'attendance_scan_wrong_qr': 'QR មិនត្រឹមត្រូវ',
+'attendance_scan_expired': 'លេខកូដ QR បានផុតកំណត់',
+'attendance_scan_wrong_class': 'QR មិនសមសម្រាប់ថ្នាក់របស់អ្នក',
+'attendance_scan_already': 'បានកត់ត្រាវត្តមានរួចហើយ',
+'attendance_scan_forbidden': 'មិនមានសិទ្ធិ',
+'attendance_scan_network': 'កំហុសបណ្ដាញ',
+'attendance_scan_invalid': 'ការស្កេនវត្តមានមិនត្រឹមត្រូវ',
+ 
 
 'attendance_summary': 'សង្ខេបវត្តមាន',
 'attendance_history': 'ប្រវត្តិវត្តមាន',
 'attendance_today': 'វត្តមានថ្ងៃនេះ',
 
-'present_days': 'ថ្ងៃវត្តមាន',
-'absent_days': 'ថ្ងៃអវត្តមាន',
-'permission_days': 'ថ្ងៃសុំច្បាប់',
+'present_days': 'វត្តមាន',
+'absent_days': 'អវត្តមាន',
+'permission_days': 'សុំច្បាប់',
 'attendance_total_days': 'ចំនួនថ្ងៃសរុប',
 'subjects': 'មុខវិជ្ជា',
 'days': 'ថ្ងៃ',
 'no_attendance': 'មិនមានទិន្នន័យវត្តមាន',
+
+// Days (full day names used in some student screens)
+'day_monday': 'ថ្ងៃច័ន្ទ',
+'day_tuesday': 'ថ្ងៃអង្គារ',
+'day_wednesday': 'ថ្ងៃពុធ',
+'day_thursday': 'ថ្ងៃព្រហស្បតិ៍',
+'day_friday': 'ថ្ងៃសុក្រ',
+'day_saturday': 'ថ្ងៃសៅរ៍',
+'day_sunday': 'ថ្ងៃអាទិត្យ',
+
+// UI / Misc
+'teacher': 'គ្រូ',
+'Upload failed': 'ការផ្ទុកបានបរាជ័យ',
+
+// Result extras
+'semester_exam_average': 'មធ្យមភាគប្រឡងឆមាស',
+'semester_result': 'លទ្ធផលឆមាស',
+'no_result': 'មិនមានលទ្ធផល',
 
 // Ask permission
 'ask_permission': 'សុំច្បាប់',
@@ -327,9 +353,16 @@ Map<String, String> kmKh = {
     'មិនអាចសុំច្បាប់ពេញមួយថ្ងៃបានទេ។',
 'ask_permission_already_requested_today':
     'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
-
+  'permission_edit_title':
+    'កែសម្រួលសំណើសុំច្បាប់',
+  'permission_update': 'ធ្វើបច្ចុប្បន្នភាព',
+  'permission_updated': 'បានធ្វើបច្ចុប្បន្នភាពសំណើសុំច្បាប់រួចរាល់',
+  'permission_deleted': 'បានលុបសំណើសុំច្បាប់រួចរាល់',
+  'permission_delete_failed': 'មិនអាចលុបសំណើសុំច្បាប់បានទេ',
   'permission_delete_title':
     'លុបសំណើសុំច្បាប់',
+  'permission_edit_title' : 'កែប្រែការសុំច្បាប់',
+  'permission_update': 'កែប្រែការសុំច្បាប់',
 
 'permission_delete_message':
     'តើអ្នកប្រាកដថាចង់លុបសំណើសុំច្បាប់នេះមែនទេ?',
@@ -381,4 +414,9 @@ Map<String, String> kmKh = {
   'children_information' : 'ព័ត៌មានរបស់កូនអ្នក',
   'view_linked_children' : 'មើលគណនីកូនរបស់អ្នកទាំងអស់',
   'phone_number' : 'លេខទូរស័ព្ទ',
+  'legal_section': 'គណនី',
+  'enter_password': 'បញ្ចូលពាក្យសម្ងាត់',
+  'enter_confirm_password': 'បញ្ចូលពាក្យសម្ងាត់ឡើងវិញ',
+  'confirm_password': 'បញ្ជាក់ពាក្យសម្ងាត់',
+  'password': 'ពាក្យសម្ងាត់',
 };

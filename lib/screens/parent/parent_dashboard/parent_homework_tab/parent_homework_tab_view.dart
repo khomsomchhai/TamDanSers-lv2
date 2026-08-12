@@ -6,8 +6,10 @@ import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/api/services/homework_services.dart';
+import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/subject_ui.dart';
 import 'package:tamdansers_lv2/data/model/homework_model.dart';
+import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_home_tab/parent_home_tab_view.dart';
 
 part 'parent_homework_tab_binding.dart';
 part 'parent_homework_tab_controller.dart';
@@ -59,11 +61,9 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
         ? Get.find<ParentHomeworkTabViewController>()
         : Get.put(ParentHomeworkTabViewController());
 
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor:
-          isDarkMode ? AppColors.darkBackground : AppColors.lightBackground,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
+      appBar: CustomAppBar(title: "homework".tr, showBackButton: false,),
       body: SafeArea(
         child: RefreshIndicator(
           color: AppColors.primary,
@@ -83,7 +83,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
 
                 const SliverToBoxAdapter(child: SizedBox(height: 14)),
 
-                // Main Content Sliver (Subject Cards Overview vs 1 Subject Homework List)
+                // Main Content Sliver
                 if (controller.isLoading.value)
                   const SliverFillRemaining(
                     child: Center(
@@ -106,7 +106,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
   }
 
   // ===========================================================================
-  // 1. OVERVIEW SCREEN: Main Top Header + Hero Summary Card
+  // 1. OVERVIEW SCREEN: Main Top Header + Hero Summary Card + Month Filter
   // ===========================================================================
   Widget _buildMainOverviewHeader(
     BuildContext context,
@@ -119,28 +119,12 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title & Child Switcher
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'homework'.tr,
-                style: AppTextStyles.headlineSmall.copyWith(
-                  color: isDarkMode ? AppColors.white : AppColors.dark,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
           // Hero Summary Card
           _buildHeroSummaryCard(context, controller),
 
           const SizedBox(height: 22),
 
-          // Section Header
+          // Section Header + Month Selector Pill
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -153,18 +137,44 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                   color: isDarkMode ? AppColors.white : AppColors.dark,
                 ),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${controller.subjectGroupList.length} Subjects',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
+
+              // Month Selector Pill synced with home_tab
+              InkWell(
+                onTap: () =>
+                    _showHomeworkMonthPickerBottomSheet(context, controller),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_month_outlined,
+                        size: 15,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        controller.selectedMonthName,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 3),
+                      const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 16,
+                        color: AppColors.primary,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -172,6 +182,196 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showHomeworkMonthPickerBottomSheet(
+    BuildContext context,
+    ParentHomeworkTabViewController controller,
+  ) {
+    final isKm = Get.locale?.languageCode == 'km';
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    const khmerMonths = [
+      'មករា',
+      'កុម្ភៈ',
+      'មីនា',
+      'មេសា',
+      'ឧសភា',
+      'មិថុនា',
+      'កក្កដា',
+      'សីហា',
+      'កញ្ញា',
+      'តុលា',
+      'វិច្ឆិកា',
+      'ធ្នូ'
+    ];
+
+    const englishMonths = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+
+    final months = isKm ? khmerMonths : englishMonths;
+
+    Get.bottomSheet(
+      Obx(() {
+        final currentSelected = controller.selectedMonth.value;
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isDarkMode ? Colors.grey[900] : AppColors.white,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(24),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? Colors.grey[700] : AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isKm ? 'ជ្រើសរើសខែផ្ទៀងផ្ទាត់' : 'Filter by Month',
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: isDarkMode ? AppColors.white : AppColors.dark,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: Get.back,
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color:
+                          isDarkMode ? Colors.grey[400] : AppColors.hintColor,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // All Months option
+              InkWell(
+                onTap: () {
+                  controller.selectMonth(null);
+                  Get.back();
+                },
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: currentSelected == null
+                        ? AppColors.primary
+                        : (isDarkMode
+                            ? Colors.grey[800]
+                            : AppColors.lightBackground),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: currentSelected == null
+                          ? AppColors.primary
+                          : (isDarkMode ? Colors.grey[700]! : AppColors.border),
+                    ),
+                  ),
+                  child: Text(
+                    isKm ? 'បង្ហាញគ្រប់ខែទាំងអស់' : 'Show All Months',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: currentSelected == null
+                          ? AppColors.white
+                          : (isDarkMode ? AppColors.white : AppColors.dark),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // 12 Months Grid
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 12,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  childAspectRatio: 2.3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemBuilder: (context, index) {
+                  final monthNum = index + 1;
+                  final isSelected = monthNum == currentSelected;
+
+                  return InkWell(
+                    onTap: () {
+                      controller.selectMonth(monthNum);
+                      Get.back();
+                    },
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.primary
+                            : (isDarkMode
+                                ? Colors.grey[850]
+                                : AppColors.lightBackground),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primary
+                              : (isDarkMode
+                                  ? Colors.grey[750]!
+                                  : AppColors.border.withValues(alpha: 0.5)),
+                        ),
+                      ),
+                      child: Text(
+                        months[index],
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: isSelected
+                              ? AppColors.white
+                              : (isDarkMode ? AppColors.white : AppColors.dark),
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      }),
+      isScrollControlled: true,
     );
   }
 
@@ -206,7 +406,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
         children: [
           Row(
             children: [
-              // Left Content
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,8 +419,8 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                       ),
                       child: Text(
                         isKm
-                            ? 'សរុបដំណើការកិច្ចការផ្ទះ'
-                            : 'Overall Homework Progress',
+                            ? 'សរុបដំណើការកិច្ចការផ្ទះ (${controller.selectedMonthName})'
+                            : 'Homework Progress (${controller.selectedMonthName})',
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.white,
                           fontWeight: FontWeight.w600,
@@ -242,8 +441,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                   ],
                 ),
               ),
-
-              // Circular Progress Ring
               SizedBox(
                 width: 60,
                 height: 60,
@@ -271,12 +468,9 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
               ),
             ],
           ),
-
           const SizedBox(height: 16),
           Divider(color: Colors.white.withValues(alpha: 0.2), height: 1),
           const SizedBox(height: 14),
-
-          // Status Counters Row: Done, Not Complete, Missing
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -338,7 +532,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
   }
 
   // ===========================================================================
-  // 2. SUBJECT CARDS GRID (SliverGrid for 2 Columns)
+  // 2. SUBJECT CARDS GRID
   // ===========================================================================
   Widget _buildSubjectGridSliver(
     BuildContext context,
@@ -402,7 +596,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Top Row: Icon & Status Badge Pill
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -478,10 +671,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                   ),
               ],
             ),
-
             const SizedBox(height: 8),
-
-            // Subject Title & Task Count
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -507,8 +697,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                 ),
               ],
             ),
-
-            // Bottom Progress Bar
             Column(
               children: [
                 Row(
@@ -565,7 +753,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
   }
 
   // ===========================================================================
-  // 3. SINGLE SUBJECT VIEW: High-Polish Modern Subject Header Card
+  // 3. SINGLE SUBJECT VIEW
   // ===========================================================================
   Widget _buildSubjectDetailHeader(
     BuildContext context,
@@ -598,10 +786,8 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
       ),
       child: Column(
         children: [
-          // Top Navigation Bar
           Row(
             children: [
-              // Back Button Circle
               Bounceable(
                 onTap: controller.backToSubjectList,
                 child: Container(
@@ -620,8 +806,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                 ),
               ),
               const SizedBox(width: 14),
-
-              // Subject Icon Container
               Container(
                 width: 46,
                 height: 46,
@@ -636,8 +820,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                 ),
               ),
               const SizedBox(width: 12),
-
-              // Subject Title & Total Assignments Subtitle
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -653,36 +835,45 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      isKm
-                          ? 'កិច្ចការសរុប ${controller.subjectAllCount}'
-                          : '${controller.subjectAllCount} Assignments Total',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.grey,
-                        fontSize: 12.5,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          isKm
+                              ? 'កិច្ចការសរុប ${controller.subjectAllCount}'
+                              : '${controller.subjectAllCount} Assignments Total',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.grey,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text('•',
+                            style: TextStyle(color: AppColors.grey)),
+                        const SizedBox(width: 6),
+                        Text(
+                          controller.selectedMonthName,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 18),
-
-          // Mini Dashboard Pill Container (Done, Missing, Total Score)
           _buildSubjectMiniDashboardCard(context, controller),
-
           const SizedBox(height: 16),
-
-          // 4 Status Filter Tabs Bar
           _buildFourStatusTabs(context, controller),
         ],
       ),
     );
   }
 
-  // Mini-Dashboard Pill Card (Done, Missing, Total Score)
   Widget _buildSubjectMiniDashboardCard(
     BuildContext context,
     ParentHomeworkTabViewController controller,
@@ -702,7 +893,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
       ),
       child: Row(
         children: [
-          // 1. Done Stat
           Expanded(
             child: _buildDashboardStatBox(
               icon: Icons.check_circle_rounded,
@@ -713,14 +903,11 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
               isDarkMode: isDarkMode,
             ),
           ),
-
           Container(
             width: 1,
             height: 32,
             color: isDarkMode ? Colors.grey[750] : const Color(0xFFE2E8F0),
           ),
-
-          // 2. Missing Stat
           Expanded(
             child: _buildDashboardStatBox(
               icon: Icons.warning_rounded,
@@ -731,14 +918,11 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
               isDarkMode: isDarkMode,
             ),
           ),
-
           Container(
             width: 1,
             height: 32,
             color: isDarkMode ? Colors.grey[750] : const Color(0xFFE2E8F0),
           ),
-
-          // 3. Total Score Stat
           Expanded(
             child: _buildDashboardStatBox(
               icon: Icons.star_rounded,
@@ -810,7 +994,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
     );
   }
 
-  // 4 Status Filter Tabs Bar inside 1 Subject View
   Widget _buildFourStatusTabs(
     BuildContext context,
     ParentHomeworkTabViewController controller,
@@ -955,7 +1138,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
     );
   }
 
-  // Creative & Ultra-Clean Homework Assignment Card
   Widget _buildHomeworkCardWithStatus(
     BuildContext context,
     ParentHomeworkTabViewController controller,
@@ -988,10 +1170,8 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Line: Subject Avatar, Category Tag, Status Pill, Three-Dots Menu
             Row(
               children: [
-                // Subject Avatar Squircle
                 Container(
                   width: 44,
                   height: 44,
@@ -1008,8 +1188,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                   ),
                 ),
                 const SizedBox(width: 12),
-
-                // Category Tag
                 Text(
                   _getLocalizedSubjectName(item.category).toUpperCase(),
                   style: AppTextStyles.bodySmall.copyWith(
@@ -1019,10 +1197,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                     letterSpacing: 0.8,
                   ),
                 ),
-
                 const Spacer(),
-
-                // Status Badge Pill (e.g. មិនទាន់រួច, ហួសកំណត់, បានបញ្ចប់)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -1039,10 +1214,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 6),
-
-                // Three-Dots Menu
                 IconButton(
                   onPressed: () =>
                       _showHomeworkDetailsBottomSheet(context, item),
@@ -1057,10 +1229,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                 ),
               ],
             ),
-
             const SizedBox(height: 10),
-
-            // Assignment Title
             Text(
               item.title,
               style: AppTextStyles.titleMedium.copyWith(
@@ -1072,10 +1241,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-
             const SizedBox(height: 6),
-
-            // Subtitle Line: Teacher Name & Due Date
             Row(
               children: [
                 const Icon(
@@ -1120,10 +1286,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                 ),
               ],
             ),
-
             const SizedBox(height: 14),
-
-            // Slender Animated Progress Bar
             Container(
               height: 6,
               decoration: BoxDecoration(
@@ -1151,13 +1314,9 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                 },
               ),
             ),
-
             const SizedBox(height: 12),
-
-            // Bottom Badges Line: Score Pill, Priority Pill & Progress %
             Row(
               children: [
-                // Score Badge Pill
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -1182,10 +1341,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
                     ),
                   ),
                 ),
-
                 const Spacer(),
-
-                // Progress % Complete
                 Text(
                   isKm
                       ? 'សម្រេចបាន ${(item.progress * 100).toInt()}%'
@@ -1237,7 +1393,7 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
           ),
           const SizedBox(height: 16),
           Text(
-            isKm ? 'មិនមានកិច្ចការផ្ទះទេ' : 'No Homework Found',
+            isKm ? 'អត់មានកិច្ចការផ្ទះទេ' : 'No Homework Found',
             style: AppTextStyles.titleMedium.copyWith(
               fontWeight: FontWeight.bold,
               color: isDarkMode ? AppColors.white : AppColors.dark,

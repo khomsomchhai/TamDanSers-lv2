@@ -17,7 +17,7 @@ class AskPermissionScreenViewController
       Get.find<UserController>();
 
   final selectedRequestType =
-      'By Subject'.obs;
+      'subject'.obs;
 
   final selectedScheduleId =
       RxnInt();
@@ -38,8 +38,8 @@ class AskPermissionScreenViewController
       Rxn<PermissionModel>();
 
   final requestTypes = const [
-    'By Subject',
-    'Full Day',
+    'subject',
+    'full_day',
   ];
 
   final List<String> permissionTypes = const [
@@ -53,7 +53,7 @@ class AskPermissionScreenViewController
 
   bool get isBySubject =>
       selectedRequestType.value ==
-      'By Subject';
+      'subject';
 
   bool get isEditing =>
       editingPermission.value != null;
@@ -86,7 +86,7 @@ class AskPermissionScreenViewController
   void _onRequestTypeChanged(
     String value,
   ) {
-    if (value == 'By Subject' &&
+    if (value == 'subject' &&
         schedules.isEmpty) {
       fetchTodaySchedules();
     }
@@ -349,8 +349,8 @@ class AskPermissionScreenViewController
     selectedRequestType.value =
         permission.requestType ==
                 'subject'
-            ? 'By Subject'
-            : 'Full Day';
+            ? 'subject'
+            : 'full_day';
 
     selectedPermissionType.value =
         permission.type;
@@ -376,7 +376,7 @@ class AskPermissionScreenViewController
     editingPermission.value = null;
 
     selectedRequestType.value =
-        'By Subject';
+        'subject';
 
     selectedScheduleId.value = null;
 
@@ -401,7 +401,7 @@ Future<void> confirmDeletePermission(
 
   final confirmed = await Get.dialog<bool>(
     Dialog(
-      backgroundColor: AppColors.transparent,
+      backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(
         horizontal: 28,
       ),
@@ -417,13 +417,11 @@ Future<void> confirmDeletePermission(
           18,
         ),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: Get.theme.cardColor,
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: AppColors.dark.withValues(
-                alpha: 0.12,
-              ),
+              color: Get.theme.shadowColor.withOpacity(0.12),
               blurRadius: 28,
               offset: const Offset(0, 12),
             ),
@@ -436,16 +434,14 @@ Future<void> confirmDeletePermission(
               width: 58,
               height: 58,
               decoration: BoxDecoration(
-                color: AppColors.error.withValues(
-                  alpha: 0.10,
-                ),
+                color: Get.theme.colorScheme.error.withOpacity(0.10),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+                child: Icon(
                 Icons.delete_outline_rounded,
-                color: AppColors.error,
+                color: Get.theme.colorScheme.error,
                 size: 30,
-              ),
+               ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -454,7 +450,7 @@ Future<void> confirmDeletePermission(
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.titleSmall.copyWith(
-                color: AppColors.dark,
+                color: Get.theme.textTheme.bodyLarge?.color,
                 fontSize: 18,
                 height: 1.35,
                 fontWeight: FontWeight.bold,
@@ -465,7 +461,7 @@ Future<void> confirmDeletePermission(
               'permission_delete_message'.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.hintColor,
+                color: Get.theme.hintColor,
                 fontSize: 13,
                 height: 1.55,
               ),
@@ -484,9 +480,9 @@ Future<void> confirmDeletePermission(
                         46,
                       ),
                       foregroundColor:
-                          AppColors.hintColor,
-                      side: const BorderSide(
-                        color: AppColors.border,
+                          Get.theme.hintColor,
+                      side: BorderSide(
+                        color: Get.theme.dividerColor,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius:
@@ -495,7 +491,8 @@ Future<void> confirmDeletePermission(
                     ),
                     child: Text(
                       'cancel'.tr,
-                      style: const TextStyle(
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: Get.theme.hintColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -515,9 +512,9 @@ Future<void> confirmDeletePermission(
                       ),
                       elevation: 0,
                       backgroundColor:
-                          AppColors.error,
+                          Get.theme.colorScheme.error,
                       foregroundColor:
-                          AppColors.white,
+                          Get.theme.colorScheme.onError,
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(13),
@@ -525,7 +522,8 @@ Future<void> confirmDeletePermission(
                     ),
                     child: Text(
                       'delete'.tr,
-                      style: const TextStyle(
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: Get.theme.colorScheme.onError,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -798,12 +796,12 @@ Future<void> confirmDeletePermission(
   String requestTypeLabel(
     String value,
   ) {
-    switch (value) {
-      case 'By Subject':
+    switch (value.toLowerCase()) {
+      case 'subject':
         return 'ask_permission_request_type_by_subject'
             .tr;
 
-      case 'Full Day':
+      case 'full_day':
         return 'ask_permission_request_type_full_day'
             .tr;
 

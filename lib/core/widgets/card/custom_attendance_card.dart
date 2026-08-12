@@ -229,23 +229,28 @@ class CustomAttendanceCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            dayCount.toString(),
-            style: AppTextStyles.headlineMedium.copyWith(
-              color: AppColors.dark,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '$subjectCount ${'subjects'.tr}',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.hintColor,
-              fontSize: 11,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                subjectCount.toString(),
+                style: AppTextStyles.headlineMedium.copyWith(
+                  color: AppColors.dark,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'subjects'.tr,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.hintColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ],
       ),

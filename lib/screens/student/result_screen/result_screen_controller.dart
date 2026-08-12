@@ -9,6 +9,8 @@ enum ResultViewMode {
 class ResultScreenViewController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final ResultApi resultApi = ResultApi();
+  final GetStorage _storage = GetStorage();
+  static const String _cacheKeyResult = 'student_result_cache';
 
   late final TabController tabController;
 
@@ -21,7 +23,7 @@ class ResultScreenViewController extends GetxController
   final selectedSemester = 1.obs;
   final selectedMonth = RxnInt();
 
-  final isLoading = false.obs;
+  final isLoading = true.obs;
   final isRankLoading = false.obs;
   final isYearRankLoading = false.obs;
 
@@ -56,6 +58,7 @@ class ResultScreenViewController extends GetxController
 
     tabController.addListener(_handleSemesterTabChange);
 
+    _loadCachedResult();
     getResult();
   }
 
@@ -71,6 +74,22 @@ class ResultScreenViewController extends GetxController
     if (selectedSemester.value != targetSemester) {
       changeSemester(targetSemester);
     }
+  }
+
+  void _loadCachedResult() {
+    try {
+      final dynamic cached = _storage.read(_cacheKeyResult);
+      if (cached is List && cached.isNotEmpty) {
+        final List<ScoreModel> cachedList = cached
+            .whereType<Map>()
+            .map((item) => ScoreModel.fromMap(Map<String, dynamic>.from(item)))
+            .toList();
+        if (cachedList.isNotEmpty) {
+          result.assignAll(cachedList);
+          _selectInitialSemesterAndMonth();
+        }
+      }
+    } catch (_) {}
   }
 
   Future<void> changeView(ResultViewMode mode) async {
@@ -123,12 +142,19 @@ class ResultScreenViewController extends GetxController
   // =========================================================
 
   Future<void> getResult() async {
-    try {
+    final bool hasCache = result.isNotEmpty;
+    if (!hasCache) {
       isLoading.value = true;
+    }
 
+    try {
       final List<ScoreModel> response = await resultApi.getResult();
 
       result.assignAll(response);
+      _storage.write(
+        _cacheKeyResult,
+        response.map((e) => e.toJson()).toList(),
+      );
 
       debugPrint('TOTAL SCORE RECORDS: ${result.length}');
 
@@ -228,14 +254,12 @@ class ResultScreenViewController extends GetxController
 
     final List<ScoreModel> scores = result.where(
       (ScoreModel score) {
-        return score.semester == selectedSemester.value &&
-            score.month == month;
+        return score.semester == selectedSemester.value && score.month == month;
       },
     ).toList();
 
     scores.sort(
-      (ScoreModel a, ScoreModel b) =>
-          a.subjectName.compareTo(
+      (ScoreModel a, ScoreModel b) => a.subjectName.compareTo(
         b.subjectName,
       ),
     );
@@ -250,8 +274,7 @@ class ResultScreenViewController extends GetxController
   double get monthlyTotalScore {
     return filterScores.fold<double>(
       0,
-      (double sum, ScoreModel score) =>
-          sum + score.score.toDouble(),
+      (double sum, ScoreModel score) => sum + score.score.toDouble(),
     );
   }
 
@@ -276,14 +299,12 @@ class ResultScreenViewController extends GetxController
   ) {
     final List<Map<String, dynamic>> data = [];
 
-    final List<int> semesterMonthList =
-        monthsForSemester(semester);
+    final List<int> semesterMonthList = monthsForSemester(semester);
 
     for (final int month in semesterMonthList) {
       final List<ScoreModel> scores = result.where(
         (ScoreModel score) {
-          return score.semester == semester &&
-              score.month == month;
+          return score.semester == semester && score.month == month;
         },
       ).toList();
 
@@ -293,8 +314,7 @@ class ResultScreenViewController extends GetxController
 
       final double total = scores.fold<double>(
         0,
-        (double sum, ScoreModel item) =>
-            sum + item.score.toDouble(),
+        (double sum, ScoreModel item) => sum + item.score.toDouble(),
       );
 
       data.add({
@@ -332,8 +352,7 @@ class ResultScreenViewController extends GetxController
   double semesterMonthlyAverageFor(
     int semester,
   ) {
-    final List<Map<String, dynamic>> data =
-        monthlyResultsForSemester(
+    final List<Map<String, dynamic>> data = monthlyResultsForSemester(
       semester,
     );
 
@@ -371,8 +390,7 @@ class ResultScreenViewController extends GetxController
   ) {
     return result.where(
       (ScoreModel score) {
-        return score.semester == semester &&
-            score.month == 0;
+        return score.semester == semester && score.month == 0;
       },
     ).toList();
   }
@@ -388,15 +406,13 @@ class ResultScreenViewController extends GetxController
   double semesterExamTotalFor(
     int semester,
   ) {
-    final List<ScoreModel> scores =
-        semesterExamScores(
+    final List<ScoreModel> scores = semesterExamScores(
       semester,
     );
 
     return scores.fold<double>(
       0,
-      (double sum, ScoreModel item) =>
-          sum + item.score.toDouble(),
+      (double sum, ScoreModel item) => sum + item.score.toDouble(),
     );
   }
 
@@ -411,8 +427,7 @@ class ResultScreenViewController extends GetxController
   double semesterExamAverageFor(
     int semester,
   ) {
-    final List<ScoreModel> scores =
-        semesterExamScores(
+    final List<ScoreModel> scores = semesterExamScores(
       semester,
     );
 
@@ -422,8 +437,7 @@ class ResultScreenViewController extends GetxController
 
     final double total = scores.fold<double>(
       0,
-      (double sum, ScoreModel item) =>
-          sum + item.score.toDouble(),
+      (double sum, ScoreModel item) => sum + item.score.toDouble(),
     );
 
     return total / scores.length;
@@ -449,23 +463,19 @@ class ResultScreenViewController extends GetxController
   double semesterResultFor(
     int semester,
   ) {
-    final double monthlyAverage =
-        semesterMonthlyAverageFor(
+    final double monthlyAverage = semesterMonthlyAverageFor(
       semester,
     );
 
-    final double examAverage =
-        semesterExamAverageFor(
+    final double examAverage = semesterExamAverageFor(
       semester,
     );
 
-    final bool hasMonthly =
-        monthlyResultsForSemester(
+    final bool hasMonthly = monthlyResultsForSemester(
       semester,
     ).isNotEmpty;
 
-    final bool hasExam =
-        hasSemesterExam(
+    final bool hasExam = hasSemesterExam(
       semester,
     );
 
@@ -481,9 +491,7 @@ class ResultScreenViewController extends GetxController
       return examAverage;
     }
 
-    return (
-      monthlyAverage + examAverage
-    ) / 2;
+    return (monthlyAverage + examAverage) / 2;
   }
 
   double get semesterResult {
@@ -536,12 +544,10 @@ class ResultScreenViewController extends GetxController
     final List<double> values = [];
 
     final bool semester1HasData =
-        monthlyResultsForSemester(1).isNotEmpty ||
-        hasSemesterExam(1);
+        monthlyResultsForSemester(1).isNotEmpty || hasSemesterExam(1);
 
     final bool semester2HasData =
-        monthlyResultsForSemester(2).isNotEmpty ||
-        hasSemesterExam(2);
+        monthlyResultsForSemester(2).isNotEmpty || hasSemesterExam(2);
 
     if (semester1HasData) {
       values.add(
@@ -571,9 +577,7 @@ class ResultScreenViewController extends GetxController
   }
 
   String get yearlyStatus {
-    return yearlyAverage >= 50
-        ? 'PASS'
-        : 'FAIL';
+    return yearlyAverage >= 50 ? 'PASS' : 'FAIL';
   }
 
   // =========================================================
@@ -581,8 +585,7 @@ class ResultScreenViewController extends GetxController
   // =========================================================
 
   void _selectInitialSemesterAndMonth() {
-    final List<int> semesters =
-        availableSemesters;
+    final List<int> semesters = availableSemesters;
 
     if (semesters.isEmpty) {
       selectedSemester.value = 1;
@@ -591,25 +594,21 @@ class ResultScreenViewController extends GetxController
       return;
     }
 
-    selectedSemester.value =
-        semesters.last;
+    selectedSemester.value = semesters.last;
 
-    final int targetIndex =
-        selectedSemester.value - 1;
+    final int targetIndex = selectedSemester.value - 1;
 
     if (targetIndex >= 0 &&
         targetIndex < tabController.length &&
         tabController.index != targetIndex) {
-      tabController.index =
-          targetIndex;
+      tabController.index = targetIndex;
     }
 
     _selectLatestMonthForCurrentSemester();
   }
 
   void _selectLatestMonthForCurrentSemester() {
-    final List<int> availableMonths =
-        semesterMonths;
+    final List<int> availableMonths = semesterMonths;
 
     if (availableMonths.isEmpty) {
       selectedMonth.value = null;
@@ -617,8 +616,7 @@ class ResultScreenViewController extends GetxController
       return;
     }
 
-    selectedMonth.value =
-        availableMonths.last;
+    selectedMonth.value = availableMonths.last;
   }
 
   // =========================================================
@@ -628,36 +626,30 @@ class ResultScreenViewController extends GetxController
   Future<void> changeSemester(
     int semester,
   ) async {
-    if (semester < 1 ||
-        semester > 2) {
+    if (semester < 1 || semester > 2) {
       return;
     }
 
-    if (selectedSemester.value ==
-        semester) {
+    if (selectedSemester.value == semester) {
       return;
     }
 
-    selectedSemester.value =
-        semester;
+    selectedSemester.value = semester;
 
     selectedMonth.value = null;
     rank.value = null;
 
     _selectLatestMonthForCurrentSemester();
 
-    final int targetIndex =
-        semester - 1;
+    final int targetIndex = semester - 1;
 
-    if (tabController.index !=
-        targetIndex) {
+    if (tabController.index != targetIndex) {
       tabController.animateTo(
         targetIndex,
       );
     }
 
-    if (selectedView.value ==
-        ResultViewMode.monthly) {
+    if (selectedView.value == ResultViewMode.monthly) {
       await getRank();
     }
   }
@@ -669,8 +661,7 @@ class ResultScreenViewController extends GetxController
   Future<void> changeMonth(
     int month,
   ) async {
-    if (month < 1 ||
-        month > 12) {
+    if (month < 1 || month > 12) {
       return;
     }
 
@@ -691,8 +682,7 @@ class ResultScreenViewController extends GetxController
   // =========================================================
 
   Future<void> getRank() async {
-    final int? month =
-        selectedMonth.value;
+    final int? month = selectedMonth.value;
 
     if (month == null) {
       rank.value = null;
@@ -702,11 +692,9 @@ class ResultScreenViewController extends GetxController
     try {
       isRankLoading.value = true;
 
-      final ScoreModel? response =
-          await resultApi.getRankStudent(
+      final ScoreModel? response = await resultApi.getRankStudent(
         month: month,
-        semester:
-            selectedSemester.value,
+        semester: selectedSemester.value,
       );
 
       rank.value = response;
@@ -730,17 +718,14 @@ class ResultScreenViewController extends GetxController
   // =========================================================
 
   Future<void> refreshResult() async {
-    final int oldSemester =
-        selectedSemester.value;
+    final int oldSemester = selectedSemester.value;
 
-    final int? oldMonth =
-        selectedMonth.value;
+    final int? oldMonth = selectedMonth.value;
 
     try {
       isLoading.value = true;
 
-      final List<ScoreModel> response =
-          await resultApi.getResult();
+      final List<ScoreModel> response = await resultApi.getResult();
 
       result.assignAll(
         response,
@@ -749,15 +734,13 @@ class ResultScreenViewController extends GetxController
       if (hasSemester(
         oldSemester,
       )) {
-        selectedSemester.value =
-            oldSemester;
+        selectedSemester.value = oldSemester;
 
         if (oldMonth != null &&
             semesterMonths.contains(
               oldMonth,
             )) {
-          selectedMonth.value =
-              oldMonth;
+          selectedMonth.value = oldMonth;
         } else {
           _selectLatestMonthForCurrentSemester();
         }
@@ -765,12 +748,9 @@ class ResultScreenViewController extends GetxController
         _selectInitialSemesterAndMonth();
       }
 
-      if (selectedView.value ==
-          ResultViewMode.monthly) {
+      if (selectedView.value == ResultViewMode.monthly) {
         await getRank();
-      } else if (
-          selectedView.value ==
-              ResultViewMode.yearly) {
+      } else if (selectedView.value == ResultViewMode.yearly) {
         await getYearRank();
       }
     } catch (e, stackTrace) {

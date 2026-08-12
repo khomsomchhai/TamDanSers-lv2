@@ -55,7 +55,7 @@ Map<String, String> enUs = {
   'change_password_title': 'Change Password',
   'create_new_password': 'Create a new password',
   'otp_instructions':
-      'Enter the 6-digit code sent to your phone by SMS and choose a new password.',
+      'Enter the 6-digit code sent to your phone by SMS.',
   'verification_code_otp': 'Verification Code (OTP)',
   'new_password': 'New Password',
   'enter_new_password': 'Enter new password',
@@ -65,6 +65,7 @@ Map<String, String> enUs = {
   'passwords_do_not_match': 'Passwords do not match',
   'resend_otp': 'Resend OTP',
   'resend_otp_in': 'Resend OTP in',
+  'did_not_receive_otp': 'Didn\'t receive OTP?',
   'reset_password': 'Reset Password',
   'phone_number_missing': 'Phone number is missing.',
   'please_correct_fields': 'Please correct the highlighted fields.',
@@ -78,9 +79,10 @@ Map<String, String> enUs = {
   'request_already_exists': 'This request already exists.',
   'please_check_input': 'Please check your input.',
   'create_parent_account': 'Create parent account',
-  'create_parent_password': 'Set up your parent password',
+  'create_parent_password': 'Set up your password',
   'create_password_description':
-      'Create a password so you can access the parent account.',
+      'Create a password so you can access the account.',
+
   'link_account_child':
       'Link your account to your child using their student ID.',
   'parent_dashboard': 'Parent Dashboard',
@@ -332,8 +334,15 @@ Map<String, String> enUs = {
       'You already requested permission for today.',
   'ask_permission_request_type_by_subject': 'By Subject',
   'ask_permission_request_type_full_day': 'Full Day',
-  'permission_delete_title':
-    'Delete Permission Request',
+  'permission_edit_title':
+    'Edit Permission Request',
+  'permission_update': 'Update Request',
+  'permission_updated': 'Permission request updated',
+  'permission_deleted': 'Permission request deleted',
+  'permission_delete_failed': 'Failed to delete permission request',
+  'permission_delete_title': 'Delete Permission Request',
+  'permission_edit_title' : 'Update permission',
+  'permission_update': 'Update Permission',
 
 'permission_delete_message':
     'Are you sure you want to delete this permission request?',
@@ -360,4 +369,9 @@ Map<String, String> enUs = {
   'children_information' : 'Children Information',
   'view_linked_children' : 'View linked children',
   'phone_number' : 'Phone number',
+  'legal_section': 'ACCOUNT',
+  'enter_password': 'Enter your password',
+  'enter_confirm_password': 'Confirm your password',
+  'confirm_password': 'Confirm Password',
+  'password': 'Password',
 };

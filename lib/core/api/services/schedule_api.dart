@@ -1,42 +1,66 @@
 import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 
 class ScheduleApi {
-  final BaseApiService baseApiService =
-      BaseApiService();
+  final BaseApiService baseApiService = BaseApiService();
 
   // ==========================================
   // STUDENT SCHEDULE
-  // Get only schedules for logged-in student's class
+  // Get schedules with fallback endpoints
   // ==========================================
   Future<dynamic> getSchedule() async {
-    try {
-      final response =
-          await baseApiService.get(
-        endpoint: "/schedules/student/me",
-      );
+    final List<String> endpoints = [
+      "/schedules/student/me",
+      "/schedules",
+    ];
 
-      return response;
-    } catch (e) {
-      rethrow;
+    for (final String endpoint in endpoints) {
+      try {
+        final response = await baseApiService.get(endpoint: endpoint);
+        if (response != null) {
+          return response;
+        }
+      } catch (_) {}
     }
+
+    return null;
   }
 
   // ==========================================
   // PARENT - STUDENT TODAY SCHEDULE
+  // Fallback through all parent/student schedule routes
   // ==========================================
   Future<dynamic> getParentSchedule(
     int studentId,
   ) async {
-    try {
-      final response =
-          await baseApiService.get(
-        endpoint:
-            "/parents/schedules/$studentId/today",
-      );
+    final List<String> endpoints = [
+      "/parents/schedules/$studentId/today",
+      "/permissions/parent/$studentId/schedules",
+      "/schedules/student/$studentId",
+      "/parents/schedules/$studentId",
+      "/schedules?student_id=$studentId",
+      "/schedules",
+    ];
 
-      return response;
-    } catch (e) {
-      rethrow;
+    for (final String endpoint in endpoints) {
+      try {
+        final response = await baseApiService.get(endpoint: endpoint);
+        if (response != null) {
+          if (response is List && response.isNotEmpty) {
+            return response;
+          }
+          if (response is Map) {
+            final dynamic listData = response['schedules'] ??
+                response['data'] ??
+                response['results'] ??
+                response['permissions'];
+            if (listData is List && listData.isNotEmpty) {
+              return response;
+            }
+          }
+        }
+      } catch (_) {}
     }
+
+    return null;
   }
 }

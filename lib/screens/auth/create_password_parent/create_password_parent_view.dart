@@ -70,7 +70,7 @@ class CreatePasswordParentView extends GetView<CreatePasswordParentViewControlle
           'create_password_description'.tr,
           textAlign: TextAlign.center,
           style: Get.textTheme.bodyMedium?.copyWith(
-            color: AppColors.hintColor,
+            // color: AppColors.hintColor,
             height: 1.45,
           ),
         ),
@@ -85,13 +85,13 @@ class CreatePasswordParentView extends GetView<CreatePasswordParentViewControlle
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'new_password'.tr,
+            'password'.tr,
             style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           Obx(
             () => CustomTextField(
-              hintText: 'enter_new_password'.tr,
+              hintText: 'enter_password'.tr,
               controller: controller.newPasswordCtrl,
               prefixIcon: const Icon(PhosphorIconsRegular.lock),
               isPwd: true,
@@ -124,7 +124,7 @@ class CreatePasswordParentView extends GetView<CreatePasswordParentViewControlle
           const SizedBox(height: 8),
           Obx(
             () => CustomTextField(
-              hintText: 'confirm_new_password'.tr,
+              hintText: 'enter_confirm_password'.tr,
               controller: controller.confirmPasswordCtrl,
               prefixIcon: const Icon(PhosphorIconsRegular.lock),
               isPwd: true,

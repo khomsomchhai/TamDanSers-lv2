@@ -37,17 +37,79 @@ class SubmissionModel {
       return 0;
     }
 
+    String? parseFilePath(dynamic rawVal) {
+      if (rawVal == null) return null;
+
+      String? strPath;
+      if (rawVal is String && rawVal.trim().isNotEmpty) {
+        strPath = rawVal.trim();
+      } else if (rawVal is List && rawVal.isNotEmpty) {
+        return parseFilePath(rawVal.first);
+      } else if (rawVal is Map) {
+        return parseFilePath(
+          rawVal['file_path'] ??
+              rawVal['file'] ??
+              rawVal['path'] ??
+              rawVal['url'] ??
+              rawVal['file_url'] ??
+              rawVal['attachment'],
+        );
+      }
+
+      if (strPath == null || strPath.isEmpty) return null;
+
+      if (!strPath.startsWith('http://') && !strPath.startsWith('https://')) {
+        if (!strPath.startsWith('/')) {
+          strPath = '/$strPath';
+        }
+        return 'https://tamdansers-1fvbe1msgz9hki.sabay.com$strPath';
+      }
+
+      return strPath;
+    }
+
+    List<String> parseFilePaths(dynamic rawVal) {
+      if (rawVal == null) return [];
+      if (rawVal is List) {
+        final List<String> result = [];
+        for (var item in rawVal) {
+          final parsed = parseFilePath(item);
+          if (parsed != null && parsed.isNotEmpty) {
+            result.add(parsed);
+          }
+        }
+        return result;
+      }
+      final single = parseFilePath(rawVal);
+      return single != null && single.isNotEmpty ? [single] : [];
+    }
+
+    dynamic rawSingleFile = json['file_path'] ??
+        json['file'] ??
+        json['attachment'] ??
+        json['attachment_path'] ??
+        json['file_url'] ??
+        json['url'] ??
+        json['filePath'];
+
+    dynamic rawFilesList = json['file_paths'] ?? json['files'];
+
+    final parsedSingle = parseFilePath(rawSingleFile);
+    final parsedList = parseFilePaths(rawFilesList);
+
+    final finalPaths = parsedList.isNotEmpty
+        ? parsedList
+        : (parsedSingle != null ? [parsedSingle] : <String>[]);
+
     return SubmissionModel(
-      id: toInt(json['id']),
-      homeworkId: toInt(json['homework_id']),
-      homeworkTitle: json['homework_title'] ?? '',
-      studentId: toInt(json['student_id']),
-      studentName: json['student_name'] ?? '',
-      answerText: json['answer_text'] ?? '',
-      filePath: json['file_path'],
-      filePaths: json['file_paths'] != null
-          ? List<String>.from(json['file_paths'])
-          : [],
+      id: toInt(json['id'] ?? json['submission_id']),
+      homeworkId: toInt(json['homework_id'] ?? json['homeworkId']),
+      homeworkTitle: json['homework_title'] ?? json['title'] ?? '',
+      studentId: toInt(json['student_id'] ?? json['studentId'] ?? json['user_id']),
+      studentName: json['student_name'] ?? json['studentName'] ?? '',
+      answerText: json['answer_text'] ?? json['answer'] ?? '',
+      filePath: parsedSingle ?? (finalPaths.isNotEmpty ? finalPaths.first : null),
+      filePaths: finalPaths,
       status: json['status'] ?? '',
       score: json['score'] != null ? (json['score'] as num).toDouble() : null,
       bonus: json['bonus'] != null ? (json['bonus'] as num).toDouble() : 0.0,

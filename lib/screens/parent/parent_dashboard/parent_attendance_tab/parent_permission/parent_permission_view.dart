@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
@@ -316,53 +315,53 @@ class ParentPermissionView extends GetView<ParentPermissionController> {
         const SizedBox(height: 8),
 
         // MON - SAT DAY SELECTION BAR
-        Obx(() {
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: controller.days.map((day) {
-                final isSelected = controller.selectedDay.value == day;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: InkWell(
-                    onTap: () {
-                      controller.selectedDay.value = day;
-                      controller.selectedScheduleId.value = null;
-                    },
-                    borderRadius: BorderRadius.circular(10),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.lightBackground,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color:
-                              isSelected ? AppColors.primary : AppColors.border,
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        day,
-                        style: TextStyle(
-                          color: isSelected ? AppColors.white : AppColors.dark,
-                          fontWeight:
-                              isSelected ? FontWeight.bold : FontWeight.w500,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          );
-        }),
+        // Obx(() {
+        //   return SingleChildScrollView(
+        //     scrollDirection: Axis.horizontal,
+        //     child: Row(
+        //       children: controller.days.map((day) {
+        //         final isSelected = controller.selectedDay.value == day;
+        //         return Padding(
+        //           padding: const EdgeInsets.only(right: 6),
+        //           child: InkWell(
+        //             onTap: () {
+        //               controller.selectedDay.value = day;
+        //               controller.selectedScheduleId.value = null;
+        //             },
+        //             borderRadius: BorderRadius.circular(10),
+        //             child: AnimatedContainer(
+        //               duration: const Duration(milliseconds: 150),
+        //               padding: const EdgeInsets.symmetric(
+        //                 horizontal: 14,
+        //                 vertical: 8,
+        //               ),
+        //               decoration: BoxDecoration(
+        //                 color: isSelected
+        //                     ? AppColors.primary
+        //                     : AppColors.lightBackground,
+        //                 borderRadius: BorderRadius.circular(10),
+        //                 border: Border.all(
+        //                   color:
+        //                       isSelected ? AppColors.primary : AppColors.border,
+        //                   width: 1,
+        //                 ),
+        //               ),
+        //               child: Text(
+        //                 day,
+        //                 style: TextStyle(
+        //                   color: isSelected ? AppColors.white : AppColors.dark,
+        //                   fontWeight:
+        //                       isSelected ? FontWeight.bold : FontWeight.w500,
+        //                   fontSize: 13,
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //         );
+        //       }).toList(),
+        //     ),
+        //   );
+        // }),
 
         const SizedBox(height: 10),
 
@@ -477,6 +476,7 @@ class ParentPermissionView extends GetView<ParentPermissionController> {
             hintText: 'ask_permission_write_reason'.tr,
             controller: controller.reasonController,
             isMultiline: true,
+            fillColor: Get.theme.scaffoldBackgroundColor,
           ),
         ),
       ],

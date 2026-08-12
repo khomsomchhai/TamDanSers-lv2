@@ -48,7 +48,19 @@ class AttendanceService {
 
 
   // =========================================================
+<<<<<<< HEAD
   // STUDENT SCAN
+=======
+  // STUDENT SCAN ATTENDANCE
+  //
+  // POST /attendance/scan
+  //
+  // SEND:
+  // token
+  // latitude
+  // longitude
+  // accuracy
+>>>>>>> main
   // =========================================================
 
   Future<Map<String, dynamic>>

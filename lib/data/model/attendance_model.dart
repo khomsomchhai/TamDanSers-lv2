@@ -53,6 +53,26 @@ class AttendanceModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'student_id': studentId,
+      'schedule_id': scheduleId,
+      'class_id': classId,
+      'class_name': className,
+      'subject_id': subjectId,
+      'subject_name': subjectName,
+      'teacher_id': teacherId,
+      'teacher_name': teacherName,
+      'date': date,
+      'day': day,
+      'start_time': startTime,
+      'end_time': endTime,
+      'status': status,
+      'remark': remark,
+    };
+  }
+
   static int? _asInt(dynamic value) {
     if (value is int) {
       return value;

@@ -71,8 +71,9 @@ class CustomSnackbar {
     Get.snackbar(
       title,
       message,
-      snackPosition:
-          position == SnackPositionType.bottom ? SnackPosition.BOTTOM : SnackPosition.TOP,
+      snackPosition: position == SnackPositionType.bottom
+          ? SnackPosition.BOTTOM
+          : SnackPosition.TOP,
       backgroundColor: backgroundColor,
       colorText: AppColors.white,
       margin: const EdgeInsets.all(16),

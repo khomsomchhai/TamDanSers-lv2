@@ -6,6 +6,7 @@ import 'package:get/get.dart' hide MultipartFile;
 import 'package:image_picker/image_picker.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
+import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
 import 'package:tamdansers_lv2/screens/student/homework/in_app_pdf_viewer.dart';
 
@@ -94,15 +95,15 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     final submission = widget.controller.submissionMap[widget.item.id];
 
     if (submission == null) {
-      Get.snackbar(
-        _isKhmer ? 'កំហុស' : 'Error',
+      CustomSnackbar.error(
         _isKhmer ? 'រកមិនឃើញកិច្ចការដែលបានប្រគល់' : 'Submission not found',
+        title: _isKhmer ? 'កំហុស' : 'Error',
       );
       return;
     }
 
     setState(() {
-      _answerController.text = submission.answerText ?? '';
+      _answerController.text = submission.answerText;
       _selectedFiles.clear();
       _keepOldFiles = true;
       _isEditing = true;
@@ -134,11 +135,11 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
         }
       }
     } catch (error) {
-      Get.snackbar(
-        _isKhmer ? 'កំហុស' : 'Error',
+      CustomSnackbar.error(
         _isKhmer
             ? 'មិនអាចជ្រើសរើសរូបភាពបានទេ៖ $error'
             : 'Failed to pick image: $error',
+        title: _isKhmer ? 'កំហុស' : 'Error',
       );
     }
   }
@@ -164,11 +165,11 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
         _selectedFiles.addAll(files);
       });
     } catch (error) {
-      Get.snackbar(
-        Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
+      CustomSnackbar.error(
         Get.locale?.languageCode == 'km'
             ? 'មិនអាចជ្រើសរើស PDF បានទេ៖ $error'
             : 'Failed to pick PDF: $error',
+        title: Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
       );
     }
   }
@@ -330,10 +331,17 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               foregroundColor: Colors.white,
               elevation: 0,
             ),
-            onPressed: () {
+            onPressed: () async {
               Get.back();
-              widget.controller.executeDeleteSubmission(
+              setState(() {
+                _answerController.clear();
+                _selectedFiles.clear();
+                _isEditing = false;
+                _keepOldFiles = false;
+              });
+              await widget.controller.executeDeleteSubmission(
                 submissionId: submissionId,
+                homeworkId: widget.item.id,
               );
             },
             child: Text(_isKhmer ? 'លុប' : 'Delete'),
@@ -398,10 +406,15 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
       statusText = _isKhmer ? 'បានប្រគល់' : 'Submitted';
       statusColor = AppColors.primary;
       statusBackground = AppColors.primary.withValues(alpha: 0.08);
-    } else {
-      statusText = _isKhmer ? 'មិនទាន់ប្រគល់' : 'Missing';
+    } else if (item.status == HomeworkStatus.pending ||
+        item.status == HomeworkStatus.none) {
+      statusText = _isKhmer ? 'រង់ចាំពិនិត្យ' : 'Pending';
       statusColor = const Color(0xffD97706);
       statusBackground = const Color(0xffFFFBEB);
+    } else {
+      statusText = _isKhmer ? 'មិនទាន់ប្រគល់' : 'Missing';
+      statusColor = const Color(0xffEF4444);
+      statusBackground = const Color(0xffFEF2F2);
     }
 
     return Scaffold(
@@ -421,27 +434,20 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               primaryThemeColor: primaryThemeColor,
             ),
             const SizedBox(height: 24),
-            if (item.filePath != null && item.filePath!.isNotEmpty) ...[
-              _buildTeacherAttachment(context, item.filePath!),
+            if ((item.filePath != null && item.filePath!.isNotEmpty) ||
+                item.filePaths.isNotEmpty) ...[
+              _buildTeacherAttachment(context, item),
               const SizedBox(height: 24),
             ],
-            if (item.status == HomeworkStatus.none)
+            if (item.status == HomeworkStatus.none ||
+                item.status == HomeworkStatus.pending)
               _buildSubmitForm(primaryThemeColor)
             else
               Obx(() {
                 final submission = widget.controller.submissionMap[item.id];
 
                 if (submission == null) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        _isKhmer
-                            ? 'រកមិនឃើញព័ត៌មានកិច្ចការដែលបានប្រគល់'
-                            : 'Submission information not found',
-                      ),
-                    ),
-                  );
+                  return _buildSubmitForm(primaryThemeColor);
                 }
 
                 if (_isEditing && item.status == HomeworkStatus.submitted) {
@@ -587,7 +593,8 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               const SizedBox(width: 10),
               Icon(
                 Icons.calendar_month_outlined,
-                color: item.status == HomeworkStatus.none
+                color: (item.status == HomeworkStatus.none ||
+                        item.status == HomeworkStatus.pending)
                     ? Colors.orange
                     : Colors.grey,
                 size: 15,
@@ -595,7 +602,8 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
-                  item.status == HomeworkStatus.none
+                  (item.status == HomeworkStatus.none ||
+                          item.status == HomeworkStatus.pending)
                       ? (_isKhmer
                           ? 'ផុតកំណត់៖ ${item.date}'
                           : 'Due: ${item.date}')
@@ -605,7 +613,8 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: item.status == HomeworkStatus.none
+                    color: (item.status == HomeworkStatus.none ||
+                            item.status == HomeworkStatus.pending)
                         ? Colors.orange
                         : Colors.grey,
                     fontSize: 12.5,
@@ -619,8 +628,14 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     );
   }
 
-  Widget _buildTeacherAttachment(BuildContext context, String path) {
-    final isPdf = path.toLowerCase().endsWith('.pdf');
+  Widget _buildTeacherAttachment(BuildContext context, HomeworkItem item) {
+    final List<String> paths = item.filePaths.isNotEmpty
+        ? item.filePaths
+        : (item.filePath != null && item.filePath!.isNotEmpty
+            ? [item.filePath!]
+            : []);
+
+    if (paths.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -633,30 +648,39 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
           ),
         ),
         const SizedBox(height: 10),
-        if (isPdf)
-          _buildPdfCard(path)
-        else
-          GestureDetector(
-            onTap: () => _showFullScreenImage(path),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                path,
-                width: double.infinity,
-                height: 160,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  height: 160,
-                  color: const Color(0xffF1F5F9),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.broken_image_rounded,
-                    color: Colors.grey,
+        ...paths.map((rawPath) {
+          final path = rawPath.startsWith('http://') || rawPath.startsWith('https://')
+              ? rawPath
+              : 'https://tamdansers-1fvbe1msgz9hki.sabay.com${rawPath.startsWith('/') ? rawPath : '/$rawPath'}';
+          final isPdf = path.toLowerCase().endsWith('.pdf');
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: isPdf
+                ? _buildPdfCard(path)
+                : GestureDetector(
+                    onTap: () => _showFullScreenImage(path),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        path,
+                        width: double.infinity,
+                        height: 160,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          height: 160,
+                          color: const Color(0xffF1F5F9),
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.broken_image_rounded,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-          ),
+          );
+        }),
       ],
     );
   }
@@ -732,11 +756,11 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               final text = _answerController.text.trim();
 
               if (text.isEmpty && _selectedFiles.isEmpty) {
-                Get.snackbar(
-                  _isKhmer ? 'កំហុស' : 'Error',
+                CustomSnackbar.warning(
                   _isKhmer
                       ? 'សូមបញ្ចូលចម្លើយ ឬភ្ជាប់ឯកសារ'
                       : 'Please enter an answer or attach a file',
+                  title: _isKhmer ? 'កំហុស' : 'Error',
                 );
                 return;
               }
@@ -796,7 +820,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
         SwitchListTile.adaptive(
           contentPadding: EdgeInsets.zero,
           value: _keepOldFiles,
-          activeColor: AppColors.primary,
+          activeThumbColor: AppColors.primary,
           title: Text(
             _isKhmer ? 'រក្សាឯកសារចាស់' : 'Keep existing files',
             style: const TextStyle(
@@ -840,11 +864,11 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                   if (text.isEmpty &&
                       _selectedFiles.isEmpty &&
                       !_keepOldFiles) {
-                    Get.snackbar(
-                      _isKhmer ? 'កំហុស' : 'Error',
+                    CustomSnackbar.warning(
                       _isKhmer
                           ? 'សូមបញ្ចូលចម្លើយ ឬភ្ជាប់ឯកសារ'
                           : 'Please enter an answer or attach a file',
+                      title: _isKhmer ? 'កំហុស' : 'Error',
                     );
                     return;
                   }

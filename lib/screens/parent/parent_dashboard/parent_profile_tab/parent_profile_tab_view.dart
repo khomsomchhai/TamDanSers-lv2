@@ -18,8 +18,7 @@ class ParentProfileTabView
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: 'profile'.tr,
         showBackButton: false,
@@ -67,7 +66,7 @@ class ParentProfileTabView
                   crossAxisAlignment:
                       CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     _buildProfileHero(
                       user,
@@ -898,7 +897,7 @@ void _showParentAccountDialog(
       MapEntry(
         'phone_number'.tr,
         _read(
-          () => user.phone,
+          () => user.formattedPhone,
         ),
       ),
     ],
@@ -1388,7 +1387,7 @@ void _showParentAccountDialog(
         MapEntry(
           'guardian_phone'.tr,
           _read(
-            () => profile.guardianPhone,
+            () => profile.formattedGuardianPhone,
           ),
         ),
       ],
@@ -1417,7 +1416,7 @@ void _showParentAccountDialog(
         MapEntry(
           'guardian_phone'.tr,
           _read(
-            () => profile.guardianPhone,
+            () => profile.formattedGuardianPhone,
           ),
         ),
         MapEntry(

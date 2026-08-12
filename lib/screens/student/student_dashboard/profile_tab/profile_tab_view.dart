@@ -13,6 +13,7 @@ import 'package:tamdansers_lv2/app/themes/skeleton_theme.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/services/theme_service.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
+import 'package:tamdansers_lv2/data/model/user_model.dart';
 
 part 'profile_tab_binding.dart';
 part 'profile_tab_controller.dart';
@@ -494,9 +495,25 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
   }
 
   Widget _buildFallback(dynamic user, BuildContext context) {
-    final name = (user.displayName ?? user.name ?? '').trim();
+    String name = '';
+    if (user != null) {
+      if (user is UserModel) {
+        name = user.fullName.isNotEmpty
+            ? user.fullName
+            : '${user.firstName} ${user.lastName}'.trim();
+      } else {
+        try {
+          name = (user.fullName ?? user.displayName ?? user.name ?? '')
+              .toString()
+              .trim();
+        } catch (_) {
+          name = '';
+        }
+      }
+    }
+
     if (name.isNotEmpty) {
-      final parts = name.split(' ');
+      final parts = name.split(RegExp(r'\s+'));
       final initials = parts.length >= 2
           ? '${parts.first[0]}${parts.last[0]}'.toUpperCase()
           : name.substring(0, name.length >= 2 ? 2 : name.length).toUpperCase();
@@ -708,6 +725,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                     children: [
                       _buildInfoRow('full_name'.tr, user.fullName ?? ''),
                       const SizedBox(height: 10),
+                      _buildInfoRow('phone_number'.tr, user.formattedPhone ?? ''),
+                      const SizedBox(height: 10),
                       _buildInfoRow('email'.tr, user.email ?? ''),
                       const SizedBox(height: 10),
                       _buildInfoRow(
@@ -717,8 +736,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       const SizedBox(height: 10),
                       _buildInfoRow('gender'.tr, profile.gender ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow(
-                          'guardian_phone'.tr, profile.guardianPhone ?? ''),
+                        _buildInfoRow(
+                          'guardian_phone'.tr, profile.formattedGuardianPhone ?? ''),
                     ],
                   ),
                 ),
@@ -843,8 +862,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       _buildInfoRow(
                           'guardian_name'.tr, profile.guardianName ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow(
-                          'guardian_phone'.tr, profile.guardianPhone ?? ''),
+                        _buildInfoRow(
+                          'guardian_phone'.tr, profile.formattedGuardianPhone ?? ''),
                       const SizedBox(height: 10),
                       _buildInfoRow('address'.tr, profile.address ?? ''),
                     ],

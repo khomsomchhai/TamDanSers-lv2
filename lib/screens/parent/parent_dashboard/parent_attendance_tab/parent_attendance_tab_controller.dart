@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/services/parent_attendance_service.dart';
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
@@ -7,6 +8,7 @@ import 'package:tamdansers_lv2/data/model/attendance_model.dart';
 class ParentAttendanceTabViewController extends GetxController {
   final ParentAttendanceService attendanceService =
       ParentAttendanceService();
+  final GetStorage _box = GetStorage();
 
   final attendanceList = <AttendanceModel>[].obs;
   final isLoading = false.obs;
@@ -59,7 +61,31 @@ class ParentAttendanceTabViewController extends GetxController {
     selectedMonth.value = DateTime.now().month;
     selectedYear.value = DateTime.now().year;
 
+    _loadFromCache(studentId);
     await getParentAttendance();
+  }
+
+  void _loadFromCache(int studentId) {
+    try {
+      final cached = _box.read('parent_attendance_$studentId');
+      if (cached is List && cached.isNotEmpty && attendanceList.isEmpty) {
+        final List<AttendanceModel> cachedList = [];
+        for (final item in cached) {
+          if (item is Map) {
+            cachedList.add(
+              AttendanceModel.fromJson(Map<String, dynamic>.from(item)),
+            );
+          }
+        }
+        if (cachedList.isNotEmpty) {
+          attendanceList.assignAll(cachedList);
+          countAttendance();
+          isLoading.value = false;
+        }
+      }
+    } catch (e) {
+      debugPrint('LOAD ATTENDANCE CACHE ERROR: $e');
+    }
   }
 
   Future<void> getParentAttendance() async {
@@ -77,7 +103,10 @@ class ParentAttendanceTabViewController extends GetxController {
     }
 
     try {
-      isLoading.value = true;
+      _loadFromCache(studentId);
+      if (attendanceList.isEmpty) {
+        isLoading.value = true;
+      }
 
       final result =
           await attendanceService.getChildAttendance(
@@ -85,8 +114,12 @@ class ParentAttendanceTabViewController extends GetxController {
       );
 
       attendanceList.assignAll(result);
-
       countAttendance();
+
+      await _box.write(
+        'parent_attendance_$studentId',
+        result.map((item) => item.toJson()).toList(),
+      );
 
       debugPrint(
         'ATTENDANCE STUDENT ID: $studentId',
@@ -328,13 +361,18 @@ void countAttendance() {
   }
 
   double get attendanceRate {
-    if (totalDays == 0) {
-      return 0;
+    final totalRecords =
+        presentSubjects.value + absentSubjects.value + permissionSubjects.value;
+
+    if (totalRecords == 0) {
+      if (totalDays == 0) {
+        return 0;
+      }
+
+      return presentDays.value / totalDays * 100;
     }
 
-    return presentDays.value /
-        totalDays *
-        100;
+    return (presentSubjects.value / totalRecords) * 100;
   }
 
   String get currentMonthName {
