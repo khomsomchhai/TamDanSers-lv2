@@ -4,11 +4,7 @@ class ParentVerifyOtpViewController extends GetxController {
   final formKey = GlobalKey<FormState>();
   final otpControllers = List.generate(6, (_) => TextEditingController());
   final otpFocusNodes = List.generate(6, (_) => FocusNode());
-  final timerText = ''.obs;
-  final canResend = false.obs;
   final isLoading = false.obs;
-  Timer? _timer;
-  int _secondsRemaining = 120;
 
   final authService = AuthServices();
   String studentCode = '';
@@ -20,30 +16,12 @@ class ParentVerifyOtpViewController extends GetxController {
   void onInit() {
     super.onInit();
     _initializeArgs();
-    _startResendTimer();
   }
 
   void _initializeArgs() {
     final args = Get.arguments as Map<String, dynamic>?;
     studentCode = args?['student_code']?.toString() ?? '';
     parentPhone = args?['parent_phone']?.toString() ?? '';
-  }
-
-  void _startResendTimer() {
-    _secondsRemaining = 120;
-    canResend.value = false;
-    timerText.value = '${'resend_otp_in'.tr} ${_secondsRemaining}s';
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _secondsRemaining--;
-      if (_secondsRemaining <= 0) {
-        canResend.value = true;
-        timerText.value = 'resend_otp'.tr;
-        timer.cancel();
-      } else {
-        timerText.value = '${'resend_otp_in'.tr} ${_secondsRemaining}s';
-      }
-    });
   }
 
   void handleOtpChanged(BuildContext context, int index, String value) {
@@ -70,7 +48,6 @@ class ParentVerifyOtpViewController extends GetxController {
   }
 
   Future<void> resendOtp() async {
-    if (!canResend.value) return;
     if (studentCode.isEmpty || parentPhone.isEmpty) {
       CustomSnackbar.error('please_fill_all_fields'.tr);
       return;
@@ -83,7 +60,6 @@ class ParentVerifyOtpViewController extends GetxController {
       );
       final message = response['message']?.toString() ?? 'otp_resent_successfully'.tr;
       CustomSnackbar.success(message);
-      _startResendTimer();
     } catch (e) {
       if (e is DioException) CustomSnackbar.error(handleDioException(e));
       else CustomSnackbar.error('something_went_wrong_retry'.tr);
@@ -131,7 +107,6 @@ class ParentVerifyOtpViewController extends GetxController {
 
   @override
   void onClose() {
-    _timer?.cancel();
     for (final c in otpControllers) {
       c.dispose();
     }

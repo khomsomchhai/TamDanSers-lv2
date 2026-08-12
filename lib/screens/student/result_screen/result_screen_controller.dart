@@ -9,6 +9,8 @@ enum ResultViewMode {
 class ResultScreenViewController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final ResultApi resultApi = ResultApi();
+  final GetStorage _storage = GetStorage();
+  static const String _cacheKeyResult = 'student_result_cache';
 
   late final TabController tabController;
 
@@ -21,7 +23,7 @@ class ResultScreenViewController extends GetxController
   final selectedSemester = 1.obs;
   final selectedMonth = RxnInt();
 
-  final isLoading = false.obs;
+  final isLoading = true.obs;
   final isRankLoading = false.obs;
   final isYearRankLoading = false.obs;
 
@@ -56,6 +58,7 @@ class ResultScreenViewController extends GetxController
 
     tabController.addListener(_handleSemesterTabChange);
 
+    _loadCachedResult();
     getResult();
   }
 
@@ -71,6 +74,22 @@ class ResultScreenViewController extends GetxController
     if (selectedSemester.value != targetSemester) {
       changeSemester(targetSemester);
     }
+  }
+
+  void _loadCachedResult() {
+    try {
+      final dynamic cached = _storage.read(_cacheKeyResult);
+      if (cached is List && cached.isNotEmpty) {
+        final List<ScoreModel> cachedList = cached
+            .whereType<Map>()
+            .map((item) => ScoreModel.fromMap(Map<String, dynamic>.from(item)))
+            .toList();
+        if (cachedList.isNotEmpty) {
+          result.assignAll(cachedList);
+          _selectInitialSemesterAndMonth();
+        }
+      }
+    } catch (_) {}
   }
 
   Future<void> changeView(ResultViewMode mode) async {
@@ -123,12 +142,19 @@ class ResultScreenViewController extends GetxController
   // =========================================================
 
   Future<void> getResult() async {
-    try {
+    final bool hasCache = result.isNotEmpty;
+    if (!hasCache) {
       isLoading.value = true;
+    }
 
+    try {
       final List<ScoreModel> response = await resultApi.getResult();
 
       result.assignAll(response);
+      _storage.write(
+        _cacheKeyResult,
+        response.map((e) => e.toJson()).toList(),
+      );
 
       debugPrint('TOTAL SCORE RECORDS: ${result.length}');
 

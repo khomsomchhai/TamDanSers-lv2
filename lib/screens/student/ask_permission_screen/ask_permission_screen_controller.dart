@@ -401,7 +401,7 @@ Future<void> confirmDeletePermission(
 
   final confirmed = await Get.dialog<bool>(
     Dialog(
-      backgroundColor: AppColors.transparent,
+      backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(
         horizontal: 28,
       ),
@@ -417,13 +417,11 @@ Future<void> confirmDeletePermission(
           18,
         ),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: Get.theme.cardColor,
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: AppColors.dark.withValues(
-                alpha: 0.12,
-              ),
+              color: Get.theme.shadowColor.withOpacity(0.12),
               blurRadius: 28,
               offset: const Offset(0, 12),
             ),
@@ -436,16 +434,14 @@ Future<void> confirmDeletePermission(
               width: 58,
               height: 58,
               decoration: BoxDecoration(
-                color: AppColors.error.withValues(
-                  alpha: 0.10,
-                ),
+                color: Get.theme.colorScheme.error.withOpacity(0.10),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+                child: Icon(
                 Icons.delete_outline_rounded,
-                color: AppColors.error,
+                color: Get.theme.colorScheme.error,
                 size: 30,
-              ),
+               ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -454,7 +450,7 @@ Future<void> confirmDeletePermission(
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.titleSmall.copyWith(
-                color: AppColors.dark,
+                color: Get.theme.textTheme.bodyLarge?.color,
                 fontSize: 18,
                 height: 1.35,
                 fontWeight: FontWeight.bold,
@@ -465,7 +461,7 @@ Future<void> confirmDeletePermission(
               'permission_delete_message'.tr,
               textAlign: TextAlign.center,
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.hintColor,
+                color: Get.theme.hintColor,
                 fontSize: 13,
                 height: 1.55,
               ),
@@ -484,9 +480,9 @@ Future<void> confirmDeletePermission(
                         46,
                       ),
                       foregroundColor:
-                          AppColors.hintColor,
-                      side: const BorderSide(
-                        color: AppColors.border,
+                          Get.theme.hintColor,
+                      side: BorderSide(
+                        color: Get.theme.dividerColor,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius:
@@ -496,7 +492,7 @@ Future<void> confirmDeletePermission(
                     child: Text(
                       'cancel'.tr,
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.hintColor,
+                        color: Get.theme.hintColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -516,9 +512,9 @@ Future<void> confirmDeletePermission(
                       ),
                       elevation: 0,
                       backgroundColor:
-                          AppColors.error,
+                          Get.theme.colorScheme.error,
                       foregroundColor:
-                          AppColors.white,
+                          Get.theme.colorScheme.onError,
                       shape: RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.circular(13),
@@ -527,7 +523,7 @@ Future<void> confirmDeletePermission(
                     child: Text(
                       'delete'.tr,
                       style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.white,
+                        color: Get.theme.colorScheme.onError,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),

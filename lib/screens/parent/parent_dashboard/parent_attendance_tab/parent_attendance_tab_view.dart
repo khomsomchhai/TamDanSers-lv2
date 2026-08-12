@@ -4,6 +4,7 @@ import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_numbers.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
+import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/card/custom_attendance_card.dart';
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/'
@@ -18,7 +19,8 @@ class ParentAttendanceTabView
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
+      appBar: CustomAppBar(title: "attendance".tr, showBackButton: false,),
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value && controller.attendanceList.isEmpty) {
@@ -38,21 +40,11 @@ class ParentAttendanceTabView
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(
                 20,
-                24,
+                16,
                 20,
                 120,
               ),
               children: [
-                Text(
-                  'attendance'.tr,
-                  style: AppTextStyles.headlineSmall.copyWith(
-                    color: AppColors.dark,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
                 CustomAttendanceCard(
                   totalDays: controller.totalDays,
                   presentDays: controller.presentDays.value,

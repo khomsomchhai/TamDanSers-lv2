@@ -59,7 +59,10 @@ class CreatePasswordParentViewController extends GetxController {
         confirmPassword: confirmPassword,
       );
       CustomSnackbar.success(response['message']?.toString() ?? 'password_changed_successfully'.tr);
-      Get.offAllNamed(AppRoutes.loginScreen);
+      Get.offAllNamed(
+        AppRoutes.loginScreen,
+        arguments: {'defaultTab': 1},
+      );
     } catch (error) {
       if (error is DioException) {
         CustomSnackbar.error(handleDioException(error));

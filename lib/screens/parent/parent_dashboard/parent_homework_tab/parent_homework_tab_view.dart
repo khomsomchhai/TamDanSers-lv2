@@ -6,6 +6,7 @@ import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/api/services/homework_services.dart';
+import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/core/widgets/subject_ui.dart';
 import 'package:tamdansers_lv2/data/model/homework_model.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_home_tab/parent_home_tab_view.dart';
@@ -60,11 +61,9 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
         ? Get.find<ParentHomeworkTabViewController>()
         : Get.put(ParentHomeworkTabViewController());
 
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
-      backgroundColor:
-          isDarkMode ? AppColors.darkBackground : AppColors.lightBackground,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
+      appBar: CustomAppBar(title: "homework".tr, showBackButton: false,),
       body: SafeArea(
         child: RefreshIndicator(
           color: AppColors.primary,
@@ -120,21 +119,6 @@ class ParentHomeworkTabView extends GetView<ParentHomeworkTabViewController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'homework'.tr,
-                style: AppTextStyles.headlineSmall.copyWith(
-                  color: isDarkMode ? AppColors.white : AppColors.dark,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
           // Hero Summary Card
           _buildHeroSummaryCard(context, controller),
 

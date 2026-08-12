@@ -13,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   final bool isMultiline;
   final FocusNode? nameFoucs;
   final TextInputType? keyboardType;
+  final Color? fillColor;
   const CustomTextField({
     super.key,
     required this.hintText,
@@ -25,6 +26,7 @@ class CustomTextField extends StatelessWidget {
     this.isMultiline = false,
     this.nameFoucs,
     this.keyboardType,
+    this.fillColor,
   });
 
   @override
@@ -62,7 +64,7 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppNumbers.radiusMedium),
         ),
         filled: true,
-        fillColor: Get.theme.cardColor,
+        fillColor: fillColor ?? Get.theme.cardColor,
         // contentPadding: const EdgeInsets.symmetric(
         //   horizontal: AppNumbers.spacingMedium,
         //   vertical: AppNumbers.spacingMedium,

@@ -99,6 +99,7 @@ class AppPages {
       name: AppRoutes.attendanceScan,
       page: () => const AttendanceScanView(),
       binding: AttendanceScanBinding(),
+      transition: Transition.fadeIn
     ),
     ////////////////////////////////
     //Parent
@@ -117,11 +118,13 @@ class AppPages {
       name: AppRoutes.parentPermission,
       page: () => const ParentPermissionView(),
       binding: ParentPermissionBinding(),
+      transition: Transition.rightToLeft
     ),
     GetPage(
       name: AppRoutes.viewStudentResultDetail,
       page: () => ViewStudentResultDetailView(),
       binding: ViewStudentResultDetailBinding(),
+      transition: Transition.rightToLeft
     ),
     //Notification
     GetPage(

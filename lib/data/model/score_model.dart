@@ -334,6 +334,21 @@ class ScoreModel {
     return ScoreModel.fromMap(json);
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'semester': semester,
+      'month': month,
+      'score': score,
+      'totalScore': totalScore,
+      'maxScore': maxScore,
+      'subjectName': subjectName,
+      'teacherName': teacherName,
+      'rank': rank,
+      'average': average,
+    };
+  }
+
   @override
   String toString() {
     return 'ScoreModel('

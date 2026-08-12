@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
@@ -42,35 +43,47 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                     final schedulesList =
                         controller.getSchedulesByDay(controller.days[index]);
                     if (schedulesList.isEmpty) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.schedule_outlined,
-                                size: 72,
-                                color: theme.colorScheme.primary.withOpacity(0.14),
-                              ),
-                              const SizedBox(height: 18),
-                              Text(
-                                'no_schedule_for'.tr,
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.titleSmall.copyWith(
-                                  color: theme.textTheme.titleSmall?.color,
+                      return RefreshIndicator(
+                        onRefresh: controller.getSchedule,
+                        color: theme.colorScheme.primary,
+                        child: ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          children: [
+                            const SizedBox(height: 80),
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 32),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.schedule_outlined,
+                                      size: 72,
+                                      color: theme.colorScheme.primary.withOpacity(0.14),
+                                    ),
+                                    const SizedBox(height: 18),
+                                    Text(
+                                      'no_schedule_for'.tr,
+                                      textAlign: TextAlign.center,
+                                      style: AppTextStyles.titleSmall.copyWith(
+                                        color: theme.textTheme.titleSmall?.color,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      'check_back_later'.tr,
+                                      textAlign: TextAlign.center,
+                                      style: AppTextStyles.bodyMedium.copyWith(
+                                        color: theme.textTheme.bodyMedium?.color?.withOpacity(0.75),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              Text(
-                                'check_back_later'.tr,
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.75),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 200),
+                          ],
                         ),
                       );
                     }
@@ -88,31 +101,36 @@ class ScheduleScreenView extends GetView<ScheduleScreenViewController> {
                       return hour >= 12;
                     }).toList();
 
-                    return ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      children: [
-                        if (morningSchedules.isNotEmpty) ...[
-                          Text(
-                            'morning'.tr,
-                            style: AppTextStyles.titleSmall.copyWith(
-                              color: theme.textTheme.titleSmall?.color,
+                    return RefreshIndicator(
+                      onRefresh: controller.getSchedule,
+                      color: theme.colorScheme.primary,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        children: [
+                          if (morningSchedules.isNotEmpty) ...[
+                            Text(
+                              'morning'.tr,
+                              style: AppTextStyles.titleSmall.copyWith(
+                                color: theme.textTheme.titleSmall?.color,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          ...morningSchedules.map((item) => scheduleCard(item)),
-                        ],
-                        if (afternoonSchedules.isNotEmpty) ...[
-                          Text(
-                            'afternoon'.tr,
-                            style: AppTextStyles.titleSmall.copyWith(
-                              color: theme.textTheme.titleSmall?.color,
+                            const SizedBox(height: 12),
+                            ...morningSchedules.map((item) => scheduleCard(item)),
+                          ],
+                          if (afternoonSchedules.isNotEmpty) ...[
+                            Text(
+                              'afternoon'.tr,
+                              style: AppTextStyles.titleSmall.copyWith(
+                                color: theme.textTheme.titleSmall?.color,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          ...afternoonSchedules.map((item) => scheduleCard(item)),
+                            const SizedBox(height: 12),
+                            ...afternoonSchedules.map((item) => scheduleCard(item)),
+                          ],
+                          const SizedBox(height: 20),
                         ],
-                        const SizedBox(height: 20),
-                      ],
+                      ),
                     );
                   },
                 ),

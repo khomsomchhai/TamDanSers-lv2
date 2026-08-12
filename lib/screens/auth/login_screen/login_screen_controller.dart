@@ -24,6 +24,25 @@ class LoginScreenViewController extends GetxController {
 
   final AuthServices authService = AuthServices();
   final GetStorage box = GetStorage();
+  bool _hasAppliedRouteArgs = false;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _applyRouteArguments();
+  }
+
+  void _applyRouteArguments() {
+    if (_hasAppliedRouteArgs) return;
+    _hasAppliedRouteArgs = true;
+
+    final args = Get.arguments as Map<String, dynamic>?;
+    final defaultTab = args?['defaultTab'];
+    if (defaultTab is int && defaultTab >= 0 && defaultTab < 2) {
+      selectedTab.value = defaultTab;
+      previousTab.value = defaultTab;
+    }
+  }
 
   void changeTab(int index) {
     if (selectedTab.value == index) return;

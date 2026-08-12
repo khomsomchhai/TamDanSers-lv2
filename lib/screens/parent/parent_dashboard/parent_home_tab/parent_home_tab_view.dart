@@ -2,25 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:tamdansers_lv2/app/constants/app_images.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
-
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
-
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
 import 'package:tamdansers_lv2/core/api/services/auth_services.dart';
 import 'package:tamdansers_lv2/core/api/services/result_api.dart';
 import 'package:tamdansers_lv2/core/api/services/schedule_api.dart';
-
 import 'package:tamdansers_lv2/core/widgets/header/custom_header.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_action.dart';
 import 'package:tamdansers_lv2/core/widgets/header/custom_header_placeholder.dart';
 import 'package:tamdansers_lv2/core/widgets/subject_ui.dart';
-
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
 import 'package:tamdansers_lv2/data/model/schedule_model.dart';
 import 'package:tamdansers_lv2/data/model/score_model.dart';
-
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_attendance_tab/parent_attendance_tab_controller.dart';
 
 part 'parent_home_tab_binding.dart';
@@ -34,7 +30,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: RefreshIndicator(
@@ -216,7 +212,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
       children: [
         Expanded(
           child: Obx(() {
-            if (controller.isLoading.value) {
+            if (controller.userController.isLoading.value) {
               return const CustomHeaderPlaceholder();
             }
 
@@ -358,11 +354,12 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
           ),
           backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
           child: imageUrl.isEmpty
-              ? const Icon(
-                  Icons.person_outline_rounded,
-                  color: AppColors.info,
-                  size: 21,
-                )
+              ? ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: Image.asset(
+                  AppImages.profileDefault
+                ),
+              )
               : null,
         ),
         const SizedBox(width: 10),
@@ -424,10 +421,11 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
             backgroundImage:
                 imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
             child: imageUrl.isEmpty
-                ? Icon(
-                    Icons.person_outline_rounded,
-                    color: isSelected ? AppColors.white : AppColors.info,
-                    size: 21,
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: Image.asset(
+                      AppImages.profileDefault
+                    ),
                   )
                 : null,
           ),
