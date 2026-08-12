@@ -1,6 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <!-- Camera for QR Scanner -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+    <!-- Location for attendance GPS -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:label="TamDanSers"
