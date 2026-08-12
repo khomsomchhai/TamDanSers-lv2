@@ -461,7 +461,9 @@ class HomeworkView extends GetView<HomeworkViewController> {
                         // Row 2: Status Badges (Left) & Task Count (Right)
                         Builder(builder: (context) {
                           final pendingCount = group.items
-                              .where((i) => i.status == HomeworkStatus.none)
+                              .where((i) =>
+                                  i.status == HomeworkStatus.none ||
+                                  i.status == HomeworkStatus.pending)
                               .length;
                           final submittedCount = group.items
                               .where(
@@ -723,7 +725,8 @@ class HomeworkView extends GetView<HomeworkViewController> {
     Color badgeTextColor = Colors.black;
     Color badgeBgColor = Colors.grey;
 
-    if (item.status == HomeworkStatus.none) {
+    if (item.status == HomeworkStatus.none ||
+        item.status == HomeworkStatus.pending) {
       badgeText = isKm ? 'រង់ចាំពិនិត្យ' : 'Pending';
       badgeTextColor = const Color(0xffD97706);
       badgeBgColor = const Color(0xffFEF3C7);

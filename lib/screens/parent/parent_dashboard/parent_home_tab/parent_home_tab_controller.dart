@@ -1584,7 +1584,8 @@ class ParentHomeTabViewController extends GetxController {
         final List<ScheduleModel> cachedList = [];
         for (final item in cached) {
           if (item is Map) {
-            cachedList.add(ScheduleModel.fromJson(Map<String, dynamic>.from(item)));
+            cachedList
+                .add(ScheduleModel.fromJson(Map<String, dynamic>.from(item)));
           }
         }
         if (cachedList.isNotEmpty) {

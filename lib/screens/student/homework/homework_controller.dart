@@ -435,8 +435,10 @@ class HomeworkViewController extends GetxController {
           logBuffer.writeln("  -> Match in inline status! status: $subStatus");
           if (subStatus == 'checked' || subStatus == 'check') {
             status = HomeworkStatus.checked;
-          } else if (subStatus == 'submitted' || subStatus == 'pending') {
+          } else if (subStatus == 'submitted') {
             status = HomeworkStatus.submitted;
+          } else if (subStatus == 'pending' || subStatus == 'none') {
+            status = HomeworkStatus.pending;
           }
         } else {
           logBuffer.writeln(
