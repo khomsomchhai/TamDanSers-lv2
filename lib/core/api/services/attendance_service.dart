@@ -35,12 +35,17 @@ class AttendanceService {
 
   Future<Map<String, dynamic>> scanAttendance({
     required String token,
+    required double latitude,
+    required double longitude,
+    required double accuracy,
   }) async {
     final response = await baseApi.post(
       endpoint: '/attendance/scan',
-
       data: {
         'token': token,
+        'latitude': latitude,
+        'longitude': longitude,
+        'accuracy': accuracy,
       },
     );
 
