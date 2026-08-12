@@ -48,9 +48,6 @@ class AttendanceService {
 
 
   // =========================================================
-<<<<<<< HEAD
-  // STUDENT SCAN
-=======
   // STUDENT SCAN ATTENDANCE
   //
   // POST /attendance/scan
@@ -60,7 +57,6 @@ class AttendanceService {
   // latitude
   // longitude
   // accuracy
->>>>>>> main
   // =========================================================
 
   Future<Map<String, dynamic>>
