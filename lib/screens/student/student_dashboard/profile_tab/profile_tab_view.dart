@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -725,6 +725,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                     children: [
                       _buildInfoRow('full_name'.tr, user.fullName ?? ''),
                       const SizedBox(height: 10),
+                      _buildInfoRow('phone_number'.tr, user.formattedPhone ?? ''),
+                      const SizedBox(height: 10),
                       _buildInfoRow('email'.tr, user.email ?? ''),
                       const SizedBox(height: 10),
                       _buildInfoRow(
@@ -734,8 +736,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       const SizedBox(height: 10),
                       _buildInfoRow('gender'.tr, profile.gender ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow(
-                          'guardian_phone'.tr, profile.guardianPhone ?? ''),
+                        _buildInfoRow(
+                          'guardian_phone'.tr, profile.formattedGuardianPhone ?? ''),
                     ],
                   ),
                 ),
@@ -860,8 +862,8 @@ class ProfileTabView extends GetView<ProfileTabViewController> {
                       _buildInfoRow(
                           'guardian_name'.tr, profile.guardianName ?? ''),
                       const SizedBox(height: 10),
-                      _buildInfoRow(
-                          'guardian_phone'.tr, profile.guardianPhone ?? ''),
+                        _buildInfoRow(
+                          'guardian_phone'.tr, profile.formattedGuardianPhone ?? ''),
                       const SizedBox(height: 10),
                       _buildInfoRow('address'.tr, profile.address ?? ''),
                     ],

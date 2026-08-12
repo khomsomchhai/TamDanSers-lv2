@@ -50,4 +50,35 @@ class UserModel {
           data['phone']?.toString(),
     );
   }
+
+  String _formatPhone(String? raw) {
+    if (raw == null) return '';
+    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) return '';
+
+    var normalized = digits;
+    if (normalized.startsWith('855')) {
+      normalized = normalized.substring(3);
+    }
+    if (normalized.startsWith('0')) {
+      normalized = normalized.substring(1);
+    }
+
+    if (normalized.length >= 8) {
+      final part1 = normalized.substring(0, 2);
+      final part2 = normalized.length >= 5
+          ? normalized.substring(2, 5)
+          : normalized.substring(2);
+      final part3 = normalized.length > 5
+          ? normalized.substring(5)
+          : '';
+      return part3.isNotEmpty
+          ? '+855 $part1 $part2 $part3'
+          : '+855 $part1 $part2';
+    }
+
+    return raw.trim();
+  }
+
+  String get formattedPhone => _formatPhone(phone);
 }
