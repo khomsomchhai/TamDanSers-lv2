@@ -22,11 +22,7 @@ class ScoreBar extends StatelessWidget {
       children: [
         Text(
           "${score.toStringAsFixed(0)} / ${maxScore.toStringAsFixed(0)}",
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
 
         const SizedBox(height: 8),

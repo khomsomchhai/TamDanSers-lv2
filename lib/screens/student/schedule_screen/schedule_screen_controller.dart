@@ -9,6 +9,11 @@ class ScheduleScreenViewController extends GetxController
   final scheduleList = <dynamic>[].obs;
   final isLoading = false.obs;
 
+  final GetStorage _storage = GetStorage();
+  static const String _cacheKeySchedule = 'student_schedule_cache';
+  static const String _cacheKeyScheduleTimestamp = 'student_schedule_cache_timestamp';
+  static const Duration _cacheExpiryDuration = Duration(minutes: 15);
+
   final days = [
     'Mon',
     'Tue',
@@ -49,7 +54,10 @@ class ScheduleScreenViewController extends GetxController
       selectedIndex.value = tabController.index;
     });
 
-    getSchedule();
+    final bool hasCache = _loadCachedSchedule();
+    if (!hasCache) {
+      getSchedule();
+    }
   }
 
   @override
@@ -59,14 +67,63 @@ class ScheduleScreenViewController extends GetxController
   }
 
   Future<void> getSchedule() async {
-    isLoading.value = true;
+    final bool hasCache = scheduleList.isNotEmpty;
+    if (!hasCache) {
+      isLoading.value = true;
+    }
 
     try {
       final response = await ScheduleApi().getSchedule();
-      scheduleList.value = response;
+      if (response is List) {
+        scheduleList.value = response;
+        _saveScheduleCache(response);
+      } else {
+        scheduleList.clear();
+      }
     } finally {
-      isLoading.value = false;
+      if (!hasCache) {
+        isLoading.value = false;
+      }
     }
+  }
+
+  bool _loadCachedSchedule() {
+    try {
+      final dynamic cached = _storage.read(_cacheKeySchedule);
+      if (cached is List && cached.isNotEmpty) {
+        scheduleList.assignAll(cached);
+        return _isScheduleCacheValid();
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  bool _isScheduleCacheValid() {
+    try {
+      final dynamic rawTimestamp = _storage.read(_cacheKeyScheduleTimestamp);
+      if (rawTimestamp == null) {
+        return false;
+      }
+
+      final timestamp = DateTime.tryParse(rawTimestamp.toString());
+      if (timestamp == null) {
+        return false;
+      }
+
+      return DateTime.now().difference(timestamp) <= _cacheExpiryDuration;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void _saveScheduleCache(List<dynamic> response) {
+    try {
+      _storage.write(_cacheKeySchedule, response);
+      _storage.write(
+        _cacheKeyScheduleTimestamp,
+        DateTime.now().toIso8601String(),
+      );
+    } catch (_) {}
   }
 
   DateTime? _parseTime(String time) {

@@ -17,12 +17,6 @@ class StudentDashboardViewController extends GetxController {
         Get.find<AttendanceTabViewController>().fetchAttendance();
       }
     }
-
-    if (index == 0) {
-      if (Get.isRegistered<HomeTabViewController>()) {
-        Get.find<HomeTabViewController>().refreshHome();
-      }
-    }
   }
 
   @override

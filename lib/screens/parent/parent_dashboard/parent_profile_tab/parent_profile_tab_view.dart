@@ -18,8 +18,7 @@ class ParentProfileTabView
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: 'profile'.tr,
         showBackButton: false,
@@ -67,7 +66,7 @@ class ParentProfileTabView
                   crossAxisAlignment:
                       CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     _buildProfileHero(
                       user,

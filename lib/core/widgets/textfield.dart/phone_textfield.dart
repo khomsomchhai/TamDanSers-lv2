@@ -76,7 +76,6 @@ class PhoneTextField extends StatelessWidget {
                           onChanged: state.didChange,
                           cursorColor: theme.textTheme.bodyLarge?.color,
                           decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
                             hintText: hintText,
                             hintStyle: theme.textTheme.bodyLarge?.copyWith(color: theme.hintColor),
                             border: InputBorder.none,

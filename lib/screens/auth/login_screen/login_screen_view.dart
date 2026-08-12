@@ -40,6 +40,7 @@ class LoginScreenView extends GetView<LoginScreenViewController> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    controller._applyRouteArguments();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

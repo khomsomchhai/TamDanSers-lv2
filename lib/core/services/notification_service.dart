@@ -29,9 +29,9 @@ Future<void> firebaseMessagingBackgroundHandler(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  debugPrint(
-    'Background notification received: ${message.messageId}',
-  );
+  // debugPrint(
+  //   'Background notification received: ${message.messageId}',
+  // );
 }
 
 Future<void> setupLocalNotifications() async {
@@ -216,10 +216,10 @@ Future<void> setupFCM() async {
 Future<void> _handleNotificationTap(
   RemoteMessage message,
 ) async {
-  debugPrint(
-    'User tapped notification: '
-    '${message.messageId}',
-  );
+  // debugPrint(
+  //   'User tapped notification: '
+  //   '${message.messageId}',
+  // );
 
   await _refreshNotificationList();
 

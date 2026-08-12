@@ -263,28 +263,6 @@ class HomeTabView extends GetView<HomeTabViewController> {
       highlightColor: Get.theme.skeletonHighlightColor,
       child: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 50,
-                height: 14,
-                decoration: BoxDecoration(
-                  color: Get.theme.cardColor,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Container(
-                width: 60,
-                height: 14,
-                decoration: BoxDecoration(
-                  color: Get.theme.cardColor,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
           Container(
             width: double.infinity,
             height: 140,

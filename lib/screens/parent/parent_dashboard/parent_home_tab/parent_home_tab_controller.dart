@@ -12,6 +12,8 @@ class ParentHomeTabViewController extends GetxController {
 
   final GetStorage box = GetStorage();
 
+
+
   final ResultApi resultApi = ResultApi();
 
   final AuthServices authServices = AuthServices();
