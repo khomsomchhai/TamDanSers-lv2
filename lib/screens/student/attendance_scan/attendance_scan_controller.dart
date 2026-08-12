@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+
 import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/attendance_tab/attendance_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
 
 class AttendanceScanController extends GetxController {
-  final AttendanceService attendanceService = AttendanceService();
+  final AttendanceService attendanceService =
+      AttendanceService();
 
-  final MobileScannerController scannerController = MobileScannerController();
+  final MobileScannerController scannerController =
+      MobileScannerController();
 
   final isLoading = false.obs;
   final isScanned = false.obs;
@@ -18,7 +21,7 @@ class AttendanceScanController extends GetxController {
       'Scan the QR code shown by your teacher'.obs;
 
   // =========================================================
-  // GET LOCATION
+  // GET CURRENT LOCATION
   // =========================================================
 
   Future<Position> _getCurrentLocation() async {
@@ -34,16 +37,12 @@ class AttendanceScanController extends GetxController {
     LocationPermission permission =
         await Geolocator.checkPermission();
 
-    if (
-        permission ==
-        LocationPermission.denied) {
+    if (permission == LocationPermission.denied) {
       permission =
           await Geolocator.requestPermission();
     }
 
-    if (
-        permission ==
-        LocationPermission.denied) {
+    if (permission == LocationPermission.denied) {
       throw Exception(
         'LOCATION_PERMISSION_DENIED',
       );
@@ -93,13 +92,16 @@ class AttendanceScanController extends GetxController {
   Future<void> scanQr(
     String rawValue,
   ) async {
-    final String token = rawValue.trim();
+    final String token =
+        rawValue.trim();
 
     if (token.isEmpty) {
       return;
     }
 
-    if (isLoading.value || isScanned.value) {
+    if (
+        isLoading.value ||
+        isScanned.value) {
       return;
     }
 
@@ -110,6 +112,7 @@ class AttendanceScanController extends GetxController {
       scanStatus.value =
           'Checking QR code...';
 
+      // Prevent duplicate scans
       await scannerController.stop();
 
       debugPrint(
@@ -123,9 +126,10 @@ class AttendanceScanController extends GetxController {
       final Position position =
           await _getCurrentLocation();
 
+      // Student GPS should be reasonably accurate
       if (position.accuracy > 100) {
         throw Exception(
-          'GPS_ACCURACY_TOO_LOW',
+          'GPS_ACCURACY_TOO_LOW:${position.accuracy}',
         );
       }
 
@@ -151,51 +155,86 @@ class AttendanceScanController extends GetxController {
         'ATTENDANCE RESPONSE: $response',
       );
 
-      final dynamic attendance = response['attendance'];
+      // =====================================================
+      // RESPONSE DATA
+      // =====================================================
+
+      final dynamic attendance =
+          response['attendance'];
 
       final String subjectName =
-          attendance is Map ? attendance['subject_name']?.toString() ?? '' : '';
+          attendance is Map
+              ? attendance['subject_name']
+                      ?.toString() ??
+                  ''
+              : '';
 
-      final String message = response['message']?.toString() ?? '';
+      final String message =
+          response['message']
+                  ?.toString() ??
+              '';
 
-      Get.snackbar(
-        'success'.tr,
-        subjectName.isNotEmpty
-            ? '${'attendance_recorded_for'.tr} '
-                '$subjectName'
-            : message.isNotEmpty
-                ? message
-                : 'attendance_scan_success'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.shade100,
-        colorText: Colors.green.shade900,
-        duration: const Duration(
-          seconds: 2,
-        ),
-      );
+      final dynamic distanceValue =
+          response['distance_m'];
 
-      await Future.delayed(
-        const Duration(
-          milliseconds: 800,
-        ),
-      );
+      final double? distance =
+          distanceValue is num
+              ? distanceValue.toDouble()
+              : double.tryParse(
+                  distanceValue
+                          ?.toString() ??
+                      '',
+                );
 
-      try {
-        if (Get.isRegistered<AttendanceTabViewController>()) {
-          await Get.find<AttendanceTabViewController>().fetchAttendance();
-        }
-      } catch (_) {}
+      scanStatus.value =
+          'Attendance recorded';
+
+      // =====================================================
+      // REFRESH ATTENDANCE TAB
+      // =====================================================
 
       try {
-        if (Get.isRegistered<HomeTabViewController>()) {
-          await Get.find<HomeTabViewController>().refreshHome();
+        if (
+            Get.isRegistered<
+                AttendanceTabViewController>()) {
+          await Get.find<
+                  AttendanceTabViewController>()
+              .fetchAttendance();
         }
-      } catch (_) {}
+      } catch (error) {
+        debugPrint(
+          'REFRESH ATTENDANCE ERROR: $error',
+        );
+      }
+
+      // =====================================================
+      // REFRESH HOME
+      // =====================================================
+
+      try {
+        if (
+            Get.isRegistered<
+                HomeTabViewController>()) {
+          await Get.find<
+                  HomeTabViewController>()
+              .refreshHome();
+        }
+      } catch (error) {
+        debugPrint(
+          'REFRESH HOME ERROR: $error',
+        );
+      }
 
       Get.forceAppUpdate();
 
-      Get.back(
-        result: true,
+      // =====================================================
+      // SUCCESS DIALOG
+      // =====================================================
+
+      await _showSuccessDialog(
+        message: message,
+        subjectName: subjectName,
+        distance: distance,
       );
     } catch (error) {
       debugPrint(
@@ -216,11 +255,15 @@ class AttendanceScanController extends GetxController {
         _getErrorMessage(
           error,
         ),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-        duration: const Duration(
-          seconds: 3,
+        snackPosition:
+            SnackPosition.BOTTOM,
+        backgroundColor:
+            Colors.red.shade100,
+        colorText:
+            Colors.red.shade900,
+        duration:
+            const Duration(
+          seconds: 4,
         ),
       );
     } finally {
@@ -266,9 +309,9 @@ class AttendanceScanController extends GetxController {
           mainAxisSize:
               MainAxisSize.min,
           children: [
-            // ---------------------------------------------
+            // =================================================
             // ICON
-            // ---------------------------------------------
+            // =================================================
 
             Container(
               width: 78,
@@ -308,9 +351,9 @@ class AttendanceScanController extends GetxController {
               height: 20,
             ),
 
-            // ---------------------------------------------
+            // =================================================
             // TITLE
-            // ---------------------------------------------
+            // =================================================
 
             Text(
               alreadyRecorded
@@ -330,9 +373,9 @@ class AttendanceScanController extends GetxController {
               height: 12,
             ),
 
-            // ---------------------------------------------
+            // =================================================
             // SUBJECT
-            // ---------------------------------------------
+            // =================================================
 
             if (
                 subjectName
@@ -354,9 +397,9 @@ class AttendanceScanController extends GetxController {
               ),
             ],
 
-            // ---------------------------------------------
+            // =================================================
             // MESSAGE
-            // ---------------------------------------------
+            // =================================================
 
             Text(
               message.isNotEmpty
@@ -375,9 +418,9 @@ class AttendanceScanController extends GetxController {
               ),
             ),
 
-            // ---------------------------------------------
+            // =================================================
             // DISTANCE
-            // ---------------------------------------------
+            // =================================================
 
             if (distance != null) ...[
               const SizedBox(
@@ -422,7 +465,7 @@ class AttendanceScanController extends GetxController {
                     ),
 
                     Text(
-                      '${distance.toStringAsFixed(1)} m from classroom',
+                      '${distance.toStringAsFixed(1)} m',
                       style:
                           TextStyle(
                         fontSize: 14,
@@ -444,22 +487,23 @@ class AttendanceScanController extends GetxController {
               height: 26,
             ),
 
-            // ---------------------------------------------
-            // OK
-            // ---------------------------------------------
+            // =================================================
+            // OK BUTTON
+            // =================================================
 
             SizedBox(
               width:
                   double.infinity,
               height: 50,
+
               child:
                   ElevatedButton(
                 onPressed: () {
                   // Close Dialog
                   Get.back();
 
-                  // Close Scanner Screen
-                  // Return true to Attendance Screen
+                  // Close QR scanner
+                  // and return to Attendance screen
                   Get.back(
                     result: true,
                   );
@@ -520,10 +564,68 @@ class AttendanceScanController extends GetxController {
   String _getErrorMessage(
     dynamic error,
   ) {
-    final String message = error.toString().toLowerCase();
+    final String originalMessage =
+        error.toString();
 
-    // Wrong QR / token not found
-    if (message.contains(
+    final String message =
+        originalMessage
+            .toLowerCase();
+
+    // Location off
+    if (
+        message.contains(
+          'location_service_disabled',
+        )) {
+      return 'Please turn on GPS / Location and try again.';
+    }
+
+    // Permission denied forever
+    if (
+        message.contains(
+          'location_permission_denied_forever',
+        )) {
+      return 'Location permission is permanently denied. '
+          'Please enable Location in your phone Settings.';
+    }
+
+    // Permission denied
+    if (
+        message.contains(
+          'location_permission_denied',
+        )) {
+      return 'Location permission is required for attendance.';
+    }
+
+    // GPS accuracy
+    if (
+        message.contains(
+          'gps_accuracy_too_low',
+        ) ||
+        message.contains(
+          'accuracy is too low',
+        ) ||
+        message.contains(
+          'not accurate enough',
+        )) {
+      return 'GPS accuracy is too low. '
+          'Please enable precise location and try again.';
+    }
+
+    // Too far
+    if (
+        message.contains(
+          'too far from the class',
+        )) {
+      return _extractBackendDetail(
+        originalMessage,
+        fallback:
+            'You are too far from the classroom.',
+      );
+    }
+
+    // Wrong QR
+    if (
+        message.contains(
           'qr attendance session not found',
         ) ||
         message.contains(
@@ -532,8 +634,9 @@ class AttendanceScanController extends GetxController {
       return 'attendance_scan_wrong_qr'.tr;
     }
 
-    // Expired QR
-    if (message.contains(
+    // Expired
+    if (
+        message.contains(
           'qr code has expired',
         ) ||
         message.contains(
@@ -543,14 +646,16 @@ class AttendanceScanController extends GetxController {
     }
 
     // Wrong class
-    if (message.contains(
-      'not for your class',
-    )) {
+    if (
+        message.contains(
+          'not for your class',
+        )) {
       return 'attendance_scan_wrong_class'.tr;
     }
 
     // Already recorded
-    if (message.contains(
+    if (
+        message.contains(
           'attendance already recorded',
         ) ||
         message.contains(
@@ -559,15 +664,9 @@ class AttendanceScanController extends GetxController {
       return 'attendance_scan_already'.tr;
     }
 
-    // Forbidden
-    if (message.contains(
-      '403',
-    )) {
-      return 'attendance_scan_forbidden'.tr;
-    }
-
-    // Network error
-    if (message.contains(
+    // Network
+    if (
+        message.contains(
           'connection',
         ) ||
         message.contains(
@@ -579,6 +678,7 @@ class AttendanceScanController extends GetxController {
       return 'attendance_scan_network'.tr;
     }
 
+    // Forbidden
     if (
         message.contains(
           '403',
@@ -590,6 +690,7 @@ class AttendanceScanController extends GetxController {
       );
     }
 
+    // Other errors
     return _extractBackendDetail(
       originalMessage,
       fallback:
@@ -673,15 +774,13 @@ class AttendanceScanController extends GetxController {
       return;
     }
 
-    isScanned.value =
-        false;
+    isScanned.value = false;
 
     scanStatus.value =
         'Scan the QR code shown by your teacher';
 
     try {
-      await scannerController
-          .start();
+      await scannerController.start();
     } catch (_) {}
   }
 
@@ -691,8 +790,7 @@ class AttendanceScanController extends GetxController {
 
   @override
   void onClose() {
-    scannerController
-        .dispose();
+    scannerController.dispose();
 
     super.onClose();
   }

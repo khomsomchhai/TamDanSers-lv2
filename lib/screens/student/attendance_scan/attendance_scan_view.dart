@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+
 import 'package:tamdansers_lv2/screens/student/attendance_scan/attendance_scan_controller.dart';
 
 part 'attendance_scan_binding.dart';
@@ -66,14 +67,11 @@ class AttendanceScanView
                         .first
                         .rawValue;
 
-                if (
-                    token ==
-                    null) {
+                if (token == null) {
                   return;
                 }
 
-                controller
-                    .scanQr(
+                controller.scanQr(
                   token,
                 );
               },
@@ -103,6 +101,7 @@ class AttendanceScanView
             top: 30,
             left: 20,
             right: 20,
+
             child:
                 Container(
               padding:
@@ -111,24 +110,28 @@ class AttendanceScanView
                 horizontal: 16,
                 vertical: 12,
               ),
+
               decoration:
                   BoxDecoration(
                 color:
                     Colors.black
                         .withOpacity(
-                  0.55,
+                  0.60,
                 ),
+
                 borderRadius:
                     BorderRadius
                         .circular(
                   16,
                 ),
               ),
+
               child:
                   const Row(
                 mainAxisAlignment:
                     MainAxisAlignment
                         .center,
+
                 children: [
                   Icon(
                     Icons
@@ -170,8 +173,7 @@ class AttendanceScanView
             child:
                 Container(
               padding:
-                  const EdgeInsets
-                      .all(
+                  const EdgeInsets.all(
                 18,
               ),
 
@@ -195,8 +197,7 @@ class AttendanceScanView
                 () =>
                     Column(
                   mainAxisSize:
-                      MainAxisSize
-                          .min,
+                      MainAxisSize.min,
 
                   children: [
                     if (
@@ -204,15 +205,15 @@ class AttendanceScanView
                             .isLoading
                             .value) ...[
                       const SizedBox(
-                        width: 34,
-                        height: 34,
+                        width: 36,
+                        height: 36,
+
                         child:
                             CircularProgressIndicator(
                           strokeWidth:
                               3,
                           color:
-                              Colors
-                                  .white,
+                              Colors.white,
                         ),
                       ),
 
@@ -227,21 +228,18 @@ class AttendanceScanView
                           .value,
 
                       textAlign:
-                          TextAlign
-                              .center,
+                          TextAlign.center,
 
                       style:
                           const TextStyle(
                         color:
-                            Colors
-                                .white,
+                            Colors.white,
 
                         fontSize:
                             16,
 
                         fontWeight:
-                            FontWeight
-                                .w600,
+                            FontWeight.w600,
                       ),
                     ),
 
@@ -258,14 +256,12 @@ class AttendanceScanView
                         'to verify your attendance.',
 
                         textAlign:
-                            TextAlign
-                                .center,
+                            TextAlign.center,
 
                         style:
                             TextStyle(
                           color:
-                              Colors
-                                  .white
+                              Colors.white
                                   .withOpacity(
                             0.65,
                           ),
@@ -286,12 +282,14 @@ class AttendanceScanView
   }
 }
 
+
 // ===========================================================
 // SCANNER OVERLAY
 // ===========================================================
 
 class ScannerOverlayPainter
     extends CustomPainter {
+
   @override
   void paint(
     Canvas canvas,
@@ -340,6 +338,7 @@ class ScannerOverlayPainter
           ..addRRect(
             RRect.fromRectAndRadius(
               scanRect,
+
               const Radius.circular(
                 24,
               ),
@@ -358,7 +357,6 @@ class ScannerOverlayPainter
       overlayPaint,
     );
 
-    // Border
     final Paint borderPaint =
         Paint()
           ..color =
@@ -371,14 +369,15 @@ class ScannerOverlayPainter
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         scanRect,
+
         const Radius.circular(
           24,
         ),
       ),
+
       borderPaint,
     );
 
-    // Corner accents
     final Paint cornerPaint =
         Paint()
           ..color =
@@ -393,7 +392,7 @@ class ScannerOverlayPainter
     const double corner =
         30;
 
-    // Top left
+    // TOP LEFT
     canvas.drawLine(
       Offset(
         scanRect.left,
@@ -422,7 +421,7 @@ class ScannerOverlayPainter
       cornerPaint,
     );
 
-    // Top right
+    // TOP RIGHT
     canvas.drawLine(
       Offset(
         scanRect.right -
@@ -451,7 +450,7 @@ class ScannerOverlayPainter
       cornerPaint,
     );
 
-    // Bottom left
+    // BOTTOM LEFT
     canvas.drawLine(
       Offset(
         scanRect.left,
@@ -480,7 +479,7 @@ class ScannerOverlayPainter
       cornerPaint,
     );
 
-    // Bottom right
+    // BOTTOM RIGHT
     canvas.drawLine(
       Offset(
         scanRect.right -
