@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/attendance_tab/attendance_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
+
 
 class AttendanceScanController extends GetxController {
   final AttendanceService attendanceService =
@@ -17,8 +19,134 @@ class AttendanceScanController extends GetxController {
   final isLoading = false.obs;
   final isScanned = false.obs;
 
+  final locationReady = false.obs;
+
   final scanStatus =
-      'Scan the QR code shown by your teacher'.obs;
+      'Preparing location...'.obs;
+
+
+  // =========================================================
+  // SCREEN OPEN
+  // =========================================================
+
+  @override
+  void onReady() {
+    super.onReady();
+
+    prepareLocation();
+  }
+
+
+  // =========================================================
+  // PREPARE LOCATION
+  //
+  // Called immediately when Scan screen opens.
+  // Android will show permission popup if permission
+  // has not been granted/denied before.
+  // =========================================================
+
+  Future<void> prepareLocation() async {
+    try {
+      scanStatus.value =
+          'Checking location permission...';
+
+      final bool serviceEnabled =
+          await Geolocator
+              .isLocationServiceEnabled();
+
+      if (!serviceEnabled) {
+        locationReady.value = false;
+
+        scanStatus.value =
+            'Please turn on GPS / Location';
+
+        await _showLocationServiceDialog();
+
+        return;
+      }
+
+      LocationPermission permission =
+          await Geolocator.checkPermission();
+
+      // =====================================================
+      // ASK PERMISSION
+      // =====================================================
+
+      if (
+          permission ==
+          LocationPermission.denied) {
+
+        permission =
+            await Geolocator
+                .requestPermission();
+      }
+
+      // =====================================================
+      // USER DENIED
+      // =====================================================
+
+      if (
+          permission ==
+          LocationPermission.denied) {
+
+        locationReady.value = false;
+
+        scanStatus.value =
+            'Location permission is required';
+
+        Get.snackbar(
+          'Location Required',
+          'Please allow location permission to scan attendance.',
+          snackPosition:
+              SnackPosition.BOTTOM,
+          backgroundColor:
+              Colors.orange.shade100,
+          colorText:
+              Colors.orange.shade900,
+        );
+
+        return;
+      }
+
+      // =====================================================
+      // DENIED FOREVER
+      // =====================================================
+
+      if (
+          permission ==
+          LocationPermission.deniedForever) {
+
+        locationReady.value = false;
+
+        scanStatus.value =
+            'Enable Location permission in Settings';
+
+        await _showAppSettingsDialog();
+
+        return;
+      }
+
+      // =====================================================
+      // READY
+      // =====================================================
+
+      locationReady.value = true;
+
+      scanStatus.value =
+          'Scan the QR code shown by your teacher';
+
+    } catch (error) {
+      debugPrint(
+        'PREPARE LOCATION ERROR: $error',
+      );
+
+      locationReady.value = false;
+
+      scanStatus.value =
+          'Cannot access location';
+    }
+  }
+
 
   // =========================================================
   // GET CURRENT LOCATION
@@ -26,7 +154,8 @@ class AttendanceScanController extends GetxController {
 
   Future<Position> _getCurrentLocation() async {
     final bool serviceEnabled =
-        await Geolocator.isLocationServiceEnabled();
+        await Geolocator
+            .isLocationServiceEnabled();
 
     if (!serviceEnabled) {
       throw Exception(
@@ -35,14 +164,22 @@ class AttendanceScanController extends GetxController {
     }
 
     LocationPermission permission =
-        await Geolocator.checkPermission();
+        await Geolocator
+            .checkPermission();
 
-    if (permission == LocationPermission.denied) {
+    if (
+        permission ==
+        LocationPermission.denied) {
+
       permission =
-          await Geolocator.requestPermission();
+          await Geolocator
+              .requestPermission();
     }
 
-    if (permission == LocationPermission.denied) {
+    if (
+        permission ==
+        LocationPermission.denied) {
+
       throw Exception(
         'LOCATION_PERMISSION_DENIED',
       );
@@ -51,23 +188,32 @@ class AttendanceScanController extends GetxController {
     if (
         permission ==
         LocationPermission.deniedForever) {
+
       throw Exception(
         'LOCATION_PERMISSION_DENIED_FOREVER',
       );
     }
 
     scanStatus.value =
-        'Getting your location...';
+        'Getting your current location...';
 
     final Position position =
-        await Geolocator.getCurrentPosition(
+        await Geolocator
+            .getCurrentPosition(
       locationSettings:
           const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        timeLimit: Duration(
-          seconds: 15,
+        accuracy:
+            LocationAccuracy.high,
+
+        timeLimit:
+            Duration(
+          seconds: 20,
         ),
       ),
+    );
+
+    debugPrint(
+      '================================',
     );
 
     debugPrint(
@@ -79,11 +225,17 @@ class AttendanceScanController extends GetxController {
     );
 
     debugPrint(
-      'GPS ACCURACY: ${position.accuracy}m',
+      'STUDENT GPS ACCURACY: '
+      '${position.accuracy}m',
+    );
+
+    debugPrint(
+      '================================',
     );
 
     return position;
   }
+
 
   // =========================================================
   // SCAN QR
@@ -102,6 +254,7 @@ class AttendanceScanController extends GetxController {
     if (
         isLoading.value ||
         isScanned.value) {
+
       return;
     }
 
@@ -109,44 +262,66 @@ class AttendanceScanController extends GetxController {
       isLoading.value = true;
       isScanned.value = true;
 
-      scanStatus.value =
-          'Checking QR code...';
-
-      // Prevent duplicate scans
       await scannerController.stop();
 
       debugPrint(
-        'QR VALUE: $token',
+        'QR TOKEN: $token',
       );
 
       // =====================================================
-      // LOCATION
+      // MAKE SURE LOCATION IS READY
+      // =====================================================
+
+      if (!locationReady.value) {
+        await prepareLocation();
+
+        if (!locationReady.value) {
+          throw Exception(
+            'LOCATION_NOT_READY',
+          );
+        }
+      }
+
+      // =====================================================
+      // GET STUDENT LOCATION
       // =====================================================
 
       final Position position =
           await _getCurrentLocation();
 
-      // Student GPS should be reasonably accurate
-      if (position.accuracy > 100) {
+      // =====================================================
+      // STUDENT GPS ACCURACY
+      // =====================================================
+
+      if (
+          position.accuracy >
+          100) {
+
         throw Exception(
-          'GPS_ACCURACY_TOO_LOW:${position.accuracy}',
+          'GPS_ACCURACY_TOO_LOW:'
+          '${position.accuracy}',
         );
       }
 
       scanStatus.value =
-          'Checking attendance location...';
+          'Checking your distance from teacher...';
 
       // =====================================================
-      // API
+      // CALL BACKEND
       // =====================================================
 
       final Map<String, dynamic> response =
-          await attendanceService.scanAttendance(
-        token: token,
+          await attendanceService
+              .scanAttendance(
+        token:
+            token,
+
         latitude:
             position.latitude,
+
         longitude:
             position.longitude,
+
         accuracy:
             position.accuracy,
       );
@@ -156,7 +331,7 @@ class AttendanceScanController extends GetxController {
       );
 
       // =====================================================
-      // RESPONSE DATA
+      // RESPONSE
       // =====================================================
 
       final dynamic attendance =
@@ -164,22 +339,24 @@ class AttendanceScanController extends GetxController {
 
       final String subjectName =
           attendance is Map
-              ? attendance['subject_name']
-                      ?.toString() ??
-                  ''
+              ? attendance[
+                            'subject_name']
+                        ?.toString() ??
+                    ''
               : '';
 
       final String message =
           response['message']
                   ?.toString() ??
-              '';
+              'Attendance recorded successfully';
 
       final dynamic distanceValue =
           response['distance_m'];
 
       final double? distance =
           distanceValue is num
-              ? distanceValue.toDouble()
+              ? distanceValue
+                  .toDouble()
               : double.tryParse(
                   distanceValue
                           ?.toString() ??
@@ -197,13 +374,15 @@ class AttendanceScanController extends GetxController {
         if (
             Get.isRegistered<
                 AttendanceTabViewController>()) {
+
           await Get.find<
                   AttendanceTabViewController>()
               .fetchAttendance();
         }
       } catch (error) {
         debugPrint(
-          'REFRESH ATTENDANCE ERROR: $error',
+          'REFRESH ATTENDANCE ERROR: '
+          '$error',
         );
       }
 
@@ -215,30 +394,48 @@ class AttendanceScanController extends GetxController {
         if (
             Get.isRegistered<
                 HomeTabViewController>()) {
+
           await Get.find<
                   HomeTabViewController>()
               .refreshHome();
         }
       } catch (error) {
         debugPrint(
-          'REFRESH HOME ERROR: $error',
+          'REFRESH HOME ERROR: '
+          '$error',
         );
       }
 
-      Get.forceAppUpdate();
-
       // =====================================================
-      // SUCCESS DIALOG
+      // SUCCESS
       // =====================================================
 
       await _showSuccessDialog(
-        message: message,
-        subjectName: subjectName,
-        distance: distance,
+        message:
+            message,
+
+        subjectName:
+            subjectName,
+
+        distance:
+            distance,
       );
+
     } catch (error) {
       debugPrint(
-        'SCAN ATTENDANCE ERROR: $error',
+        '================================',
+      );
+
+      debugPrint(
+        'SCAN ATTENDANCE ERROR:',
+      );
+
+      debugPrint(
+        error.toString(),
+      );
+
+      debugPrint(
+        '================================',
       );
 
       isScanned.value = false;
@@ -251,7 +448,7 @@ class AttendanceScanController extends GetxController {
       } catch (_) {}
 
       Get.snackbar(
-        'error'.tr,
+        'Error',
         _getErrorMessage(
           error,
         ),
@@ -266,304 +463,84 @@ class AttendanceScanController extends GetxController {
           seconds: 4,
         ),
       );
+
     } finally {
       isLoading.value = false;
     }
   }
 
-  // =========================================================
-  // SUCCESS DIALOG
-  // =========================================================
-
-  Future<void> _showSuccessDialog({
-    required String message,
-    required String subjectName,
-    required double? distance,
-  }) async {
-    final bool alreadyRecorded =
-        message
-            .toLowerCase()
-            .contains(
-              'already recorded',
-            );
-
-    await Get.dialog(
-      AlertDialog(
-        shape:
-            RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(
-            24,
-          ),
-        ),
-
-        contentPadding:
-            const EdgeInsets.fromLTRB(
-          24,
-          28,
-          24,
-          22,
-        ),
-
-        content: Column(
-          mainAxisSize:
-              MainAxisSize.min,
-          children: [
-            // =================================================
-            // ICON
-            // =================================================
-
-            Container(
-              width: 78,
-              height: 78,
-              decoration:
-                  BoxDecoration(
-                color:
-                    alreadyRecorded
-                        ? Colors
-                            .blue
-                            .shade100
-                        : Colors
-                            .green
-                            .shade100,
-                shape:
-                    BoxShape.circle,
-              ),
-              child: Icon(
-                alreadyRecorded
-                    ? Icons
-                        .check_circle_outline_rounded
-                    : Icons
-                        .check_rounded,
-                size: 48,
-                color:
-                    alreadyRecorded
-                        ? Colors
-                            .blue
-                            .shade700
-                        : Colors
-                            .green
-                            .shade700,
-              ),
-            ),
-
-            const SizedBox(
-              height: 20,
-            ),
-
-            // =================================================
-            // TITLE
-            // =================================================
-
-            Text(
-              alreadyRecorded
-                  ? 'Attendance Already Recorded'
-                  : 'Attendance Successful',
-              textAlign:
-                  TextAlign.center,
-              style:
-                  const TextStyle(
-                fontSize: 20,
-                fontWeight:
-                    FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(
-              height: 12,
-            ),
-
-            // =================================================
-            // SUBJECT
-            // =================================================
-
-            if (
-                subjectName
-                    .isNotEmpty) ...[
-              Text(
-                subjectName,
-                textAlign:
-                    TextAlign.center,
-                style:
-                    const TextStyle(
-                  fontSize: 17,
-                  fontWeight:
-                      FontWeight.w600,
-                ),
-              ),
-
-              const SizedBox(
-                height: 8,
-              ),
-            ],
-
-            // =================================================
-            // MESSAGE
-            // =================================================
-
-            Text(
-              message.isNotEmpty
-                  ? message
-                  : 'Attendance recorded successfully.',
-              textAlign:
-                  TextAlign.center,
-              style:
-                  TextStyle(
-                fontSize: 14,
-                height: 1.4,
-                color:
-                    Colors
-                        .grey
-                        .shade600,
-              ),
-            ),
-
-            // =================================================
-            // DISTANCE
-            // =================================================
-
-            if (distance != null) ...[
-              const SizedBox(
-                height: 16,
-              ),
-
-              Container(
-                padding:
-                    const EdgeInsets
-                        .symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                decoration:
-                    BoxDecoration(
-                  color:
-                      Colors
-                          .blue
-                          .shade50,
-                  borderRadius:
-                      BorderRadius
-                          .circular(
-                    14,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize:
-                      MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons
-                          .location_on_rounded,
-                      size: 20,
-                      color:
-                          Colors
-                              .blue
-                              .shade700,
-                    ),
-
-                    const SizedBox(
-                      width: 6,
-                    ),
-
-                    Text(
-                      '${distance.toStringAsFixed(1)} m',
-                      style:
-                          TextStyle(
-                        fontSize: 14,
-                        fontWeight:
-                            FontWeight
-                                .w600,
-                        color:
-                            Colors
-                                .blue
-                                .shade700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-
-            const SizedBox(
-              height: 26,
-            ),
-
-            // =================================================
-            // OK BUTTON
-            // =================================================
-
-            SizedBox(
-              width:
-                  double.infinity,
-              height: 50,
-
-              child:
-                  ElevatedButton(
-                onPressed: () {
-                  // Close Dialog
-                  Get.back();
-
-                  // Close QR scanner
-                  // and return to Attendance screen
-                  Get.back(
-                    result: true,
-                  );
-                },
-
-                style:
-                    ElevatedButton
-                        .styleFrom(
-                  backgroundColor:
-                      alreadyRecorded
-                          ? Colors
-                              .blue
-                              .shade600
-                          : Colors
-                              .green
-                              .shade600,
-
-                  foregroundColor:
-                      Colors.white,
-
-                  elevation: 0,
-
-                  shape:
-                      RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius
-                            .circular(
-                      14,
-                    ),
-                  ),
-                ),
-
-                child:
-                    const Text(
-                  'OK',
-                  style:
-                      TextStyle(
-                    fontSize: 16,
-                    fontWeight:
-                        FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-
-      barrierDismissible:
-          false,
-    );
-  }
 
   // =========================================================
-  // ERROR MESSAGE
+  // GET ERROR MESSAGE
   // =========================================================
 
   String _getErrorMessage(
     dynamic error,
   ) {
+    // =======================================================
+    // DIO / FASTAPI ERROR
+    // =======================================================
+
+    if (error is DioException) {
+      final dynamic data =
+          error.response?.data;
+
+      debugPrint(
+        'DIO STATUS: '
+        '${error.response?.statusCode}',
+      );
+
+      debugPrint(
+        'DIO DATA: $data',
+      );
+
+      if (data is Map) {
+        final dynamic detail =
+            data['detail'];
+
+        if (detail != null) {
+          return detail.toString();
+        }
+
+        final dynamic message =
+            data['message'];
+
+        if (message != null) {
+          return message.toString();
+        }
+      }
+
+      if (data is String &&
+          data.trim().isNotEmpty) {
+
+        return data;
+      }
+
+      if (
+          error.response
+                  ?.statusCode ==
+              404) {
+
+        return 'QR attendance session not found.';
+      }
+
+      if (
+          error.response
+                  ?.statusCode ==
+              403) {
+
+        return 'You are not allowed to scan this attendance.';
+      }
+
+      return error.message ??
+          'Attendance scan failed.';
+    }
+
+
+    // =======================================================
+    // NORMAL ERROR
+    // =======================================================
+
     final String originalMessage =
         error.toString();
 
@@ -571,59 +548,67 @@ class AttendanceScanController extends GetxController {
         originalMessage
             .toLowerCase();
 
-    // Location off
+
     if (
         message.contains(
           'location_service_disabled',
+        ) ||
+        message.contains(
+          'location_not_ready',
         )) {
+
       return 'Please turn on GPS / Location and try again.';
     }
 
-    // Permission denied forever
+
     if (
         message.contains(
           'location_permission_denied_forever',
         )) {
+
       return 'Location permission is permanently denied. '
-          'Please enable Location in your phone Settings.';
+          'Please enable Location permission in Settings.';
     }
 
-    // Permission denied
+
     if (
         message.contains(
           'location_permission_denied',
         )) {
-      return 'Location permission is required for attendance.';
+
+      return 'Please allow Location permission to scan attendance.';
     }
 
-    // GPS accuracy
+
     if (
         message.contains(
           'gps_accuracy_too_low',
         ) ||
         message.contains(
-          'accuracy is too low',
-        ) ||
-        message.contains(
           'not accurate enough',
         )) {
-      return 'GPS accuracy is too low. '
+
+      return 'Your GPS accuracy is too low. '
           'Please enable precise location and try again.';
     }
 
-    // Too far
+
     if (
+        message.contains(
+          'too far from teacher',
+        ) ||
         message.contains(
           'too far from the class',
         )) {
+
       return _extractBackendDetail(
         originalMessage,
         fallback:
-            'You are too far from the classroom.',
+            'You are too far from the teacher.',
       );
     }
 
-    // Wrong QR
+
     if (
         message.contains(
           'qr attendance session not found',
@@ -631,40 +616,38 @@ class AttendanceScanController extends GetxController {
         message.contains(
           '404',
         )) {
-      return 'attendance_scan_wrong_qr'.tr;
+
+      return 'QR attendance session not found.';
     }
 
-    // Expired
+
     if (
-        message.contains(
-          'qr code has expired',
-        ) ||
         message.contains(
           'expired',
         )) {
-      return 'attendance_scan_expired'.tr;
+
+      return 'This QR code has expired. Please scan a new QR.';
     }
 
-    // Wrong class
+
     if (
         message.contains(
           'not for your class',
         )) {
-      return 'attendance_scan_wrong_class'.tr;
+
+      return 'This QR code is not for your class.';
     }
 
-    // Already recorded
+
     if (
-        message.contains(
-          'attendance already recorded',
-        ) ||
         message.contains(
           'already recorded',
         )) {
-      return 'attendance_scan_already'.tr;
+
+      return 'Attendance already recorded.';
     }
 
-    // Network
+
     if (
         message.contains(
           'connection',
@@ -675,31 +658,21 @@ class AttendanceScanController extends GetxController {
         message.contains(
           'socket',
         )) {
-      return 'attendance_scan_network'.tr;
+
+      return 'Cannot connect to server. Please check your internet.';
     }
 
-    // Forbidden
-    if (
-        message.contains(
-          '403',
-        )) {
-      return _extractBackendDetail(
-        originalMessage,
-        fallback:
-            'attendance_scan_forbidden'.tr,
-      );
-    }
 
-    // Other errors
     return _extractBackendDetail(
       originalMessage,
       fallback:
-          'attendance_scan_invalid'.tr,
+          'Attendance scan failed. Please try again.',
     );
   }
 
+
   // =========================================================
-  // EXTRACT BACKEND DETAIL
+  // EXTRACT FASTAPI DETAIL FROM STRING
   // =========================================================
 
   String _extractBackendDetail(
@@ -748,28 +721,114 @@ class AttendanceScanController extends GetxController {
     return result;
   }
 
+
   // =========================================================
-  // SETTINGS
+  // LOCATION SERVICE DIALOG
   // =========================================================
 
   Future<void>
-      openLocationSettings() async {
-    await Geolocator
-        .openLocationSettings();
+      _showLocationServiceDialog() async {
+
+    await Get.dialog(
+      AlertDialog(
+        title:
+            const Text(
+          'Turn On Location',
+        ),
+
+        content:
+            const Text(
+          'Location/GPS must be turned on before you can scan attendance.',
+        ),
+
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child:
+                const Text(
+              'Cancel',
+            ),
+          ),
+
+          ElevatedButton(
+            onPressed: () async {
+              Get.back();
+
+              await Geolocator
+                  .openLocationSettings();
+            },
+
+            child:
+                const Text(
+              'Open Settings',
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible:
+          false,
+    );
   }
 
+
+  // =========================================================
+  // APP SETTINGS DIALOG
+  // =========================================================
+
   Future<void>
-      openAppSettings() async {
-    await Geolocator
-        .openAppSettings();
+      _showAppSettingsDialog() async {
+
+    await Get.dialog(
+      AlertDialog(
+        title:
+            const Text(
+          'Location Permission',
+        ),
+
+        content:
+            const Text(
+          'Please allow Location permission for TamDanSers in Settings.',
+        ),
+
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child:
+                const Text(
+              'Cancel',
+            ),
+          ),
+
+          ElevatedButton(
+            onPressed: () async {
+              Get.back();
+
+              await Geolocator
+                  .openAppSettings();
+            },
+
+            child:
+                const Text(
+              'Open Settings',
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible:
+          false,
+    );
   }
 
+
   // =========================================================
-  // RESTART SCANNER
+  // RESTART
   // =========================================================
 
-  Future<void>
-      restartScanner() async {
+  Future<void> restartScanner() async {
     if (isLoading.value) {
       return;
     }
@@ -784,9 +843,164 @@ class AttendanceScanController extends GetxController {
     } catch (_) {}
   }
 
+
   // =========================================================
-  // CLOSE
+  // SUCCESS DIALOG
   // =========================================================
+
+  Future<void> _showSuccessDialog({
+    required String message,
+    required String subjectName,
+    required double? distance,
+  }) async {
+
+    final bool alreadyRecorded =
+        message
+            .toLowerCase()
+            .contains(
+              'already recorded',
+            );
+
+    await Get.dialog(
+      AlertDialog(
+        shape:
+            RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(
+            24,
+          ),
+        ),
+
+        content:
+            Column(
+          mainAxisSize:
+              MainAxisSize.min,
+
+          children: [
+            Icon(
+              Icons
+                  .check_circle_rounded,
+
+              size:
+                  80,
+
+              color:
+                  alreadyRecorded
+                      ? Colors.blue
+                      : Colors.green,
+            ),
+
+            const SizedBox(
+              height: 18,
+            ),
+
+            Text(
+              alreadyRecorded
+                  ? 'Attendance Already Recorded'
+                  : 'Attendance Successful',
+
+              textAlign:
+                  TextAlign.center,
+
+              style:
+                  const TextStyle(
+                fontSize:
+                    20,
+
+                fontWeight:
+                    FontWeight.bold,
+              ),
+            ),
+
+            if (
+                subjectName
+                    .isNotEmpty) ...[
+              const SizedBox(
+                height:
+                    10,
+              ),
+
+              Text(
+                subjectName,
+
+                style:
+                    const TextStyle(
+                  fontSize:
+                      17,
+
+                  fontWeight:
+                      FontWeight.w600,
+                ),
+              ),
+            ],
+
+            const SizedBox(
+              height:
+                  10,
+            ),
+
+            Text(
+              message,
+
+              textAlign:
+                  TextAlign.center,
+            ),
+
+            if (distance != null) ...[
+              const SizedBox(
+                height:
+                    12,
+              ),
+
+              Text(
+                'Distance from teacher: '
+                '${distance.toStringAsFixed(1)} m',
+
+                style:
+                    const TextStyle(
+                  fontWeight:
+                      FontWeight.w600,
+                ),
+              ),
+            ],
+
+            const SizedBox(
+              height:
+                  20,
+            ),
+
+            SizedBox(
+              width:
+                  double.infinity,
+
+              child:
+                  ElevatedButton(
+                onPressed: () {
+                  // Dialog
+                  Get.back();
+
+                  // Scanner screen
+                  Get.back(
+                    result:
+                        true,
+                  );
+                },
+
+                child:
+                    const Text(
+                  'OK',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      barrierDismissible:
+          false,
+    );
+  }
+
 
   @override
   void onClose() {
