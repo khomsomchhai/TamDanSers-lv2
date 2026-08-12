@@ -897,7 +897,7 @@ void _showParentAccountDialog(
       MapEntry(
         'phone_number'.tr,
         _read(
-          () => user.phone,
+          () => user.formattedPhone,
         ),
       ),
     ],
@@ -1387,7 +1387,7 @@ void _showParentAccountDialog(
         MapEntry(
           'guardian_phone'.tr,
           _read(
-            () => profile.guardianPhone,
+            () => profile.formattedGuardianPhone,
           ),
         ),
       ],
@@ -1416,7 +1416,7 @@ void _showParentAccountDialog(
         MapEntry(
           'guardian_phone'.tr,
           _read(
-            () => profile.guardianPhone,
+            () => profile.formattedGuardianPhone,
           ),
         ),
         MapEntry(

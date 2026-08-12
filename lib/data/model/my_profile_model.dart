@@ -12,16 +12,28 @@ class MyProfileModel {
 
   factory MyProfileModel.fromJson(Map<String, dynamic>? json) {
     final data = json ?? <String, dynamic>{};
-    final userJson = data['user'];
-    final profileJson = data['profile'];
+
+    final userJsonRaw = data['user'];
+    final profileJsonRaw = data['profile'];
+
+    final Map<String, dynamic>? userMap =
+        userJsonRaw is Map ? Map<String, dynamic>.from(userJsonRaw) : null;
+    final Map<String, dynamic>? profileMap = profileJsonRaw is Map
+        ? Map<String, dynamic>.from(profileJsonRaw)
+        : null;
+    final Map<String, dynamic> mergedUser =
+        Map<String, dynamic>.from(userMap ?? <String, dynamic>{});
+
+    if ((mergedUser['phone'] == null ||
+            mergedUser['phone'].toString().trim().isEmpty) &&
+        profileMap != null &&
+        profileMap['phone'] != null) {
+      mergedUser['phone'] = profileMap['phone'];
+    }
 
     return MyProfileModel(
-      user: UserModel.fromJson(
-        userJson is Map ? Map<String, dynamic>.from(userJson) : null,
-      ),
-      profile: ProfileModel.fromJson(
-        profileJson is Map ? Map<String, dynamic>.from(profileJson) : null,
-      ),
+      user: UserModel.fromJson(mergedUser),
+      profile: ProfileModel.fromJson(profileMap),
     );
   }
 }
