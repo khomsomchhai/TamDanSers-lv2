@@ -272,9 +272,9 @@ Map<String, String> kmKh = {
 'attendance_history': 'ប្រវត្តិវត្តមាន',
 'attendance_today': 'វត្តមានថ្ងៃនេះ',
 
-'present_days': 'ថ្ងៃវត្តមាន',
-'absent_days': 'ថ្ងៃអវត្តមាន',
-'permission_days': 'ថ្ងៃសុំច្បាប់',
+'present_days': 'វត្តមាន',
+'absent_days': 'អវត្តមាន',
+'permission_days': 'សុំច្បាប់',
 'attendance_total_days': 'ចំនួនថ្ងៃសរុប',
 'subjects': 'មុខវិជ្ជា',
 'days': 'ថ្ងៃ',
@@ -327,9 +327,16 @@ Map<String, String> kmKh = {
     'មិនអាចសុំច្បាប់ពេញមួយថ្ងៃបានទេ។',
 'ask_permission_already_requested_today':
     'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
-
+  'permission_edit_title':
+    'កែសម្រួលសំណើសុំច្បាប់',
+  'permission_update': 'ធ្វើបច្ចុប្បន្នភាព',
+  'permission_updated': 'បានធ្វើបច្ចុប្បន្នភាពសំណើសុំច្បាប់រួចរាល់',
+  'permission_deleted': 'បានលុបសំណើសុំច្បាប់រួចរាល់',
+  'permission_delete_failed': 'មិនអាចលុបសំណើសុំច្បាប់បានទេ',
   'permission_delete_title':
     'លុបសំណើសុំច្បាប់',
+  'permission_edit_title' : 'កែប្រែការសុំច្បាប់',
+  'permission_update': 'កែប្រែការសុំច្បាប់',
 
 'permission_delete_message':
     'តើអ្នកប្រាកដថាចង់លុបសំណើសុំច្បាប់នេះមែនទេ?',
@@ -381,4 +388,5 @@ Map<String, String> kmKh = {
   'children_information' : 'ព័ត៌មានរបស់កូនអ្នក',
   'view_linked_children' : 'មើលគណនីកូនរបស់អ្នកទាំងអស់',
   'phone_number' : 'លេខទូរស័ព្ទ',
+  'legal_section': 'គណនី',
 };

@@ -18,10 +18,8 @@ import 'package:tamdansers_lv2/core/widgets/header/custom_header_placeholder.dar
 import 'package:tamdansers_lv2/core/widgets/subject_ui.dart';
 
 import 'package:tamdansers_lv2/data/model/attendance_model.dart';
-import 'package:tamdansers_lv2/data/model/parent_model.dart';
 import 'package:tamdansers_lv2/data/model/schedule_model.dart';
 import 'package:tamdansers_lv2/data/model/score_model.dart';
-import 'package:tamdansers_lv2/data/model/student_model.dart';
 
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/parent_attendance_tab/parent_attendance_tab_controller.dart';
 
@@ -229,7 +227,10 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
           }),
         ),
         const SizedBox(width: 12),
-        const CustomHeaderAction(),
+        const CustomHeaderAction(
+          iconColor:
+              Colors.white, // Sets the notification bell icon color to white
+        ),
       ],
     );
   }
@@ -342,14 +343,27 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
   Widget _buildSelectedChild(
     Map<String, dynamic> student,
   ) {
-    final name = _getStudentName(student);
-    final code = _getStudentCode(student);
+    final name = student['student_name']?.toString() ?? '-';
+
+    final code = student['student_code']?.toString() ?? '-';
+
+    final imageUrl = student['profile_image']?.toString().trim() ?? '';
 
     return Row(
       children: [
-        _buildStudentAvatar(
-          student,
-          radius: 19,
+        CircleAvatar(
+          radius: 18,
+          backgroundColor: AppColors.info.withValues(
+            alpha: 0.12,
+          ),
+          backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+          child: imageUrl.isEmpty
+              ? const Icon(
+                  Icons.person_outline_rounded,
+                  color: AppColors.info,
+                  size: 21,
+                )
+              : null,
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -386,24 +400,36 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
   Widget _buildDropdownChild(
     Map<String, dynamic> student,
   ) {
-    final name = _getStudentName(student);
-    final code = _getStudentCode(student);
+    final name = student['student_name']?.toString() ?? '-';
 
-    final selectedId = _parseStudentId(controller.selectedChild.value);
+    final code = student['student_code']?.toString() ?? '-';
 
-    final currentId = _parseStudentId(student);
+    final imageUrl = student['profile_image']?.toString().trim() ?? '';
 
-    final isSelected =
-        selectedId != null && currentId != null && selectedId == currentId;
+    final selectedId = controller.selectedChild.value?['id'];
+
+    final isSelected = selectedId?.toString() == student['id']?.toString();
 
     return SizedBox(
       height: 58,
       child: Row(
         children: [
-          _buildStudentAvatar(
-            student,
+          CircleAvatar(
             radius: 19,
-            isSelected: isSelected,
+            backgroundColor: isSelected
+                ? AppColors.info
+                : AppColors.info.withValues(
+                    alpha: 0.12,
+                  ),
+            backgroundImage:
+                imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+            child: imageUrl.isEmpty
+                ? Icon(
+                    Icons.person_outline_rounded,
+                    color: isSelected ? AppColors.white : AppColors.info,
+                    size: 21,
+                  )
+                : null,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -444,132 +470,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
     );
   }
 
-  String _getStudentName(
-    Map<String, dynamic> student,
-  ) {
-    return student['student_name']?.toString() ??
-        student['name']?.toString() ??
-        student['full_name']?.toString() ??
-        '-';
-  }
-
-  String _getStudentCode(
-    Map<String, dynamic> student,
-  ) {
-    return student['student_code']?.toString() ??
-        student['code']?.toString() ??
-        '-';
-  }
-
-  // =====================================================
-  // STUDENT AVATAR
-  // =====================================================
-
-  Widget _buildStudentAvatar(
-    Map<String, dynamic> student, {
-    double radius = 18,
-    bool isSelected = false,
-  }) {
-    final name = _getStudentName(student);
-
-    return Obx(() {
-      final candidateUrls = _getStudentCandidateUrls(student);
-
-      return _StudentAvatarWidget(
-        candidateUrls: candidateUrls,
-        radius: radius,
-        isSelected: isSelected,
-        headers: _getImageHeaders(),
-        name: name,
-      );
-    });
-  }
-
-  // =====================================================
-  // IMAGE HELPERS
-  // =====================================================
-
-  String _formatImageUrl(String url) {
-    final cleanUrl = url.trim();
-
-    if (cleanUrl.isEmpty || cleanUrl == 'null' || cleanUrl == 'None') {
-      return '';
-    }
-
-    if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
-      return cleanUrl;
-    }
-
-    const baseUrl = 'https://tamdansers-1fvbe1msgz9hki.sabay.com';
-
-    final formattedPath = cleanUrl.startsWith('/') ? cleanUrl : '/$cleanUrl';
-
-    return '$baseUrl$formattedPath';
-  }
-
-  String _extractImageFromMap(dynamic data) {
-    if (data == null) {
-      return '';
-    }
-
-    if (data is StudentModel) {
-      if (data.profileImage.isNotEmpty) {
-        return _formatImageUrl(
-          data.profileImage,
-        );
-      }
-
-      return '';
-    }
-
-    if (data is String) {
-      final value = data.trim();
-
-      if (value.isNotEmpty && value != 'null') {
-        return _formatImageUrl(value);
-      }
-
-      return '';
-    }
-
-    if (data is Map) {
-      const knownKeys = [
-        'profile_image',
-        'profileImage',
-        'profile_photo',
-        'student_image',
-        'studentImage',
-        'avatar_url',
-        'avatarUrl',
-        'avatar',
-        'photo_url',
-        'photoUrl',
-        'image',
-        'image_url',
-        'imageUrl',
-      ];
-
-      for (final key in knownKeys) {
-        if (data.containsKey(key) && data[key] != null) {
-          final value = data[key].toString().trim();
-
-          if (value.isNotEmpty && value != 'null') {
-            return _formatImageUrl(value);
-          }
-        }
-      }
-
-      // Nested student object
-      if (data['student'] != null) {
-        return _extractImageFromMap(
-          data['student'],
-        );
-      }
-    }
-
-    return '';
-  }
-
   int? _parseStudentId(dynamic value) {
     if (value == null) {
       return null;
@@ -607,73 +507,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
     );
   }
 
-  List<String> _getStudentCandidateUrls(
-    Map<String, dynamic> student,
-  ) {
-    final urls = <String>[];
-
-    final directUrl = _extractImageFromMap(student);
-
-    if (directUrl.isNotEmpty) {
-      urls.add(directUrl);
-    }
-
-    final id = _parseStudentId(student);
-
-    if (id != null && controller.studentImages.containsKey(id)) {
-      final cachedUrl = controller.studentImages[id];
-
-      if (cachedUrl != null) {
-        final formatted = _formatImageUrl(
-          cachedUrl.toString(),
-        );
-
-        if (formatted.isNotEmpty) {
-          urls.add(formatted);
-        }
-      }
-    }
-
-    final dashboard = controller.dashboard.value;
-
-    if (dashboard != null) {
-      final dashboardStudentId = _parseStudentId(
-        dashboard.student,
-      );
-
-      if (id != null &&
-          dashboardStudentId != null &&
-          id == dashboardStudentId) {
-        final dashboardUrl = _formatImageUrl(
-          dashboard.student.profileImage,
-        );
-
-        if (dashboardUrl.isNotEmpty) {
-          urls.add(dashboardUrl);
-        }
-      }
-    }
-
-    return urls
-        .where(
-          (url) => url.trim().isNotEmpty,
-        )
-        .toSet()
-        .toList();
-  }
-
-  Map<String, String>? _getImageHeaders() {
-    final token = GetStorage().read('token');
-
-    if (token != null && token.toString().trim().isNotEmpty) {
-      return {
-        'Authorization': 'Bearer ${token.toString().trim()}',
-      };
-    }
-
-    return null;
-  }
-
   // =====================================================
   // ATTENDANCE PROGRESS
   // =====================================================
@@ -695,11 +528,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
       final totalDays = attendanceController.totalDays;
 
-      final presentDays = attendanceController.presentDays.value;
-
-      final absentDays = attendanceController.absentDays.value;
-
-      final permissionDays = attendanceController.permissionDays.value;
+      final presentSubjects = attendanceController.presentSubjects.value;
+      final absentSubjects = attendanceController.absentSubjects.value;
+      final permissionSubjects = attendanceController.permissionSubjects.value;
 
       final isKm = Get.locale?.languageCode == 'km';
 
@@ -798,7 +629,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        '${rate.toStringAsFixed(0)}%',
+                        rate % 1 == 0
+                            ? '${rate.toInt()}%'
+                            : '${rate.toStringAsFixed(1)}%',
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: const Color(0xFF059669),
                           fontWeight: FontWeight.bold,
@@ -870,8 +703,10 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
               Expanded(
                 child: _buildHomeStatSquareCard(
                   mainTitle: isKm ? 'វត្តមាន' : 'Present',
-                  count: presentDays,
-                  unit: isKm ? 'ថ្ងៃ' : (presentDays == 1 ? 'Day' : 'Days'),
+                  count: presentSubjects,
+                  unit: isKm
+                      ? 'មុខវិជ្ជា'
+                      : (presentSubjects == 1 ? 'Subject' : 'Subjects'),
                   icon: Icons.check_circle_rounded,
                   color: const Color(0xFF10B981),
                   bgColor: const Color(0xFFF0FDF4),
@@ -882,8 +717,10 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
               Expanded(
                 child: _buildHomeStatSquareCard(
                   mainTitle: isKm ? 'អវត្តមាន' : 'Absent',
-                  count: absentDays,
-                  unit: isKm ? 'ថ្ងៃ' : (absentDays == 1 ? 'Day' : 'Days'),
+                  count: absentSubjects,
+                  unit: isKm
+                      ? 'មុខវិជ្ជា'
+                      : (absentSubjects == 1 ? 'Subject' : 'Subjects'),
                   icon: Icons.cancel_rounded,
                   color: const Color(0xFFEF4444),
                   bgColor: const Color(0xFFFEF2F2),
@@ -894,8 +731,10 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
               Expanded(
                 child: _buildHomeStatSquareCard(
                   mainTitle: isKm ? 'សុំច្បាប់' : 'Leave',
-                  count: permissionDays,
-                  unit: isKm ? 'ថ្ងៃ' : (permissionDays == 1 ? 'Day' : 'Days'),
+                  count: permissionSubjects,
+                  unit: isKm
+                      ? 'មុខវិជ្ជា'
+                      : (permissionSubjects == 1 ? 'Subject' : 'Subjects'),
                   icon: Icons.assignment_rounded,
                   color: const Color(0xFFF59E0B),
                   bgColor: const Color(0xFFFFFBEB),
@@ -1195,45 +1034,73 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Text(
-                  'attendance_today'.tr,
-                  style: AppTextStyles.titleSmall.copyWith(
-                    color: AppColors.dark,
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'attendance_today'.tr,
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.dark,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
               ),
               if (canExpand)
                 InkWell(
-                  borderRadius: BorderRadius.circular(
-                    10,
-                  ),
                   onTap: controller.toggleAttendanceExpanded,
-                  child: Padding(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: 12,
                       vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(
+                        alpha: 0.08,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        20,
+                      ),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(
+                          alpha: 0.20,
+                        ),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          isExpanded ? 'បង្ហាញតិច' : 'មើលទាំងអស់',
+                          isExpanded
+                              ? (Get.locale?.languageCode == 'km'
+                                  ? 'បង្រួម'
+                                  : 'Show Less')
+                              : (Get.locale?.languageCode == 'km'
+                                  ? 'មើលទាំងអស់'
+                                  : 'View All'),
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(
-                          width: 4,
-                        ),
+                        const SizedBox(width: 4),
                         Icon(
                           isExpanded
                               ? Icons.keyboard_arrow_up_rounded
                               : Icons.keyboard_arrow_down_rounded,
-                          size: 20,
+                          size: 16,
                           color: AppColors.primary,
                         ),
                       ],
@@ -1599,17 +1466,13 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.circular(
-                  16,
-                ),
+                borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: 0.04,
-                    ),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
@@ -1625,31 +1488,21 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                         final isTypeSelected = type == selectedType;
 
                         return Padding(
-                          padding: const EdgeInsets.only(
-                            right: 6,
-                          ),
+                          padding: const EdgeInsets.only(right: 5),
                           child: InkWell(
-                            onTap: () => controller.selectResultType(
-                              type,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              14,
-                            ),
+                            onTap: () => controller.selectResultType(type),
+                            borderRadius: BorderRadius.circular(10),
                             child: AnimatedContainer(
-                              duration: const Duration(
-                                milliseconds: 150,
-                              ),
+                              duration: const Duration(milliseconds: 150),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
+                                horizontal: 10,
+                                vertical: 4,
                               ),
                               decoration: BoxDecoration(
                                 color: isTypeSelected
                                     ? AppColors.primary
                                     : AppColors.lightBackground,
-                                borderRadius: BorderRadius.circular(
-                                  14,
-                                ),
+                                borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: isTypeSelected
                                       ? AppColors.primary
@@ -1665,7 +1518,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                                   fontWeight: isTypeSelected
                                       ? FontWeight.bold
                                       : FontWeight.w500,
-                                  fontSize: 12,
+                                  fontSize: 11,
                                 ),
                               ),
                             ),
@@ -1674,104 +1527,223 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                       }).toList(),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   Text(
                     'ជ្រើសរើស $selectedType:',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: AppColors.hintColor,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   if (selectedType == 'ប្រចាំខែ')
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: subOptions.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        childAspectRatio: 2.5,
-                        crossAxisSpacing: 6,
-                        mainAxisSpacing: 6,
-                      ),
-                      itemBuilder: (context, index) {
-                        final monthName = subOptions[index];
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Compact Segmented Control for Semester Selection
+                        Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      controller.selectMonthlySemester(1),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 180),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                    ),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: controller.selectedMonthlySemester
+                                                  .value ==
+                                              1
+                                          ? AppColors.primary
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: controller
+                                                  .selectedMonthlySemester
+                                                  .value ==
+                                              1
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.25),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 1),
+                                              )
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Text(
+                                      'ឆមាស ១',
+                                      style: TextStyle(
+                                        color: controller
+                                                    .selectedMonthlySemester
+                                                    .value ==
+                                                1
+                                            ? Colors.white
+                                            : const Color(0xFF64748B),
+                                        fontWeight: controller
+                                                    .selectedMonthlySemester
+                                                    .value ==
+                                                1
+                                            ? FontWeight.bold
+                                            : FontWeight.w600,
+                                        fontSize: 11.5,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      controller.selectMonthlySemester(2),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 180),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                    ),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: controller.selectedMonthlySemester
+                                                  .value ==
+                                              2
+                                          ? AppColors.primary
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: controller
+                                                  .selectedMonthlySemester
+                                                  .value ==
+                                              2
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.25),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 1),
+                                              )
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Text(
+                                      'ឆមាស ២',
+                                      style: TextStyle(
+                                        color: controller
+                                                    .selectedMonthlySemester
+                                                    .value ==
+                                                2
+                                            ? Colors.white
+                                            : const Color(0xFF64748B),
+                                        fontWeight: controller
+                                                    .selectedMonthlySemester
+                                                    .value ==
+                                                2
+                                            ? FontWeight.bold
+                                            : FontWeight.w600,
+                                        fontSize: 11.5,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        // Ultra-tight Single Row for 4 Months
+                        Row(
+                          children: subOptions.map((monthName) {
+                            final isSubSelected = monthName == selectedSub;
 
-                        final isSubSelected = monthName == selectedSub;
-
-                        return InkWell(
-                          onTap: () => controller.selectSubResult(
-                            monthName,
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            10,
-                          ),
-                          child: AnimatedContainer(
-                            duration: const Duration(
-                              milliseconds: 150,
-                            ),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: isSubSelected
-                                  ? AppColors.primary
-                                  : AppColors.lightBackground,
-                              borderRadius: BorderRadius.circular(
-                                10,
+                            return Expanded(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 2),
+                                child: InkWell(
+                                  onTap: () => controller.selectSubResult(
+                                    monthName,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(
+                                      milliseconds: 180,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                    ),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: isSubSelected
+                                          ? AppColors.primary
+                                          : const Color(0xFFF8FAFC),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isSubSelected
+                                            ? AppColors.primary
+                                            : const Color(0xFFE2E8F0),
+                                        width: isSubSelected ? 1.2 : 1,
+                                      ),
+                                      boxShadow: isSubSelected
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.2),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 1),
+                                              )
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Text(
+                                      monthName,
+                                      style: TextStyle(
+                                        color: isSubSelected
+                                            ? Colors.white
+                                            : const Color(0xFF334155),
+                                        fontWeight: isSubSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.w600,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              border: Border.all(
-                                color: isSubSelected
-                                    ? AppColors.primary
-                                    : AppColors.border,
-                              ),
-                            ),
-                            child: Text(
-                              monthName,
-                              style: TextStyle(
-                                color: isSubSelected
-                                    ? Colors.white
-                                    : AppColors.dark,
-                                fontWeight: isSubSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                                fontSize: 11.5,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+                            );
+                          }).toList(),
+                        ),
+                      ],
                     )
                   else
                     Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
+                      spacing: 5,
+                      runSpacing: 5,
                       children: subOptions.map(
                         (opt) {
                           final isSubSelected = opt == selectedSub;
 
                           return InkWell(
-                            onTap: () => controller.selectSubResult(
-                              opt,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ),
+                            onTap: () => controller.selectSubResult(opt),
+                            borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
-                              duration: const Duration(
-                                milliseconds: 150,
-                              ),
+                              duration: const Duration(milliseconds: 150),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 7,
+                                horizontal: 10,
+                                vertical: 5,
                               ),
                               decoration: BoxDecoration(
                                 color: isSubSelected
                                     ? AppColors.primary
                                     : AppColors.lightBackground,
-                                borderRadius: BorderRadius.circular(
-                                  10,
-                                ),
+                                borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: isSubSelected
                                       ? AppColors.primary
@@ -1790,16 +1762,14 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                                       fontWeight: isSubSelected
                                           ? FontWeight.bold
                                           : FontWeight.w500,
-                                      fontSize: 12,
+                                      fontSize: 11,
                                     ),
                                   ),
                                   if (isSubSelected) ...[
-                                    const SizedBox(
-                                      width: 5,
-                                    ),
+                                    const SizedBox(width: 4),
                                     const Icon(
                                       Icons.check_circle_rounded,
-                                      size: 14,
+                                      size: 13,
                                       color: Colors.white,
                                     ),
                                   ],
@@ -1838,10 +1808,16 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
       }
 
       final totalSessions = controller.todaySchedule.length;
+      final isExpanded = controller.isScheduleExpanded.value;
+      final isKm = Get.locale?.languageCode == 'km';
 
-      final sessionText = Get.locale?.languageCode == 'km'
-          ? '$totalSessions វគ្គ'
-          : '$totalSessions session';
+      final String headerText = totalSessions <= 2
+          ? (isKm
+              ? '$totalSessions វគ្គ'
+              : '$totalSessions session${totalSessions > 1 ? 's' : ''}')
+          : (isExpanded
+              ? (isKm ? 'បង្រួម' : 'Show Less')
+              : (isKm ? 'មើលបន្ថែម' : 'Show More'));
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1870,47 +1846,58 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(
-                    alpha: 0.08,
+              InkWell(
+                onTap: totalSessions > 2
+                    ? controller.toggleScheduleExpand
+                    : null,
+                borderRadius: BorderRadius.circular(20),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
-                  borderRadius: BorderRadius.circular(
-                    20,
-                  ),
-                  border: Border.all(
+                  decoration: BoxDecoration(
                     color: AppColors.primary.withValues(
-                      alpha: 0.20,
+                      alpha: 0.08,
                     ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.class_outlined,
-                      size: 14,
-                      color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(
+                      20,
                     ),
-                    const SizedBox(width: 5),
-                    Text(
-                      sessionText,
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
+                    border: Border.all(
+                      color: AppColors.primary.withValues(
+                        alpha: 0.20,
                       ),
                     ),
-                  ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        totalSessions <= 2
+                            ? Icons.class_outlined
+                            : (isExpanded
+                                ? Icons.keyboard_arrow_up_rounded
+                                : Icons.keyboard_arrow_down_rounded),
+                        size: 16,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        headerText,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 14),
-          ...controller.todaySchedule.map(scheduleCard),
+          ...controller.visibleTodaySchedules.map(scheduleCard),
         ],
       );
     });
@@ -2288,12 +2275,93 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
     );
   }
 
+  String _translatePointItem(String item, bool isKm) {
+    if (isKm) return item;
+    final map = {
+      'ខិតខំបន្ថែម': 'Extra Effort',
+      'គណិតវិទ្យា': 'Mathematics',
+      'ភាសាខ្មែរ': 'Khmer',
+      'ខ្មែរ': 'Khmer',
+      'រូបវិទ្យា': 'Physics',
+      'គីមីវិទ្យា': 'Chemistry',
+      'ជីវវិទ្យា': 'Biology',
+      'ផែនដីវិទ្យា': 'Earth Science',
+      'ប្រវត្តិវិទ្យា': 'History',
+      'ភូមិវិទ្យា': 'Geography',
+      'ភាសាអង់គ្លេស': 'English',
+      'សីលធម៌ ពលរដ្ឋ': 'Civics & Morals',
+      'គ្មាន': 'None',
+      'គ្មានចំណុចខ្លាំង': 'None',
+      'គ្មានចំណុចត្រូវកែលម្អ': 'None',
+      'វត្តមានល្អ': 'Good Attendance',
+      'វត្តមាន': 'Attendance',
+      'ពិន្ទុខ្ពស់': 'High Score',
+      'ការចូលរួមល្អ': 'Good Participation',
+    };
+
+    final trimmed = item.trim();
+    if (map.containsKey(trimmed)) {
+      return map[trimmed]!;
+    }
+
+    var result = item;
+    map.forEach((key, val) {
+      result = result.replaceAll(key, val);
+    });
+    return result;
+  }
+
+  String _translateResultType(String type, bool isKm) {
+    if (isKm) return type;
+    if (type == 'ប្រចាំខែ') return 'Monthly';
+    if (type.contains('ឆមាស')) return 'Semester';
+    if (type == 'ប្រចាំឆ្នាំ') return 'Yearly';
+    return type;
+  }
+
+  String _translateSubResult(String sub, bool isKm) {
+    if (isKm) return sub;
+    final monthsKmMap = {
+      'ខែមករា': 'January',
+      'មករា': 'January',
+      'ខែកុម្ភៈ': 'February',
+      'កុម្ភៈ': 'February',
+      'ខែមីនា': 'March',
+      'មីនា': 'March',
+      'ខែមេសា': 'April',
+      'មេសា': 'April',
+      'ខែឧសភា': 'May',
+      'ឧសភា': 'May',
+      'ខែមិថុនា': 'June',
+      'មិថុនា': 'June',
+      'ខែកក្កដា': 'July',
+      'កក្កដា': 'July',
+      'ខែសីហា': 'August',
+      'សីហា': 'August',
+      'ខែកញ្ញា': 'September',
+      'កញ្ញា': 'September',
+      'ខែតុលា': 'October',
+      'តុលា': 'October',
+      'ខែវិច្ឆិកា': 'November',
+      'វិច្ឆិកា': 'November',
+      'ខែធ្នូ': 'December',
+      'ធ្នូ': 'December',
+    };
+    if (monthsKmMap.containsKey(sub)) {
+      return monthsKmMap[sub]!;
+    }
+    if (sub == 'ឆមាស ១') return 'Semester 1';
+    if (sub == 'ឆមាស ២') return 'Semester 2';
+    return sub;
+  }
+
 // =====================================================
 // ACADEMIC PROGRESS SECTION
 // WITH COLLAPSED CARD VIEW
 // =====================================================
   Widget _buildAcademicProgressSection() {
     return Obx(() {
+      final isKm = Get.locale?.languageCode == 'km';
       final isExpanded = controller.isAcademicProgressExpanded.value;
 
       return Column(
@@ -2305,27 +2373,55 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'លទ្ធផលសិក្សា',
-                style: AppTextStyles.titleSmall.copyWith(
-                  color: AppColors.dark,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    isKm ? 'លទ្ធផលសិក្សា' : 'Academic Results',
+                    style: AppTextStyles.titleMedium.copyWith(
+                      color: AppColors.dark,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
               ),
               InkWell(
-                borderRadius: BorderRadius.circular(10),
                 onTap: controller.toggleAcademicProgressExpanded,
-                child: Padding(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                    horizontal: 12,
                     vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(
+                      alpha: 0.08,
+                    ),
+                    borderRadius: BorderRadius.circular(
+                      20,
+                    ),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(
+                        alpha: 0.20,
+                      ),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        isExpanded ? 'លាក់' : 'បង្ហាញ',
+                        isExpanded
+                            ? (isKm ? 'លាក់' : 'Hide')
+                            : (isKm ? 'បង្ហាញ' : 'Show'),
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
@@ -2336,7 +2432,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                         isExpanded
                             ? Icons.keyboard_arrow_up_rounded
                             : Icons.keyboard_arrow_down_rounded,
-                        size: 20,
+                        size: 16,
                         color: AppColors.primary,
                       ),
                     ],
@@ -2370,9 +2466,12 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 // =====================================================
   Widget _buildCollapsedAcademicCard() {
     return Obx(() {
+      final isKm = Get.locale?.languageCode == 'km';
       final selectedType = controller.selectedResultType.value;
-
       final selectedSub = controller.selectedSubResult.value;
+
+      final typeStr = _translateResultType(selectedType, isKm);
+      final subStr = _translateSubResult(selectedSub, isKm);
 
       return InkWell(
         onTap: controller.toggleAcademicProgressExpanded,
@@ -2393,9 +2492,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
           ),
           child: Row(
             children: [
-              // =================================================
-              // ICON
-              // =================================================
               Container(
                 width: 42,
                 height: 42,
@@ -2411,18 +2507,13 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                   size: 24,
                 ),
               ),
-
               const SizedBox(width: 12),
-
-              // =================================================
-              // TITLE + FILTER
-              // =================================================
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'លទ្ធផលសិក្សា',
+                      isKm ? 'លទ្ធផលសិក្សា' : 'Academic Results',
                       style: AppTextStyles.titleMedium.copyWith(
                         color: AppColors.dark,
                         fontWeight: FontWeight.bold,
@@ -2431,8 +2522,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'របាយការណ៍សង្ខេប '
-                      '$selectedType • $selectedSub',
+                      isKm
+                          ? 'របាយការណ៍សង្ខេប $selectedType • $selectedSub'
+                          : 'Summary Report $typeStr • $subStr',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.hintColor,
                         fontSize: 12,
@@ -2443,7 +2535,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                   ],
                 ),
               ),
-
               const Icon(
                 Icons.more_horiz_rounded,
                 color: AppColors.hintColor,
@@ -2460,9 +2551,12 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 // =====================================================
   Widget _buildAcademicResultCard() {
     return Obx(() {
+      final isKm = Get.locale?.languageCode == 'km';
       final selectedType = controller.selectedResultType.value;
-
       final selectedSub = controller.selectedSubResult.value;
+
+      final typeStr = _translateResultType(selectedType, isKm);
+      final subStr = _translateSubResult(selectedSub, isKm);
 
       return Container(
         width: double.infinity,
@@ -2481,9 +2575,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // =================================================
-            // HEADER
-            // =================================================
             Row(
               children: [
                 Container(
@@ -2507,7 +2598,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'លទ្ធផលសិក្សា',
+                        isKm ? 'លទ្ធផលសិក្សា' : 'Academic Results',
                         style: AppTextStyles.titleMedium.copyWith(
                           color: AppColors.dark,
                           fontWeight: FontWeight.bold,
@@ -2515,8 +2606,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                         ),
                       ),
                       Text(
-                        'របាយការណ៍សង្ខេប '
-                        '$selectedType • $selectedSub',
+                        isKm
+                            ? 'របាយការណ៍សង្ខេប $selectedType • $selectedSub'
+                            : 'Summary Report $typeStr • $subStr',
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.hintColor,
                           fontSize: 11.5,
@@ -2538,25 +2630,12 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
-            // =================================================
-            // SCORE GRAPH
-            // =================================================
             _buildScoreLevelGraphBox(),
-
             const SizedBox(height: 14),
-
-            // =================================================
-            // STRENGTHS + IMPROVEMENTS
-            // =================================================
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // =================================================
-                // STRENGTHS
-                // =================================================
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -2570,20 +2649,24 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.trending_up_rounded,
                               size: 16,
                               color: Color(0xFF16A34A),
                             ),
-                            SizedBox(width: 5),
-                            Text(
-                              'ចំណុចខ្លាំង',
-                              style: TextStyle(
-                                color: Color(0xFF16A34A),
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.bold,
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                isKm ? 'ចំណុចខ្លាំង' : 'Strengths',
+                                style: const TextStyle(
+                                  color: Color(0xFF16A34A),
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -2595,7 +2678,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                               bottom: 3,
                             ),
                             child: Text(
-                              '• $item',
+                              '• ${_translatePointItem(item, isKm)}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -2610,12 +2693,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 10),
-
-                // =================================================
-                // IMPROVEMENTS
-                // =================================================
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -2629,20 +2707,24 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.track_changes_rounded,
                               size: 16,
                               color: Color(0xFFD97706),
                             ),
-                            SizedBox(width: 5),
-                            Text(
-                              'ចំណុចត្រូវកែលម្អ',
-                              style: TextStyle(
-                                color: Color(0xFFD97706),
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.bold,
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                isKm ? 'ចំណុចត្រូវកែលម្អ' : 'Improvements',
+                                style: const TextStyle(
+                                  color: Color(0xFFD97706),
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -2654,7 +2736,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                               bottom: 3,
                             ),
                             child: Text(
-                              '• $item',
+                              '• ${_translatePointItem(item, isKm)}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -2671,12 +2753,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
-            // =================================================
-            // VIEW DETAIL BUTTON
-            // =================================================
             SizedBox(
               width: double.infinity,
               height: 44,
@@ -2694,7 +2771,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
                   ),
                 ),
                 child: Text(
-                  'មើលរបាយការណ៍លម្អិត',
+                  isKm ? 'មើលរបាយការណ៍លម្អិត' : 'View Detailed Report',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,
@@ -2711,34 +2788,15 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
 // =====================================================
 // SCORE LEVEL GRAPH BOX
-//
-// IMPORTANT FIX:
-// Use selectedSubResult as the source of truth.
-//
-// Example:
-// selectedSubResult = "ខែធ្នូ"
-//
-// The graph becomes:
-//
-// កញ្ញា | តុលា | វិច្ឆិកា | ធ្នូ
-//                              ↑
-//                             39
-//
-// The graph does NOT use attendanceController.selectedMonth
-// anymore.
 // =====================================================
   Widget _buildScoreLevelGraphBox() {
+    final isKm = Get.locale?.languageCode == 'km';
     final type = controller.selectedResultType.value;
-
     final sub = controller.selectedSubResult.value;
-
     final averageScore = controller.displayAverage;
 
     List<Widget> items = [];
 
-    // =====================================================
-    // MONTHLY
-    // =====================================================
     if (type == 'ប្រចាំខែ') {
       const khmerMonths = [
         'ខែមករា',
@@ -2754,7 +2812,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
         'ខែវិច្ឆិកា',
         'ខែធ្នូ',
       ];
-
       const khmerShortMonths = [
         'មករា',
         'កុម្ភៈ',
@@ -2769,100 +2826,59 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
         'វិច្ឆិកា',
         'ធ្នូ',
       ];
+      const englishShortMonths = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
 
-      // ===================================================
-      // FIND SELECTED MONTH FROM selectedSubResult
-      //
-      // Examples:
-      //
-      // "ខែធ្នូ"    -> 11
-      // "ខែសីហា"   -> 7
-      // "ខែមករា"   -> 0
-      // ===================================================
       int selectedIdx = khmerMonths.indexOf(sub);
-
-      // ===================================================
-      // FALLBACK
-      //
-      // In case selectedSubResult is already a short month:
-      //
-      // "ធ្នូ" -> 11
-      // "សីហា" -> 7
-      // ===================================================
       if (selectedIdx < 0) {
         selectedIdx = khmerShortMonths.indexOf(sub);
       }
-
-      // ===================================================
-      // FALLBACK FOR "ខែ" PREFIX
-      //
-      // Example:
-      // "ខែធ្នូ" -> "ធ្នូ"
-      // ===================================================
       if (selectedIdx < 0) {
         final cleanSub = sub.replaceAll('ខែ', '').trim();
-
         selectedIdx = khmerShortMonths.indexOf(cleanSub);
       }
-
-      // ===================================================
-      // FINAL FALLBACK
-      //
-      // If nothing matches, use current month.
-      // ===================================================
       if (selectedIdx < 0) {
         selectedIdx = DateTime.now().month - 1;
       }
-
-      // Make sure index is always valid.
       selectedIdx = selectedIdx.clamp(0, 11);
 
-      // ===================================================
-      // DISPLAY 4 MONTHS
-      //
-      // Example:
-      // selected = December
-      //
-      // កញ្ញា | តុលា | វិច្ឆិកា | ធ្នូ
-      //
-      // Example:
-      // selected = August
-      //
-      // ឧសភា | មិថុនា | កក្កដា | សីហា
-      // ===================================================
-      final displayShortMonths = [
-        khmerShortMonths[(selectedIdx - 3 + 12) % 12],
-        khmerShortMonths[(selectedIdx - 2 + 12) % 12],
-        khmerShortMonths[(selectedIdx - 1 + 12) % 12],
-        khmerShortMonths[selectedIdx],
+      final displayMonthIndices = [
+        (selectedIdx - 3 + 12) % 12,
+        (selectedIdx - 2 + 12) % 12,
+        (selectedIdx - 1 + 12) % 12,
+        selectedIdx,
       ];
 
-      // ===================================================
-      // BUILD GRAPH ITEMS
-      // ===================================================
-      items = displayShortMonths.map((month) {
-        final isSelected = month == khmerShortMonths[selectedIdx];
+      items = displayMonthIndices.map((idx) {
+        final monthLabel =
+            isKm ? khmerShortMonths[idx] : englishShortMonths[idx];
+        final isSelected = idx == selectedIdx;
 
         return _buildGraphItem(
-          month,
+          monthLabel,
           isSelected ? averageScore : '',
           isSelected,
         );
       }).toList();
-    }
-
-    // =====================================================
-    // SEMESTER
-    // =====================================================
-    else if (type.contains('ឆមាស')) {
-      const semesters = [
-        'ឆមាស ១',
-        'ឆមាស ២',
-      ];
+    } else if (type.contains('ឆមាស')) {
+      final semesters = isKm ? ['ឆមាស ១', 'ឆមាស ២'] : ['Sem 1', 'Sem 2'];
 
       items = semesters.map((semester) {
-        final isSelected =
-            sub.contains('២') ? semester == 'ឆមាស ២' : semester == 'ឆមាស ១';
+        final isSelected = sub.contains('២')
+            ? (semester == 'ឆមាស ២' || semester == 'Sem 2')
+            : (semester == 'ឆមាស ១' || semester == 'Sem 1');
 
         return _buildGraphItem(
           semester,
@@ -2870,13 +2886,9 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
           isSelected,
         );
       }).toList();
-    }
-
-    // =====================================================
-    // YEARLY
-    // =====================================================
-    else {
-      final currentYearLabel = 'ឆ្នាំ ${DateTime.now().year}';
+    } else {
+      final currentYearLabel =
+          isKm ? 'ឆ្នាំ ${DateTime.now().year}' : 'Year ${DateTime.now().year}';
 
       items = [
         _buildGraphItem(
@@ -2887,9 +2899,6 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
       ];
     }
 
-    // =====================================================
-    // GRAPH CONTAINER
-    // =====================================================
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -2900,21 +2909,18 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // =================================================
-          // GRAPH HEADER
-          // =================================================
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'កម្រិតពិន្ទុមធ្យម',
+                isKm ? 'កម្រិតពិន្ទុមធ្យម' : 'Average Score Level',
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.hintColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
-                'មធ្យមភាគ: $averageScore',
+                isKm ? 'មធ្យមភាគ: $averageScore' : 'Average: $averageScore',
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.bold,
@@ -2922,12 +2928,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
               ),
             ],
           ),
-
           const SizedBox(height: 16),
-
-          // =================================================
-          // GRAPH ITEMS
-          // =================================================
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: items,

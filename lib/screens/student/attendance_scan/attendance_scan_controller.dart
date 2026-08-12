@@ -3,14 +3,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
+import 'package:tamdansers_lv2/screens/student/student_dashboard/attendance_tab/attendance_tab_view.dart';
+import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
 
-class AttendanceScanController
-    extends GetxController {
-  final AttendanceService attendanceService =
-      AttendanceService();
+class AttendanceScanController extends GetxController {
+  final AttendanceService attendanceService = AttendanceService();
 
-  final MobileScannerController scannerController =
-      MobileScannerController();
+  final MobileScannerController scannerController = MobileScannerController();
 
   final isLoading = false.obs;
   final isScanned = false.obs;
@@ -94,16 +93,13 @@ class AttendanceScanController
   Future<void> scanQr(
     String rawValue,
   ) async {
-    final String token =
-        rawValue.trim();
+    final String token = rawValue.trim();
 
     if (token.isEmpty) {
       return;
     }
 
-    if (
-        isLoading.value ||
-        isScanned.value) {
+    if (isLoading.value || isScanned.value) {
       return;
     }
 
@@ -141,8 +137,7 @@ class AttendanceScanController
       // =====================================================
 
       final Map<String, dynamic> response =
-          await attendanceService
-              .scanAttendance(
+          await attendanceService.scanAttendance(
         token: token,
         latitude:
             position.latitude,
@@ -156,44 +151,51 @@ class AttendanceScanController
         'ATTENDANCE RESPONSE: $response',
       );
 
-      final dynamic attendance =
-          response['attendance'];
+      final dynamic attendance = response['attendance'];
 
       final String subjectName =
-          attendance is Map
-              ? attendance['subject_name']
-                      ?.toString() ??
-                  ''
-              : '';
+          attendance is Map ? attendance['subject_name']?.toString() ?? '' : '';
 
-      final String message =
-          response['message']
-                  ?.toString() ??
-              '';
+      final String message = response['message']?.toString() ?? '';
 
-      final dynamic distanceValue =
-          response['distance_m'];
+      Get.snackbar(
+        'success'.tr,
+        subjectName.isNotEmpty
+            ? '${'attendance_recorded_for'.tr} '
+                '$subjectName'
+            : message.isNotEmpty
+                ? message
+                : 'attendance_scan_success'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.shade100,
+        colorText: Colors.green.shade900,
+        duration: const Duration(
+          seconds: 2,
+        ),
+      );
 
-      final double? distance =
-          distanceValue is num
-              ? distanceValue.toDouble()
-              : double.tryParse(
-                  distanceValue
-                          ?.toString() ??
-                      '',
-                );
+      await Future.delayed(
+        const Duration(
+          milliseconds: 800,
+        ),
+      );
 
-      scanStatus.value =
-          'Attendance recorded';
+      try {
+        if (Get.isRegistered<AttendanceTabViewController>()) {
+          await Get.find<AttendanceTabViewController>().fetchAttendance();
+        }
+      } catch (_) {}
 
-      // =====================================================
-      // SUCCESS / ALREADY DIALOG
-      // =====================================================
+      try {
+        if (Get.isRegistered<HomeTabViewController>()) {
+          await Get.find<HomeTabViewController>().refreshHome();
+        }
+      } catch (_) {}
 
-      await _showSuccessDialog(
-        message: message,
-        subjectName: subjectName,
-        distance: distance,
+      Get.forceAppUpdate();
+
+      Get.back(
+        result: true,
       );
     } catch (error) {
       debugPrint(
@@ -214,15 +216,11 @@ class AttendanceScanController
         _getErrorMessage(
           error,
         ),
-        snackPosition:
-            SnackPosition.BOTTOM,
-        backgroundColor:
-            Colors.red.shade100,
-        colorText:
-            Colors.red.shade900,
-        duration:
-            const Duration(
-          seconds: 4,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade900,
+        duration: const Duration(
+          seconds: 3,
         ),
       );
     } finally {
@@ -522,62 +520,10 @@ class AttendanceScanController
   String _getErrorMessage(
     dynamic error,
   ) {
-    final String originalMessage =
-        error.toString();
+    final String message = error.toString().toLowerCase();
 
-    final String message =
-        originalMessage
-            .toLowerCase();
-
-    if (
-        message.contains(
-          'location_service_disabled',
-        )) {
-      return 'Please turn on GPS / Location and try again.';
-    }
-
-    if (
-        message.contains(
-          'location_permission_denied_forever',
-        )) {
-      return 'Location permission is permanently denied. '
-          'Please enable it in your phone Settings.';
-    }
-
-    if (
-        message.contains(
-          'location_permission_denied',
-        )) {
-      return 'Location permission is required for attendance.';
-    }
-
-    if (
-        message.contains(
-          'gps_accuracy_too_low',
-        ) ||
-        message.contains(
-          'accuracy is too low',
-        ) ||
-        message.contains(
-          'not accurate enough',
-        )) {
-      return 'GPS accuracy is too low. '
-          'Please enable precise location and try again.';
-    }
-
-    if (
-        message.contains(
-          'too far from the class',
-        )) {
-      return _extractBackendDetail(
-        originalMessage,
-        fallback:
-            'You are too far from the classroom.',
-      );
-    }
-
-    if (
-        message.contains(
+    // Wrong QR / token not found
+    if (message.contains(
           'qr attendance session not found',
         ) ||
         message.contains(
@@ -586,8 +532,8 @@ class AttendanceScanController
       return 'attendance_scan_wrong_qr'.tr;
     }
 
-    if (
-        message.contains(
+    // Expired QR
+    if (message.contains(
           'qr code has expired',
         ) ||
         message.contains(
@@ -596,15 +542,15 @@ class AttendanceScanController
       return 'attendance_scan_expired'.tr;
     }
 
-    if (
-        message.contains(
-          'not for your class',
-        )) {
+    // Wrong class
+    if (message.contains(
+      'not for your class',
+    )) {
       return 'attendance_scan_wrong_class'.tr;
     }
 
-    if (
-        message.contains(
+    // Already recorded
+    if (message.contains(
           'attendance already recorded',
         ) ||
         message.contains(
@@ -613,8 +559,15 @@ class AttendanceScanController
       return 'attendance_scan_already'.tr;
     }
 
-    if (
-        message.contains(
+    // Forbidden
+    if (message.contains(
+      '403',
+    )) {
+      return 'attendance_scan_forbidden'.tr;
+    }
+
+    // Network error
+    if (message.contains(
           'connection',
         ) ||
         message.contains(

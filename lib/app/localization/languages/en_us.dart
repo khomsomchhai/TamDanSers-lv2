@@ -332,8 +332,15 @@ Map<String, String> enUs = {
       'You already requested permission for today.',
   'ask_permission_request_type_by_subject': 'By Subject',
   'ask_permission_request_type_full_day': 'Full Day',
-  'permission_delete_title':
-    'Delete Permission Request',
+  'permission_edit_title':
+    'Edit Permission Request',
+  'permission_update': 'Update Request',
+  'permission_updated': 'Permission request updated',
+  'permission_deleted': 'Permission request deleted',
+  'permission_delete_failed': 'Failed to delete permission request',
+  'permission_delete_title': 'Delete Permission Request',
+  'permission_edit_title' : 'Update permission',
+  'permission_update': 'Update Permission',
 
 'permission_delete_message':
     'Are you sure you want to delete this permission request?',
@@ -360,4 +367,5 @@ Map<String, String> enUs = {
   'children_information' : 'Children Information',
   'view_linked_children' : 'View linked children',
   'phone_number' : 'Phone number',
+  'legal_section': 'ACCOUNT',
 };

@@ -14,26 +14,35 @@ class ParentDashboardModel {
   });
 
   factory ParentDashboardModel.fromMap(Map<String, dynamic> map) {
-    final studentData = map['student'] ??
+    final dynamic studentData = map['student'] ??
         map['student_info'] ??
         map['user'] ??
         map['profile'] ??
         map;
-    final rankData = map['rank'] ?? map['score'] ?? {};
+
+    Map<String, dynamic> rankMap = <String, dynamic>{};
+
+    final dynamic rawRank = map['rank'] ?? map['score'] ?? map['summary'];
+
+    if (rawRank is Map) {
+      rankMap = Map<String, dynamic>.from(rawRank);
+    } else if (rawRank != null) {
+      rankMap = <String, dynamic>{'rank': rawRank.toString()};
+    } else {
+      rankMap = map;
+    }
 
     return ParentDashboardModel(
       student: StudentModel.fromMap(
         studentData is Map<String, dynamic>
             ? studentData
-            : Map<String, dynamic>.from(studentData as Map? ?? {}),
+            : studentData is Map
+                ? Map<String, dynamic>.from(studentData)
+                : <String, dynamic>{},
       ),
-      rank: ScoreModel.fromMap(
-        rankData is Map<String, dynamic>
-            ? rankData
-            : Map<String, dynamic>.from(rankData as Map? ?? {}),
-      ),
-      homework: (map['homework'] as List? ?? [])
-          .map((e) => HomeworkModel.fromJson(e))
+      rank: ScoreModel.fromMap(rankMap),
+      homework: (map['homework'] as List? ?? <dynamic>[])
+          .map((dynamic e) => HomeworkModel.fromJson(e))
           .toList(),
     );
   }

@@ -12,6 +12,7 @@ class HomeworkItem {
   final String title;
   final String description;
   final String? filePath;
+  final List<String> filePaths;
   final String subjectName;
   final String teacherName;
   final HomeworkStatus status;
@@ -25,6 +26,7 @@ class HomeworkItem {
     required this.title,
     required this.description,
     this.filePath,
+    this.filePaths = const [],
     required this.subjectName,
     required this.teacherName,
     required this.status,
@@ -35,8 +37,32 @@ class HomeworkItem {
   });
 }
 
+class SubjectHomeworkGroup {
+  final String subjectName;
+  final String teacherName;
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBgColor;
+  final List<HomeworkItem> items;
+
+  SubjectHomeworkGroup({
+    required this.subjectName,
+    required this.teacherName,
+    required this.icon,
+    required this.iconColor,
+    required this.iconBgColor,
+    required this.items,
+  });
+
+  String get displayDate {
+    if (items.isEmpty) return '';
+    return items.first.date;
+  }
+}
+
 class HomeworkViewController extends GetxController {
   final selectedTabIndex = 0.obs;
+  final selectedSubject = RxnString();
 
   final ongoingList = <HomeworkItem>[].obs;
   final completedList = <HomeworkItem>[].obs;
@@ -45,14 +71,200 @@ class HomeworkViewController extends GetxController {
 
   final homeworkServices = HomeworkServices();
 
+  final GetStorage _box = GetStorage();
+
+  final deletedSubmissionIds = <int>{}.obs;
+  final deletedHomeworkIds = <int>{}.obs;
+
+  static const String _cacheKeyOngoing = 'homework_ongoing_cache';
+  static const String _cacheKeyCompleted = 'homework_completed_cache';
+  static const String _cacheKeyDeletedSubmissions = 'deleted_submission_ids';
+  static const String _cacheKeyDeletedHomeworks = 'deleted_homework_ids';
+
   @override
   void onInit() {
     super.onInit();
+    _loadFromCache();
     fetchHomework();
+  }
+
+  // =====================================================
+  // LOAD FROM CACHE
+  //
+  // Show cached data immediately so the user doesn't
+  // see an empty screen while the API is loading.
+  // =====================================================
+
+  void _loadFromCache() {
+    try {
+      final dynamic delSubRaw = _box.read(_cacheKeyDeletedSubmissions);
+      if (delSubRaw is List) {
+        deletedSubmissionIds.addAll(delSubRaw.whereType<int>());
+      }
+      final dynamic delHwRaw = _box.read(_cacheKeyDeletedHomeworks);
+      if (delHwRaw is List) {
+        deletedHomeworkIds.addAll(delHwRaw.whereType<int>());
+      }
+
+      final dynamic ongoingRaw = _box.read(_cacheKeyOngoing);
+      final dynamic completedRaw = _box.read(_cacheKeyCompleted);
+
+      if (ongoingRaw is List && ongoingRaw.isNotEmpty) {
+        final List<HomeworkItem> cached = ongoingRaw
+            .whereType<Map>()
+            .map((e) => _homeworkItemFromMap(Map<String, dynamic>.from(e)))
+            .toList();
+        if (cached.isNotEmpty) {
+          ongoingList.assignAll(cached);
+        }
+      }
+
+      if (completedRaw is List && completedRaw.isNotEmpty) {
+        final List<HomeworkItem> cached = completedRaw
+            .whereType<Map>()
+            .map((e) => _homeworkItemFromMap(Map<String, dynamic>.from(e)))
+            .toList();
+        if (cached.isNotEmpty) {
+          completedList.assignAll(cached);
+        }
+      }
+    } catch (_) {}
+  }
+
+  // =====================================================
+  // SAVE TO CACHE
+  // =====================================================
+
+  void _saveToCache() {
+    try {
+      _box.write(
+        _cacheKeyDeletedSubmissions,
+        deletedSubmissionIds.toList(),
+      );
+      _box.write(
+        _cacheKeyDeletedHomeworks,
+        deletedHomeworkIds.toList(),
+      );
+      _box.write(
+        _cacheKeyOngoing,
+        ongoingList.map((e) => _homeworkItemToMap(e)).toList(),
+      );
+      _box.write(
+        _cacheKeyCompleted,
+        completedList.map((e) => _homeworkItemToMap(e)).toList(),
+      );
+    } catch (_) {}
+  }
+
+  // =====================================================
+  // SERIALIZE / DESERIALIZE HomeworkItem
+  // =====================================================
+
+  Map<String, dynamic> _homeworkItemToMap(HomeworkItem item) {
+    return {
+      'id': item.id,
+      'title': item.title,
+      'description': item.description,
+      'filePath': item.filePath,
+      'filePaths': item.filePaths,
+      'subjectName': item.subjectName,
+      'teacherName': item.teacherName,
+      'status': item.status.index,
+      'date': item.date,
+      'iconCode': item.icon.codePoint,
+      'iconColorValue': item.iconColor.toARGB32(),
+      'iconBgColorValue': item.iconBgColor.toARGB32(),
+    };
+  }
+
+  HomeworkItem _homeworkItemFromMap(Map<String, dynamic> map) {
+    final int statusIndex = map['status'] is int ? map['status'] : 0;
+    final HomeworkStatus status = statusIndex < HomeworkStatus.values.length
+        ? HomeworkStatus.values[statusIndex]
+        : HomeworkStatus.none;
+
+    final int iconCode = map['iconCode'] is int
+        ? map['iconCode']
+        : Icons.assignment_outlined.codePoint;
+
+    final int iconColorValue =
+        map['iconColorValue'] is int ? map['iconColorValue'] : 0xff6763EB;
+
+    final int iconBgColorValue =
+        map['iconBgColorValue'] is int ? map['iconBgColorValue'] : 0x1E6763EB;
+
+    return HomeworkItem(
+      id: map['id'] ?? 0,
+      title: map['title']?.toString() ?? '',
+      description: map['description']?.toString() ?? '',
+      filePath: map['filePath']?.toString(),
+      filePaths: map['filePaths'] != null
+          ? List<String>.from(map['filePaths'])
+          : (map['filePath'] != null ? [map['filePath'].toString()] : []),
+      subjectName: map['subjectName']?.toString() ?? '',
+      teacherName: map['teacherName']?.toString() ?? '',
+      status: status,
+      date: map['date']?.toString() ?? '',
+      icon: IconData(iconCode, fontFamily: 'MaterialIcons'),
+      iconColor: Color(iconColorValue),
+      iconBgColor: Color(iconBgColorValue),
+    );
   }
 
   void changeTab(int index) {
     selectedTabIndex.value = index;
+    selectedSubject.value = null;
+  }
+
+  void openSubject(String subjectName) {
+    selectedSubject.value = subjectName;
+  }
+
+  void backToSubjectList() {
+    selectedSubject.value = null;
+  }
+
+  List<SubjectHomeworkGroup> get ongoingSubjectGroups =>
+      _groupHomeworkList(ongoingList);
+
+  List<SubjectHomeworkGroup> get completedSubjectGroups =>
+      _groupHomeworkList(completedList);
+
+  List<SubjectHomeworkGroup> _groupHomeworkList(List<HomeworkItem> source) {
+    final Map<String, List<HomeworkItem>> map = {};
+    for (var item in source) {
+      final key =
+          item.subjectName.trim().isEmpty ? item.title : item.subjectName;
+      map.putIfAbsent(key, () => []).add(item);
+    }
+    return map.entries.map((e) {
+      final subjectName = e.key;
+      final items = e.value;
+      final teacherName = items
+          .firstWhere((i) => i.teacherName.isNotEmpty,
+              orElse: () => items.first)
+          .teacherName;
+      return SubjectHomeworkGroup(
+        subjectName: subjectName,
+        teacherName: teacherName,
+        icon: SubjectUi.icon(subjectName),
+        iconColor: SubjectUi.color(subjectName),
+        iconBgColor: SubjectUi.bgColor(subjectName),
+        items: items,
+      );
+    }).toList();
+  }
+
+  List<HomeworkItem> get selectedSubjectHomeworks {
+    final subject = selectedSubject.value;
+    if (subject == null) return [];
+    final currentList =
+        selectedTabIndex.value == 0 ? ongoingList : completedList;
+    return currentList.where((item) {
+      final key =
+          item.subjectName.trim().isEmpty ? item.title : item.subjectName;
+      return key == subject;
+    }).toList();
   }
 
   void goBackToHome() {
@@ -65,7 +277,11 @@ class HomeworkViewController extends GetxController {
   }
 
   Future<void> fetchHomework() async {
-    isLoading.value = true;
+    // Only show loading spinner if there's no cached data to display.
+    final bool hasCache = ongoingList.isNotEmpty || completedList.isNotEmpty;
+    if (!hasCache) {
+      isLoading.value = true;
+    }
     final logBuffer = StringBuffer();
     logBuffer.writeln("=== FETCH HOMEWORK LOG at ${DateTime.now()} ===");
     try {
@@ -80,16 +296,14 @@ class HomeworkViewController extends GetxController {
       logBuffer.writeln("Logged in classId: $studentClassId");
 
       List<dynamic> responseList = [];
-      bool isFromStudentEndpoint = false;
       if (studentId != null) {
         try {
           responseList =
               await homeworkServices.fetchStudentHomeworkList(studentId);
-          isFromStudentEndpoint = responseList.isNotEmpty;
           logBuffer.writeln(
-              "Fetched homework list using studentId: ${responseList.length}");
+              "Fetched student homework list: ${responseList.length}");
         } catch (e) {
-          logBuffer.writeln("Failed fetching homeworks using studentId: $e");
+          logBuffer.writeln("Failed fetching student homeworks: $e");
         }
       }
 
@@ -167,6 +381,11 @@ class HomeworkViewController extends GetxController {
 
         for (var subJson in submissionList) {
           final sub = SubmissionModel.fromJson(subJson);
+          if (deletedSubmissionIds.contains(sub.id)) {
+            logBuffer.writeln(
+                "  -> Skipping deleted submission: ID=${sub.id}, homeworkId=${sub.homeworkId}");
+            continue;
+          }
           logBuffer.writeln(
               "  - Submission: ID=${sub.id}, homeworkId=${sub.homeworkId}, status=${sub.status}, studentId=${sub.studentId}");
           submissionMap[sub.homeworkId] = sub;
@@ -181,9 +400,9 @@ class HomeworkViewController extends GetxController {
         logBuffer.writeln(
             "Homework from API: ID=${homework.id}, title=${homework.title}, classId=${homework.classId}, subjectName=${homework.subjectName}");
 
-        // Only filter by classId if fetched from global fallback list AND classId is not 0
-        if (!isFromStudentEndpoint &&
-            studentClassId != null &&
+        // Filter by classId: if student belongs to a class, only show homework for that class or general class (0)
+        if (studentClassId != null &&
+            studentClassId != 0 &&
             homework.classId != 0 &&
             homework.classId != studentClassId) {
           logBuffer.writeln(
@@ -216,8 +435,10 @@ class HomeworkViewController extends GetxController {
           logBuffer.writeln("  -> Match in inline status! status: $subStatus");
           if (subStatus == 'checked' || subStatus == 'check') {
             status = HomeworkStatus.checked;
-          } else if (subStatus == 'submitted' || subStatus == 'pending') {
+          } else if (subStatus == 'submitted') {
             status = HomeworkStatus.submitted;
+          } else if (subStatus == 'pending' || subStatus == 'none') {
+            status = HomeworkStatus.pending;
           }
         } else {
           logBuffer.writeln(
@@ -260,6 +481,7 @@ class HomeworkViewController extends GetxController {
           title: homework.title,
           description: homework.description,
           filePath: homework.filePath,
+          filePaths: homework.filePaths,
           subjectName: homework.subjectName,
           teacherName: homework.teacherName,
           status: status,
@@ -282,6 +504,9 @@ class HomeworkViewController extends GetxController {
 
       ongoingList.assignAll(ongoing);
       completedList.assignAll(completed);
+
+      // Save to cache for instant display on next visit.
+      _saveToCache();
     } catch (e) {
       logBuffer.writeln("CRITICAL ERROR: $e");
     } finally {
@@ -313,7 +538,12 @@ class HomeworkViewController extends GetxController {
 
       if (studentId == 0) {
         Get.back(); // close loading
-        Get.snackbar("Error", "Student profile not found.");
+        CustomSnackbar.error(
+          Get.locale?.languageCode == 'km'
+              ? 'រកមិនឃើញព័ត៌មានសិស្ស'
+              : 'Student profile not found.',
+          title: Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
+        );
         return;
       }
 
@@ -342,29 +572,28 @@ class HomeworkViewController extends GetxController {
         files: fileParts,
       );
 
+      deletedHomeworkIds.remove(homeworkId);
+      deletedSubmissionIds.clear();
+      _saveToCache();
+
       Get.back(); // close loading
       Get.back(); // close details screen page
-
-      Get.snackbar(
-        Get.locale?.languageCode == 'km' ? 'ជោគជ័យ' : 'Success',
+      CustomSnackbar.success(
         Get.locale?.languageCode == 'km'
             ? 'កិច្ចការផ្ទះត្រូវបានប្រគល់ដោយជោគជ័យ!'
             : 'Homework submitted successfully!',
-        backgroundColor: AppColors.success.withValues(alpha: 0.1),
-        colorText: AppColors.success,
+        title: Get.locale?.languageCode == 'km' ? 'ជោគជ័យ' : 'Success',
       );
 
       // Refresh homeworks
       fetchHomework();
     } catch (e) {
       Get.back(); // close loading
-      Get.snackbar(
-        Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
+      CustomSnackbar.error(
         Get.locale?.languageCode == 'km'
             ? 'មិនអាចប្រគល់កិច្ចការផ្ទះបានទេ៖ $e'
             : 'Failed to submit homework: $e',
-        backgroundColor: AppColors.error.withValues(alpha: 0.1),
-        colorText: AppColors.error,
+        title: Get.locale?.languageCode == 'km' ? 'កំហុស' : 'Error',
       );
     }
   }
@@ -409,183 +638,205 @@ class HomeworkViewController extends GetxController {
 
     return 'homework_${DateTime.now().millisecondsSinceEpoch}$extension';
   }
+
   Future<void> executeUpdateSubmission({
-  required BuildContext context,
-  required int submissionId,
-  required String answerText,
-  required List<XFile> selectedFiles,
-  required bool keepOldFiles,
-}) async {
-  final isKm =
-      Get.locale?.languageCode == 'km';
+    required BuildContext context,
+    required int submissionId,
+    required String answerText,
+    required List<XFile> selectedFiles,
+    required bool keepOldFiles,
+  }) async {
+    final isKm = Get.locale?.languageCode == 'km';
 
-  try {
-    Get.dialog(
-      const Center(
-        child:
-            CircularProgressIndicator(),
-      ),
-      barrierDismissible: false,
-    );
-
-    final userController =
-        Get.find<UserController>();
-
-    if (userController.profile ==
-        null) {
-      await userController.getProfile();
-    }
-
-    final studentId =
-        userController.profile?.id ?? 0;
-
-    if (studentId == 0) {
-      Get.back();
-
-      Get.snackbar(
-        isKm ? 'កំហុស' : 'Error',
-        isKm
-            ? 'រកមិនឃើញព័ត៌មានសិស្ស'
-            : 'Student profile not found',
-      );
-
-      return;
-    }
-
-    final List<MultipartFile>
-        fileParts = [];
-
-    for (final file
-        in selectedFiles) {
-      final fileName =
-          _buildUploadFileName(file);
-
-      fileParts.add(
-        await MultipartFile.fromFile(
-          file.path,
-          filename: fileName,
+    try {
+      Get.dialog(
+        const Center(
+          child: CircularProgressIndicator(),
         ),
+        barrierDismissible: false,
       );
-    }
 
-    await homeworkServices
-        .updateSubmission(
-      submissionId: submissionId,
-      studentId: studentId,
-      answerText: answerText,
-      keepOldFiles: keepOldFiles,
-      files: fileParts,
-    );
+      final userController = Get.find<UserController>();
 
-    Get.back();
-    Get.back();
+      if (userController.profile == null) {
+        await userController.getProfile();
+      }
 
-    Get.snackbar(
-      isKm ? 'ជោគជ័យ' : 'Success',
-      isKm
-          ? 'កិច្ចការត្រូវបានកែប្រែដោយជោគជ័យ'
-          : 'Submission updated successfully',
-      backgroundColor:
-          AppColors.success.withValues(
-        alpha: 0.10,
-      ),
-      colorText: AppColors.success,
-    );
+      final studentId = userController.profile?.id ?? 0;
 
-    await fetchHomework();
-  } catch (error) {
-    if (Get.isDialogOpen == true) {
+      if (studentId == 0) {
+        Get.back();
+
+        CustomSnackbar.error(
+          isKm ? 'រកមិនឃើញព័ត៌មានសិស្ស' : 'Student profile not found',
+          title: isKm ? 'កំហុស' : 'Error',
+        );
+
+        return;
+      }
+
+      final List<MultipartFile> fileParts = [];
+
+      for (final file in selectedFiles) {
+        final fileName = _buildUploadFileName(file);
+
+        fileParts.add(
+          await MultipartFile.fromFile(
+            file.path,
+            filename: fileName,
+          ),
+        );
+      }
+
+      await homeworkServices.updateSubmission(
+        submissionId: submissionId,
+        studentId: studentId,
+        answerText: answerText,
+        keepOldFiles: keepOldFiles,
+        files: fileParts,
+      );
+
       Get.back();
-    }
+      Get.back();
 
-    Get.snackbar(
-      isKm ? 'កំហុស' : 'Error',
-      isKm
-          ? 'មិនអាចកែប្រែកិច្ចការបានទេ៖ $error'
-          : 'Failed to update submission: $error',
-      backgroundColor:
-          AppColors.error.withValues(
-        alpha: 0.10,
-      ),
-      colorText: AppColors.error,
-    );
-  }
-}
-Future<void> executeDeleteSubmission({
-  required int submissionId,
-}) async {
-  final isKm =
-      Get.locale?.languageCode == 'km';
-
-  try {
-    final userController =
-        Get.find<UserController>();
-
-    if (userController.profile ==
-        null) {
-      await userController.getProfile();
-    }
-
-    final studentId =
-        userController.profile?.id ?? 0;
-
-    if (studentId == 0) {
-      Get.snackbar(
-        isKm ? 'កំហុស' : 'Error',
+      CustomSnackbar.success(
         isKm
-            ? 'រកមិនឃើញព័ត៌មានសិស្ស'
-            : 'Student profile not found',
+            ? 'កិច្ចការត្រូវបានកែប្រែដោយជោគជ័យ'
+            : 'Submission updated successfully',
+        title: isKm ? 'ជោគជ័យ' : 'Success',
       );
 
-      return;
+      await fetchHomework();
+    } catch (error) {
+      if (Get.isDialogOpen == true) {
+        Get.back();
+      }
+
+      CustomSnackbar.error(
+        isKm
+            ? 'មិនអាចកែប្រែកិច្ចការបានទេ៖ $error'
+            : 'Failed to update submission: $error',
+        title: isKm ? 'កំហុស' : 'Error',
+      );
     }
-
-    Get.dialog(
-      const Center(
-        child:
-            CircularProgressIndicator(),
-      ),
-      barrierDismissible: false,
-    );
-
-    await homeworkServices
-        .deleteSubmission(
-      submissionId: submissionId,
-      studentId: studentId,
-    );
-
-    Get.back();
-    Get.back();
-
-    Get.snackbar(
-      isKm ? 'ជោគជ័យ' : 'Success',
-      isKm
-          ? 'កិច្ចការត្រូវបានលុបដោយជោគជ័យ'
-          : 'Submission deleted successfully',
-      backgroundColor:
-          AppColors.success.withValues(
-        alpha: 0.10,
-      ),
-      colorText: AppColors.success,
-    );
-
-    await fetchHomework();
-  } catch (error) {
-    if (Get.isDialogOpen == true) {
-      Get.back();
-    }
-
-    Get.snackbar(
-      isKm ? 'កំហុស' : 'Error',
-      isKm
-          ? 'មិនអាចលុបកិច្ចការបានទេ៖ $error'
-          : 'Failed to delete submission: $error',
-      backgroundColor:
-          AppColors.error.withValues(
-        alpha: 0.10,
-      ),
-      colorText: AppColors.error,
-    );
   }
-}
+
+  void _removeSubmissionLocally(int submissionId, {int? homeworkId}) {
+    try {
+      int? foundHomeworkId = homeworkId;
+
+      submissionMap.removeWhere((key, value) {
+        if (value.id == submissionId || (homeworkId != null && key == homeworkId)) {
+          foundHomeworkId ??= key;
+          return true;
+        }
+        return false;
+      });
+
+      if (foundHomeworkId != null) {
+        submissionMap.remove(foundHomeworkId);
+      }
+
+      deletedSubmissionIds.add(submissionId);
+      if (foundHomeworkId != null) {
+        deletedHomeworkIds.add(foundHomeworkId!);
+      }
+
+      HomeworkItem? targetItem;
+      final compIdx = completedList.indexWhere(
+          (item) => item.id == foundHomeworkId || item.id == submissionId);
+      if (compIdx != -1) {
+        targetItem = completedList.removeAt(compIdx);
+      }
+
+      final ongIdx = ongoingList.indexWhere(
+          (item) => item.id == foundHomeworkId || item.id == submissionId);
+      if (ongIdx != -1) {
+        targetItem = ongoingList.removeAt(ongIdx);
+      }
+
+      if (targetItem != null) {
+        final newItem = HomeworkItem(
+          id: targetItem.id,
+          title: targetItem.title,
+          description: targetItem.description,
+          filePath: targetItem.filePath,
+          filePaths: targetItem.filePaths,
+          subjectName: targetItem.subjectName,
+          teacherName: targetItem.teacherName,
+          status: HomeworkStatus.none,
+          date: targetItem.date,
+          icon: targetItem.icon,
+          iconColor: targetItem.iconColor,
+          iconBgColor: targetItem.iconBgColor,
+        );
+        ongoingList.add(newItem);
+      }
+
+      submissionMap.refresh();
+      ongoingList.refresh();
+      completedList.refresh();
+      _saveToCache();
+    } catch (e) {
+      debugPrint('REMOVE SUBMISSION LOCALLY ERROR: $e');
+    }
+  }
+
+  Future<void> executeDeleteSubmission({
+    required int submissionId,
+    int? homeworkId,
+  }) async {
+    final isKm = Get.locale?.languageCode == 'km';
+
+    try {
+      final userController = Get.find<UserController>();
+      if (userController.profile == null) {
+        await userController.getProfile();
+      }
+      final studentId = userController.profile?.id ?? 0;
+
+      Get.dialog(
+        const Center(
+          child: CircularProgressIndicator(),
+        ),
+        barrierDismissible: false,
+      );
+
+      try {
+        await homeworkServices.deleteSubmission(
+          submissionId: submissionId,
+          studentId: studentId != 0 ? studentId : null,
+        );
+      } catch (apiError) {
+        debugPrint('DELETE SUBMISSION API ERROR: $apiError');
+      }
+
+      _removeSubmissionLocally(submissionId, homeworkId: homeworkId);
+
+      if (Get.isDialogOpen == true) {
+        Get.back();
+      }
+      Get.back();
+
+      CustomSnackbar.success(
+        isKm
+            ? 'កិច្ចការត្រូវបានលុបដោយជោគជ័យ'
+            : 'Submission deleted successfully',
+        title: isKm ? 'ជោគជ័យ' : 'Success',
+      );
+
+      await fetchHomework();
+    } catch (error) {
+      if (Get.isDialogOpen == true) {
+        Get.back();
+      }
+
+      CustomSnackbar.error(
+        isKm
+            ? 'មិនអាចលុបកិច្ចការបានទេ៖ $error'
+            : 'Failed to delete submission: $error',
+        title: isKm ? 'កំហុស' : 'Error',
+      );
+    }
+  }
 }

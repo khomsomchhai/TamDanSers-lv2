@@ -161,18 +161,37 @@ class ScoreModel {
         '';
 
     // =====================================================
+    // SUBJECT SCORE VS SUMMARY SCORE
+    // =====================================================
+
+    final bool isSubjectModel = subjectName.isNotEmpty;
+
+    final double subjectScore = parseDouble(
+      subjectMap['total_score'] ??
+          subjectMap['totalScore'] ??
+          subjectMap['score'] ??
+          map['total_score'] ??
+          map['totalScore'] ??
+          map['score'] ??
+          map['monthly_average'] ??
+          map['result'],
+    );
+
+    // =====================================================
     // TOTAL SCORE
     // =====================================================
 
     final double totalScore = parseDouble(
-      map['total_score'] ??
-          map['totalScore'] ??
-          summary['total_score'] ??
+      summary['total_score'] ??
           summary['totalScore'] ??
-          summary['semester_result'] ??
-          yearlySummary['average'] ??
           rankMap['total_score'] ??
-          rankMap['totalScore'],
+          rankMap['totalScore'] ??
+          (isSubjectModel
+              ? subjectScore
+              : (map['total_score'] ??
+                  map['totalScore'] ??
+                  summary['semester_result'] ??
+                  yearlySummary['average'])),
     );
 
     // =====================================================
@@ -193,12 +212,14 @@ class ScoreModel {
     // INDIVIDUAL SCORE
     // =====================================================
 
-    final double score = parseDouble(
-      subjectMap['total_score'] ??
-          subjectMap['totalScore'] ??
-          map['score'] ??
-          summary['score'],
-    );
+    final double score = isSubjectModel
+        ? subjectScore
+        : parseDouble(
+            subjectMap['total_score'] ??
+                subjectMap['totalScore'] ??
+                map['score'] ??
+                summary['score'],
+          );
 
     // =====================================================
     // AVERAGE
@@ -220,12 +241,63 @@ class ScoreModel {
             ? averageValue.toInt().toString()
             : averageValue.toStringAsFixed(1);
 
-    // =====================================================
-    // RANK
-    // =====================================================
+    dynamic parsedRank;
+    if (map['rank'] is Map) {
+      parsedRank = map['rank']['rank'];
+    } else if (map['rank'] != null) {
+      parsedRank = map['rank'];
+    } else if (rankMap['rank'] != null) {
+      parsedRank = rankMap['rank'];
+    } else if (summary['rank'] != null) {
+      parsedRank = summary['rank'];
+    } else if (summary['yearly_rank'] != null) {
+      parsedRank = summary['yearly_rank'];
+    } else if (yearlySummary['rank'] != null) {
+      parsedRank = yearlySummary['rank'];
+    } else if (yearlySummary['yearly_rank'] != null) {
+      parsedRank = yearlySummary['yearly_rank'];
+    } else if (map['yearly_rank'] != null) {
+      parsedRank = map['yearly_rank'];
+    }
 
-    final String rank =
-        map['rank']?.toString() ?? rankMap['rank']?.toString() ?? '';
+    // -------------------------------------------------
+    // NEW API: semester_rank as Map
+    // { "rank": 4, "total_students": 6, "ranking": [...] }
+    // -------------------------------------------------
+
+    if (parsedRank == null) {
+      final dynamic semesterRank = map['semester_rank'];
+      if (semesterRank is Map) {
+        parsedRank = semesterRank['rank'];
+      } else if (semesterRank != null) {
+        parsedRank = semesterRank;
+      }
+    }
+
+    // -------------------------------------------------
+    // NEW API: yearly_rank as Map
+    // -------------------------------------------------
+
+    if (parsedRank == null) {
+      final dynamic yearlyRankMap = map['yearly_rank'];
+      if (yearlyRankMap is Map) {
+        parsedRank = yearlyRankMap['rank'];
+      }
+    }
+
+    // -------------------------------------------------
+    // Safety: if parsedRank is a Map, extract 'rank' key
+    // -------------------------------------------------
+
+    if (parsedRank is Map) {
+      parsedRank = parsedRank['rank'];
+    }
+
+    final String rank = (parsedRank != null &&
+            parsedRank.toString().trim().isNotEmpty &&
+            parsedRank.toString().trim() != 'null')
+        ? parsedRank.toString().trim()
+        : '';
 
     // =====================================================
     // SEMESTER
