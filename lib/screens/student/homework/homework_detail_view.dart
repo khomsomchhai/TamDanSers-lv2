@@ -406,10 +406,15 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
       statusText = _isKhmer ? 'បានប្រគល់' : 'Submitted';
       statusColor = AppColors.primary;
       statusBackground = AppColors.primary.withValues(alpha: 0.08);
-    } else {
-      statusText = _isKhmer ? 'មិនទាន់ប្រគល់' : 'Missing';
+    } else if (item.status == HomeworkStatus.pending ||
+        item.status == HomeworkStatus.none) {
+      statusText = _isKhmer ? 'រង់ចាំពិនិត្យ' : 'Pending';
       statusColor = const Color(0xffD97706);
       statusBackground = const Color(0xffFFFBEB);
+    } else {
+      statusText = _isKhmer ? 'មិនទាន់ប្រគល់' : 'Missing';
+      statusColor = const Color(0xffEF4444);
+      statusBackground = const Color(0xffFEF2F2);
     }
 
     return Scaffold(
@@ -434,23 +439,15 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               _buildTeacherAttachment(context, item),
               const SizedBox(height: 24),
             ],
-            if (item.status == HomeworkStatus.none)
+            if (item.status == HomeworkStatus.none ||
+                item.status == HomeworkStatus.pending)
               _buildSubmitForm(primaryThemeColor)
             else
               Obx(() {
                 final submission = widget.controller.submissionMap[item.id];
 
                 if (submission == null) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        _isKhmer
-                            ? 'រកមិនឃើញព័ត៌មានកិច្ចការដែលបានប្រគល់'
-                            : 'Submission information not found',
-                      ),
-                    ),
-                  );
+                  return _buildSubmitForm(primaryThemeColor);
                 }
 
                 if (_isEditing && item.status == HomeworkStatus.submitted) {
@@ -596,7 +593,8 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               const SizedBox(width: 10),
               Icon(
                 Icons.calendar_month_outlined,
-                color: item.status == HomeworkStatus.none
+                color: (item.status == HomeworkStatus.none ||
+                        item.status == HomeworkStatus.pending)
                     ? Colors.orange
                     : Colors.grey,
                 size: 15,
@@ -604,7 +602,8 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
-                  item.status == HomeworkStatus.none
+                  (item.status == HomeworkStatus.none ||
+                          item.status == HomeworkStatus.pending)
                       ? (_isKhmer
                           ? 'ផុតកំណត់៖ ${item.date}'
                           : 'Due: ${item.date}')
@@ -614,7 +613,8 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: item.status == HomeworkStatus.none
+                    color: (item.status == HomeworkStatus.none ||
+                            item.status == HomeworkStatus.pending)
                         ? Colors.orange
                         : Colors.grey,
                     fontSize: 12.5,
@@ -820,7 +820,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
         SwitchListTile.adaptive(
           contentPadding: EdgeInsets.zero,
           value: _keepOldFiles,
-          activeColor: AppColors.primary,
+          activeThumbColor: AppColors.primary,
           title: Text(
             _isKhmer ? 'រក្សាឯកសារចាស់' : 'Keep existing files',
             style: const TextStyle(

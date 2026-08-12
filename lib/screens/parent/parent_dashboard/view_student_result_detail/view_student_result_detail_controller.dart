@@ -77,8 +77,8 @@ class ViewStudentResultDetailController extends GetxController {
             subjectResults.assignAll(parsedResults);
             _parseSummary(data);
 
-            final double sumScore = parsedResults.fold(
-                0.0, (double sum, item) => sum + item.score);
+            final double sumScore =
+                parsedResults.fold(0.0, (double sum, item) => sum + item.score);
             final double sumMax = parsedResults.fold(
                 0.0,
                 (double sum, item) =>
@@ -215,8 +215,7 @@ class ViewStudentResultDetailController extends GetxController {
       // PARSE SUBJECT RESULTS
       // ========================================================
 
-      List<SubjectResultDetailModel> parsedResults =
-          _parseSubjectResults(data);
+      List<SubjectResultDetailModel> parsedResults = _parseSubjectResults(data);
 
       if (parsedResults.isEmpty && filter.type == 'yearly') {
         debugPrint(
@@ -529,7 +528,9 @@ class ViewStudentResultDetailController extends GetxController {
       );
 
       percentage.value = _parseDouble(
-        summary['percentage'] ?? summary['percent'] ?? (average.value > 0 ? average.value : null),
+        summary['percentage'] ??
+            summary['percent'] ??
+            (average.value > 0 ? average.value : null),
       );
 
       subjectCount.value = _parseInt(
@@ -717,19 +718,16 @@ class ViewStudentResultDetailController extends GetxController {
               item,
             );
 
-            final String subjectName =
-                map['subject_name']?.toString().trim() ??
-                    map['subject']?.toString().trim() ??
-                    map['name']?.toString().trim() ??
-                    '';
+            final String subjectName = map['subject_name']?.toString().trim() ??
+                map['subject']?.toString().trim() ??
+                map['name']?.toString().trim() ??
+                '';
 
             final String subjectId =
-                (map['subject_id'] ?? map['subjectId'] ?? map['id'])
-                    .toString();
+                (map['subject_id'] ?? map['subjectId'] ?? map['id']).toString();
 
-            final String key = subjectName.isNotEmpty
-                ? subjectName.toLowerCase()
-                : subjectId;
+            final String key =
+                subjectName.isNotEmpty ? subjectName.toLowerCase() : subjectId;
 
             if (key.isEmpty) {
               continue;
@@ -756,19 +754,16 @@ class ViewStudentResultDetailController extends GetxController {
               item,
             );
 
-            final String subjectName =
-                map['subject_name']?.toString().trim() ??
-                    map['subject']?.toString().trim() ??
-                    map['name']?.toString().trim() ??
-                    '';
+            final String subjectName = map['subject_name']?.toString().trim() ??
+                map['subject']?.toString().trim() ??
+                map['name']?.toString().trim() ??
+                '';
 
             final String subjectId =
-                (map['subject_id'] ?? map['subjectId'] ?? map['id'])
-                    .toString();
+                (map['subject_id'] ?? map['subjectId'] ?? map['id']).toString();
 
-            final String key = subjectName.isNotEmpty
-                ? subjectName.toLowerCase()
-                : subjectId;
+            final String key =
+                subjectName.isNotEmpty ? subjectName.toLowerCase() : subjectId;
 
             if (key.isEmpty) {
               continue;
