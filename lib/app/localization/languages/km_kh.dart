@@ -227,6 +227,8 @@ Map<String, String> kmKh = {
   'yearly': 'ប្រចាំឆ្នាំ',
   'monthly': 'ប្រចាំខែ',
   'semester': 'ប្រចាំឆមាស',
+  'ranking_for_year': 'ចំណាត់ថ្នាក់ប្រចាំឆ្នាំ',
+  'ranking_for_semester': 'ចំណាត់ថ្នាក់ប្រចាំឆមាស',
   'result_yearly': 'លទ្ធផលប្រចាំឆ្នាំ',
 
 

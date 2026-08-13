@@ -30,6 +30,9 @@ class ResultScreenViewController extends GetxController
   final result = <ScoreModel>[].obs;
   final rank = Rxn<ScoreModel>();
   final yearlyRank = Rxn<ScoreModel>();
+final isSemesterRankLoading = false.obs;
+final semesterRank = Rxn<ScoreModel>();
+
 
   final Map<int, String> months = {
     1: 'month_1',
@@ -92,19 +95,23 @@ class ResultScreenViewController extends GetxController
     } catch (_) {}
   }
 
-  Future<void> changeView(ResultViewMode mode) async {
-    selectedView.value = mode;
+Future<void> changeView(ResultViewMode mode) async {
+  selectedView.value = mode;
 
-    if (mode == ResultViewMode.monthly) {
+  switch (mode) {
+    case ResultViewMode.monthly:
       await getRank();
-      return;
-    }
+      break;
 
-    if (mode == ResultViewMode.yearly) {
+    case ResultViewMode.semester:
+      await getSemesterRank();
+      break;
+
+    case ResultViewMode.yearly:
       await getYearRank();
-    }
+      break;
   }
-
+}
   // =========================================================
   // YEARLY RANK
   // =========================================================
@@ -136,6 +143,44 @@ class ResultScreenViewController extends GetxController
       isYearRankLoading.value = false;
     }
   }
+Future<void> getSemesterRank() async {
+  try {
+    isSemesterRankLoading.value = true;
+
+    semesterRank.value = null;
+
+    debugPrint(
+      'GET SEMESTER RANK: semester=${selectedSemester.value}',
+    );
+
+    final ScoreModel? response =
+        await resultApi.getSemesterRank(
+      semester: selectedSemester.value,
+    );
+
+    semesterRank.value = response;
+
+    debugPrint(
+      'SEMESTER RANK RESPONSE => '
+      'semester=${response?.semester}, '
+      'rank=${response?.rank}, '
+      'totalScore=${response?.totalScore}, '
+      'average=${response?.average}',
+    );
+  } catch (e, stackTrace) {
+    debugPrint(
+      'GET SEMESTER RANK ERROR: $e',
+    );
+
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+
+    semesterRank.value = null;
+  } finally {
+    isSemesterRankLoading.value = false;
+  }
+}
 
   // =========================================================
   // LOAD RESULT
@@ -623,37 +668,43 @@ class ResultScreenViewController extends GetxController
   // CHANGE SEMESTER
   // =========================================================
 
-  Future<void> changeSemester(
-    int semester,
-  ) async {
-    if (semester < 1 || semester > 2) {
-      return;
-    }
-
-    if (selectedSemester.value == semester) {
-      return;
-    }
-
-    selectedSemester.value = semester;
-
-    selectedMonth.value = null;
-    rank.value = null;
-
-    _selectLatestMonthForCurrentSemester();
-
-    final int targetIndex = semester - 1;
-
-    if (tabController.index != targetIndex) {
-      tabController.animateTo(
-        targetIndex,
-      );
-    }
-
-    if (selectedView.value == ResultViewMode.monthly) {
-      await getRank();
-    }
+Future<void> changeSemester(
+  int semester,
+) async {
+  if (semester < 1 || semester > 2) {
+    return;
   }
 
+  selectedSemester.value = semester;
+
+  selectedMonth.value = null;
+
+  rank.value = null;
+  semesterRank.value = null;
+
+  _selectLatestMonthForCurrentSemester();
+
+  final int targetIndex = semester - 1;
+
+  if (tabController.index != targetIndex) {
+    tabController.animateTo(
+      targetIndex,
+    );
+  }
+
+  switch (selectedView.value) {
+    case ResultViewMode.monthly:
+      await getRank();
+      break;
+
+    case ResultViewMode.semester:
+      await getSemesterRank();
+      break;
+
+    case ResultViewMode.yearly:
+      break;
+  }
+}
   // =========================================================
   // CHANGE MONTH
   // =========================================================
@@ -716,56 +767,61 @@ class ResultScreenViewController extends GetxController
   // =========================================================
   // REFRESH
   // =========================================================
+Future<void> refreshResult() async {
+  final int oldSemester = selectedSemester.value;
+  final int? oldMonth = selectedMonth.value;
 
-  Future<void> refreshResult() async {
-    final int oldSemester = selectedSemester.value;
+  try {
+    isLoading.value = true;
 
-    final int? oldMonth = selectedMonth.value;
+    final List<ScoreModel> response =
+        await resultApi.getResult();
 
-    try {
-      isLoading.value = true;
+    result.assignAll(response);
 
-      final List<ScoreModel> response = await resultApi.getResult();
+    _storage.write(
+      _cacheKeyResult,
+      response.map((e) => e.toJson()).toList(),
+    );
 
-      result.assignAll(
-        response,
-      );
+    if (hasSemester(oldSemester)) {
+      selectedSemester.value = oldSemester;
 
-      if (hasSemester(
-        oldSemester,
-      )) {
-        selectedSemester.value = oldSemester;
-
-        if (oldMonth != null &&
-            semesterMonths.contains(
-              oldMonth,
-            )) {
-          selectedMonth.value = oldMonth;
-        } else {
-          _selectLatestMonthForCurrentSemester();
-        }
+      if (oldMonth != null &&
+          semesterMonths.contains(oldMonth)) {
+        selectedMonth.value = oldMonth;
       } else {
-        _selectInitialSemesterAndMonth();
+        _selectLatestMonthForCurrentSemester();
       }
-
-      if (selectedView.value == ResultViewMode.monthly) {
-        await getRank();
-      } else if (selectedView.value == ResultViewMode.yearly) {
-        await getYearRank();
-      }
-    } catch (e, stackTrace) {
-      debugPrint(
-        'REFRESH RESULT ERROR: $e',
-      );
-
-      debugPrintStack(
-        stackTrace: stackTrace,
-      );
-    } finally {
-      isLoading.value = false;
+    } else {
+      _selectInitialSemesterAndMonth();
     }
-  }
 
+    switch (selectedView.value) {
+      case ResultViewMode.monthly:
+        await getRank();
+        break;
+
+      case ResultViewMode.semester:
+        await getSemesterRank();
+        break;
+
+      case ResultViewMode.yearly:
+        await getYearRank();
+        break;
+    }
+  } catch (e, stackTrace) {
+    debugPrint(
+      'REFRESH RESULT ERROR: $e',
+    );
+
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+  } finally {
+    isLoading.value = false;
+  }
+}
   // =========================================================
   // CLOSE
   // =========================================================
