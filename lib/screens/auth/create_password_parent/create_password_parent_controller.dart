@@ -53,12 +53,15 @@ class CreatePasswordParentViewController extends GetxController {
 
     try {
       isLoading.value = true;
-      final response = await authService.createParentPassword(
+      await authService.createParentPassword(
         setupToken: setupToken!,
         newPassword: newPassword,
         confirmPassword: confirmPassword,
       );
-      CustomSnackbar.success(response['message']?.toString() ?? 'password_changed_successfully'.tr);
+      CustomSnackbar.success(
+        'parent_password_created_successfully'.tr,
+        title: 'success'.tr,
+      );
       Get.offAllNamed(
         AppRoutes.loginScreen,
         arguments: {'defaultTab': 1},
@@ -76,8 +79,8 @@ class CreatePasswordParentViewController extends GetxController {
 
   @override
   void onClose() {
-    newPasswordCtrl.dispose();
-    confirmPasswordCtrl.dispose();
+    newPasswordCtrl.clear();
+    confirmPasswordCtrl.clear();
     super.onClose();
   }
 }

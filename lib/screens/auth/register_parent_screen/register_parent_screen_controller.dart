@@ -19,8 +19,13 @@ class RegisterParentScreenViewController extends GetxController {
         parentPhone: normalizedPhone,
       );
 
-      final message = response['message']?.toString() ?? 'otp_sent'.tr;
-      CustomSnackbar.success(message);
+      final rawMessage = response['message']?.toString();
+      final message = rawMessage == null ||
+              rawMessage.toLowerCase() == 'otp sent successfully' ||
+              rawMessage.toLowerCase() == 'an otp has been sent to your phone number.'
+          ? 'otp_sent'.tr
+          : rawMessage;
+      CustomSnackbar.success(message, title: 'success'.tr);
       // Navigate to OTP verification screen
       Get.toNamed(
         AppRoutes.parentVerifyOtp,
@@ -45,8 +50,8 @@ class RegisterParentScreenViewController extends GetxController {
 
   @override
   void onClose() {
-    studentIdCtrl.dispose();
-    phoneCtrl.dispose();
+    studentIdCtrl.clear();
+    phoneCtrl.clear();
     super.onClose();
   }
 }

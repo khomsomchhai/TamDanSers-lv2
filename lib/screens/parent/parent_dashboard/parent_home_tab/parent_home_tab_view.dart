@@ -237,7 +237,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
 
   Widget _buildChildSection() {
     return Obx(() {
-      if (controller.students.isEmpty) {
+      if (controller.students.isEmpty || !controller.hasValidSelectedChild) {
         return Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),

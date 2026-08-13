@@ -1552,6 +1552,60 @@ class ParentHomeTabViewController extends GetxController {
     }
   }
 
+  bool get hasValidSelectedChild {
+    if (selectedChild.value == null) {
+      return false;
+    }
+
+    final int? studentId = _parseStudentId(selectedChild.value);
+    if (studentId == null) {
+      return false;
+    }
+
+    final dynamic name = selectedChild.value?['student_name'] ??
+        selectedChild.value?['name'] ??
+        selectedChild.value?['full_name'] ??
+        selectedChild.value?['studentName'];
+
+    final dynamic code = selectedChild.value?['student_code'] ??
+        selectedChild.value?['code'] ??
+        selectedChild.value?['studentCode'];
+
+    final String nameText = name?.toString().trim() ?? '';
+    final String codeText = code?.toString().trim() ?? '';
+
+    return nameText.isNotEmpty || codeText.isNotEmpty;
+  }
+
+  Map<String, dynamic>? _firstValidChild(
+    List<Map<String, dynamic>> children,
+  ) {
+    for (final Map<String, dynamic> child in children) {
+      final int? studentId = _parseStudentId(child);
+      if (studentId == null) {
+        continue;
+      }
+
+      final dynamic name = child['student_name'] ??
+          child['name'] ??
+          child['full_name'] ??
+          child['studentName'];
+
+      final dynamic code = child['student_code'] ??
+          child['code'] ??
+          child['studentCode'];
+
+      final String nameText = name?.toString().trim() ?? '';
+      final String codeText = code?.toString().trim() ?? '';
+
+      if (nameText.isNotEmpty || codeText.isNotEmpty) {
+        return child;
+      }
+    }
+
+    return null;
+  }
+
   void _loadFromStorageEarly() {
     try {
       final dynamic cachedData = box.read('students');
@@ -1562,16 +1616,22 @@ class ParentHomeTabViewController extends GetxController {
             cachedStudents.add(Map<String, dynamic>.from(item));
           }
         }
-        if (cachedStudents.isNotEmpty) {
+
+        final Map<String, dynamic>? validChild = _firstValidChild(cachedStudents);
+
+        if (cachedStudents.isNotEmpty && validChild != null) {
           students.assignAll(cachedStudents);
-          selectedChild.value = cachedStudents.first;
+          selectedChild.value = validChild;
           isLoading.value = false;
 
-          final int? studentId = _parseStudentId(cachedStudents.first);
+          final int? studentId = _parseStudentId(validChild);
           if (studentId != null) {
             _loadCachedSchedule(studentId);
             attendanceController.loadAttendanceByStudent(studentId);
           }
+        } else {
+          students.clear();
+          selectedChild.value = null;
         }
       }
     } catch (e) {
@@ -1698,7 +1758,12 @@ class ParentHomeTabViewController extends GetxController {
         }
       }
 
-      childToSelect ??= students.first;
+      childToSelect ??= _firstValidChild(students.toList());
+
+      if (childToSelect == null) {
+        selectedChild.value = null;
+        return;
+      }
 
       selectedChild.value = childToSelect;
 
@@ -1784,16 +1849,18 @@ class ParentHomeTabViewController extends GetxController {
         cachedStudents,
       );
 
-      if (students.isEmpty) {
+      final Map<String, dynamic>? validChild = _firstValidChild(cachedStudents);
+
+      if (validChild == null) {
         _clearStudentData();
 
         return;
       }
 
-      selectedChild.value = students.first;
+      selectedChild.value = validChild;
 
       final int? studentId = _parseStudentId(
-        students.first,
+        validChild,
       );
 
       if (studentId != null) {
