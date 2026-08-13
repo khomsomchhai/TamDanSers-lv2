@@ -292,35 +292,59 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
   // MONTHLY VIEW
   // ===========================================================
 
-  Widget monthlyView() {
-    return Column(
-      children: [
-        SizedBox(
-          height: 34,
-          child: monthList(),
-        ),
-        const SizedBox(
-          height: 16,
-        ),
-        Obx(
-          () {
-            if (controller.isRankLoading.value) {
-              return rankSkeleton();
-            }
+Widget monthlyView() {
+  return Column(
+    children: [
+      SizedBox(
+        height: 34,
+        child: monthList(),
+      ),
 
-            return CustomScoreCard();
-          },
-        ),
-        const SizedBox(
-          height: 18,
-        ),
-        Expanded(
-          child: scoreList(),
-        ),
-      ],
-    );
-  }
+      const SizedBox(height: 16),
 
+      Obx(
+        () {
+          if (controller.isRankLoading.value) {
+            return rankSkeleton();
+          }
+
+          final ScoreModel? data =
+              controller.rank.value;
+
+          final double totalScore =
+              (data?.totalScore ?? 0).toDouble();
+
+          final double maxScore =
+              (data?.maxScore ?? 100).toDouble();
+
+          final double progress = maxScore > 0
+              ? (totalScore / maxScore)
+                  .clamp(0.0, 1.0)
+              : 0;
+
+          final int? month =
+              controller.selectedMonth.value;
+
+          final String monthName =
+              month == null
+                  ? ''
+                  : (controller.months[month]?.tr ??
+                      '');
+
+          return CustomScoreCard(
+  mode: ResultViewMode.monthly,
+);
+        },
+      ),
+
+      const SizedBox(height: 18),
+
+      Expanded(
+        child: scoreList(),
+      ),
+    ],
+  );
+}
   // ===========================================================
   // MONTH LIST
   // ===========================================================
@@ -568,265 +592,174 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
   // SEMESTER VIEW
   // ===========================================================
 
-  Widget semesterView() {
-    final ThemeData theme = Get.theme;
+Widget semesterView() {
+  final ThemeData theme = Get.theme;
 
-    return Obx(
-      () {
-        final double monthlyAverage = controller.semesterMonthlyAverage;
+  return Obx(
+    () {
+      final List<Map<String, dynamic>> monthly =
+          controller.semesterMonthlyResults;
 
-        final double semesterResult = controller.semesterResult;
-
-        final List<Map<String, dynamic>> monthly =
-            controller.semesterMonthlyResults;
-
-        return RefreshIndicator(
-          onRefresh: controller.refreshResult,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(
-              bottom: 24,
-            ),
-            children: [
-              // =========================================
-              // SEMESTER SUMMARY
-              // =========================================
-
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(
-                  22,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(
-                    22,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(
-                        0.16,
-                      ),
-                      blurRadius: 16,
-                      offset: const Offset(
-                        0,
-                        7,
-                      ),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(
-                              0.15,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              13,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.school_outlined,
-                            color: Colors.white,
-                            size: 23,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        Text(
-                          controller.selectedSemester.value == 1
-                              ? 'semester 1'.tr
-                              : 'semester 2'.tr,
-                          style: AppTextStyles.titleLarge.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: semesterSummaryItem(
-                            title: 'average_month'.tr,
-                            value: monthlyAverage.toStringAsFixed(
-                              2,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 1,
-                          height: 52,
-                          color: Colors.white24,
-                        ),
-                        Expanded(
-                          child: semesterSummaryItem(
-                            title: 'result'.tr,
-                            value: semesterResult.toStringAsFixed(
-                              2,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(
-                height: 24,
-              ),
-
-              Text(
-                'ranking_for_month'.tr,
-                style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              if (monthly.isEmpty) emptyResultCard(),
-
-              // =========================================
-              // Monthly result cards
-              // Month 0 can never appear here
-              // =========================================
-
-              ...monthly.map(
-                (
-                  Map<String, dynamic> item,
-                ) {
-                  final int month = item['month'] as int;
-
-                  if (month < 1 || month > 12) {
-                    return const SizedBox.shrink();
-                  }
-
-                  final double total = item['totalScore'] as double;
-
-                  final int subjects = item['subjects'] as int;
-
-                  final double average = item['average'] as double;
-
-                  final String monthName =
-                      controller.months[month]?.tr ?? 'Month $month';
-
-                  return Container(
-                    margin: const EdgeInsets.only(
-                      bottom: 10,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: theme.cardColor,
-                      borderRadius: BorderRadius.circular(
-                        16,
-                      ),
-                      border: Border.all(
-                        color: theme.dividerColor.withOpacity(
-                          0.70,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withOpacity(
-                              0.10,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              12,
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.calendar_month_outlined,
-                            size: 21,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-
-                        const SizedBox(
-                          width: 14,
-                        ),
-
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                monthName,
-                                style: AppTextStyles.titleSmall.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 4,
-                              ),
-                              Text(
-                                'Total '
-                                '${total.toStringAsFixed(0)}'
-                                '  •  '
-                                '$subjects Subjects',
-                                style: AppTextStyles.bodyMedium.copyWith(
-                                  color: theme.textTheme.bodyMedium?.color
-                                      ?.withOpacity(
-                                    0.60,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(
-                          width: 10,
-                        ),
-
-                        // =====================================
-                        // Smaller average font
-                        // =====================================
-
-                        Text(
-                          average.toStringAsFixed(
-                            2,
-                          ),
-                          style: AppTextStyles.titleMedium.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
+      return RefreshIndicator(
+        onRefresh: controller.refreshResult,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(
+            bottom: 24,
           ),
-        );
-      },
-    );
-  }
+          children: [
+            // ==========================================
+            // SEMESTER RANK + RESULT
+            // ONLY ONE CUSTOM SCORE CARD
+            // ==========================================
 
+            if (controller.isSemesterRankLoading.value)
+              rankSkeleton()
+            else
+              CustomScoreCard(
+                mode: ResultViewMode.semester,
+              ),
+
+            const SizedBox(height: 24),
+
+            // ==========================================
+            // MONTHLY RESULT TITLE
+            // ==========================================
+
+            Text(
+              'លទ្ធផលប្រចាំខែ',
+              style: AppTextStyles.titleMedium.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            if (monthly.isEmpty) emptyResultCard(),
+
+            // ==========================================
+            // MONTH RESULTS
+            // ==========================================
+
+            ...monthly.map(
+              (Map<String, dynamic> item) {
+                final int month = item['month'] as int;
+
+                if (month < 1 || month > 12) {
+                  return const SizedBox.shrink();
+                }
+
+                final double total =
+                    item['totalScore'] as double;
+
+                final int subjects =
+                    item['subjects'] as int;
+
+                final double average =
+                    item['average'] as double;
+
+                final String monthName =
+                    controller.months[month]?.tr ??
+                        'Month $month';
+
+                return Container(
+                  margin: const EdgeInsets.only(
+                    bottom: 10,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius:
+                        BorderRadius.circular(16),
+                    border: Border.all(
+                      color: theme.dividerColor
+                          .withOpacity(0.70),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary
+                              .withOpacity(0.10),
+                          borderRadius:
+                              BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.calendar_month_outlined,
+                          size: 21,
+                          color:
+                              theme.colorScheme.primary,
+                        ),
+                      ),
+
+                      const SizedBox(width: 14),
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              monthName,
+                              style: AppTextStyles
+                                  .titleSmall
+                                  .copyWith(
+                                fontWeight:
+                                    FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(height: 4),
+
+                            Text(
+                              'Total ${total.toStringAsFixed(0)}'
+                              '  •  '
+                              '$subjects Subjects',
+                              style: AppTextStyles
+                                  .bodyMedium
+                                  .copyWith(
+                                color: theme
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.color
+                                    ?.withOpacity(0.60),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 10),
+
+                      Text(
+                        average.toStringAsFixed(2),
+                        style: AppTextStyles
+                            .titleMedium
+                            .copyWith(
+                          color:
+                              theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
   // ===========================================================
   // SEMESTER SUMMARY ITEM
   // ===========================================================
@@ -872,209 +805,106 @@ class ResultScreenView extends GetView<ResultScreenViewController> {
   //   Semester Result
   // ===========================================================
 
-  Widget yearlyView() {
-    final ThemeData theme = Get.theme;
+Widget yearlyView() {
+  final ThemeData theme = Get.theme;
 
-    return Obx(
-      () {
-        final double finalAverage = controller.yearlyAverage;
+  return Obx(
+    () {
+      final double finalAverage =
+          controller.yearlyAverage;
 
-        final ScoreModel? rankData = controller.yearlyRank.value;
+      final ScoreModel? rankData =
+          controller.yearlyRank.value;
 
-        final String rank =
-            rankData?.rank.isNotEmpty == true ? rankData!.rank : '-';
+      final String rank =
+          rankData?.rank.isNotEmpty == true
+              ? rankData!.rank
+              : '-';
 
-        return RefreshIndicator(
-          onRefresh: controller.refreshResult,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(
-              bottom: 30,
-            ),
-            children: [
-              // ===============================================
-              // YEARLY SUMMARY CARD
-              // ===============================================
+      final String average =
+          rankData?.average.isNotEmpty == true
+              ? rankData!.average
+              : finalAverage.toStringAsFixed(2);
 
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 22,
-                  horizontal: 18,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(
-                    22,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(
-                        0.18,
-                      ),
-                      blurRadius: 18,
-                      offset: const Offset(
-                        0,
-                        8,
-                      ),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    // -----------------------------------------
-                    // Title
-                    // -----------------------------------------
+      final double progress =
+          (finalAverage / 100).clamp(
+        0.0,
+        1.0,
+      );
 
-                    Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(
-                              0.15,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              13,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.workspace_premium_outlined,
-                            color: Colors.white,
-                            size: 23,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        Expanded(
-                          child: Text(
-                            'result_yearly'.tr,
-                            style: AppTextStyles.titleLarge.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(
-                      height: 24,
-                    ),
-
-                    // -----------------------------------------
-                    // Average + Rank
-                    // -----------------------------------------
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: yearlyTopSummaryItem(
-                            title: 'average_year'.tr,
-                            value: finalAverage.toStringAsFixed(
-                              2,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 1,
-                          height: 62,
-                          color: Colors.white24,
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Text(
-                                'rank'.tr,
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.bodyLarge.copyWith(
-                                  color: Colors.white70,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 7,
-                              ),
-                              controller.isYearRankLoading.value
-                                  ? const SizedBox(
-                                      width: 26,
-                                      height: 26,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : Text(
-                                      rank,
-                                      style: AppTextStyles.titleLarge.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 25,
-                                      ),
-                                    ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(
-                height: 26,
-              ),
-
-              // ===============================================
-              // SECTION TITLE
-              // ===============================================
-
-              Text(
-                'result_yearly'.tr,
-                style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(
-                height: 14,
-              ),
-
-              // ===============================================
-              // SEMESTER 1
-              // ===============================================
-
-              yearlySemesterSummaryCard(
-                theme: theme,
-                semester: 1,
-                monthlyAverage: controller.semester1MonthlyAverage,
-                examAverage: controller.semester1ExamAverage,
-                semesterResult: controller.semester1Result,
-              ),
-
-              const SizedBox(
-                height: 14,
-              ),
-
-              // ===============================================
-              // SEMESTER 2
-              // ===============================================
-
-              yearlySemesterSummaryCard(
-                theme: theme,
-                semester: 2,
-                monthlyAverage: controller.semester2MonthlyAverage,
-                examAverage: controller.semester2ExamAverage,
-                semesterResult: controller.semester2Result,
-              ),
-            ],
+      return RefreshIndicator(
+        onRefresh: controller.refreshResult,
+        child: ListView(
+          physics:
+              const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(
+            bottom: 30,
           ),
-        );
-      },
-    );
-  }
+          children: [
+            // ==========================================
+            // YEAR RANK
+            // ==========================================
 
+            if (controller.isYearRankLoading.value)
+              rankSkeleton()
+            else
+              CustomScoreCard(
+  mode: ResultViewMode.yearly,
+),
+
+            const SizedBox(height: 26),
+
+            // ==========================================
+            // YEAR RESULT
+            // ==========================================
+
+            Text(
+              'result_yearly'.tr,
+              style:
+                  AppTextStyles.titleMedium.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            // ==========================================
+            // SEMESTER 1
+            // ==========================================
+
+            yearlySemesterSummaryCard(
+              theme: theme,
+              semester: 1,
+              monthlyAverage:
+                  controller.semester1MonthlyAverage,
+              examAverage:
+                  controller.semester1ExamAverage,
+              semesterResult:
+                  controller.semester1Result,
+            ),
+
+            const SizedBox(height: 14),
+
+            // ==========================================
+            // SEMESTER 2
+            // ==========================================
+
+            yearlySemesterSummaryCard(
+              theme: theme,
+              semester: 2,
+              monthlyAverage:
+                  controller.semester2MonthlyAverage,
+              examAverage:
+                  controller.semester2ExamAverage,
+              semesterResult:
+                  controller.semester2Result,
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
   // ===========================================================
   // YEARLY TOP SUMMARY ITEM
   // ===========================================================
