@@ -247,6 +247,8 @@ Map<String, String> enUs = {
   'yearly': 'Yearly',
   'monthly': 'Monthly',
   'semester': 'Semester',
+  'ranking_for_year': 'Ranking for Year',
+  'ranking_for_semester': 'Ranking for Semester',
 
   // Months
   'month_1': 'January',

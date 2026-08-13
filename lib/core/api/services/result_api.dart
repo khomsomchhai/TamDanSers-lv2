@@ -241,7 +241,69 @@ class ResultApi {
 
     return ScoreModel.fromMap(data);
   }
+Future<ScoreModel?> getSemesterRank({
+  required int semester,
+}) async {
+  try {
+    final dynamic response =
+        await baseApiService.get(
+      endpoint:
+          '/scores/student/semester-rank?semester=$semester',
+    );
 
+    debugPrint(
+      'SEMESTER RANK RESPONSE: $response',
+    );
+
+    if (response == null) {
+      return null;
+    }
+
+    Map<String, dynamic> data;
+
+    if (response is Map<String, dynamic>) {
+      data = response;
+    } else if (response is Map) {
+      data = Map<String, dynamic>.from(
+        response,
+      );
+    } else {
+      debugPrint(
+        'SEMESTER RANK INVALID RESPONSE TYPE: '
+        '${response.runtimeType}',
+      );
+
+      return null;
+    }
+
+    if (data.isEmpty) {
+      return null;
+    }
+
+    final ScoreModel model =
+        ScoreModel.fromMap(data);
+
+    debugPrint(
+      'SEMESTER RANK PARSED => '
+      'rank=${model.rank}, '
+      'semester=${model.semester}, '
+      'totalScore=${model.totalScore}, '
+      'average=${model.average}',
+    );
+
+    return model;
+  } catch (e, stackTrace) {
+    debugPrint(
+      'GET SEMESTER RANK API ERROR: $e',
+    );
+
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+
+    rethrow;
+  }
+}
   // =====================================================
   // YEAR RANK
   // =====================================================
