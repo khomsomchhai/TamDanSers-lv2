@@ -42,8 +42,10 @@ class ParentVerifyOtpViewController extends GetxController {
 
     if (digits.isNotEmpty && index < 5) {
       otpFocusNodes[index + 1].requestFocus();
-    } else if (digits.isEmpty && index > 0) {
-      otpFocusNodes[index - 1].requestFocus();
+    } else {
+      if (digits.isEmpty && index > 0) {
+        otpFocusNodes[index - 1].requestFocus();
+      }
     }
   }
 
@@ -54,15 +56,17 @@ class ParentVerifyOtpViewController extends GetxController {
     }
     try {
       isLoading.value = true;
-      final response = await authService.requestParentOtp(
+      await authService.requestParentOtp(
         studentCode: studentCode,
         parentPhone: parentPhone,
       );
-      final message = response['message']?.toString() ?? 'otp_resent_successfully'.tr;
-      CustomSnackbar.success(message);
+      CustomSnackbar.success('otp_resent_successfully'.tr);
     } catch (e) {
-      if (e is DioException) CustomSnackbar.error(handleDioException(e));
-      else CustomSnackbar.error('something_went_wrong_retry'.tr);
+      if (e is DioException) {
+        CustomSnackbar.error(handleDioException(e));
+      } else {
+        CustomSnackbar.error('something_went_wrong_retry'.tr);
+      }
     } finally {
       isLoading.value = false;
     }
@@ -83,10 +87,10 @@ class ParentVerifyOtpViewController extends GetxController {
       );
       final setupToken = response['setup_token']?.toString();
       if (setupToken == null || setupToken.isEmpty) {
-        CustomSnackbar.success(response['message']?.toString() ?? 'otp_sent'.tr);
+        CustomSnackbar.success('otp_verified_successfully'.tr, title: 'success'.tr);
         Get.offAllNamed(AppRoutes.loginScreen);
       } else {
-        CustomSnackbar.success(response['message']?.toString() ?? 'otp_sent'.tr);
+        CustomSnackbar.success('otp_verified_successfully'.tr, title: 'success'.tr);
         Get.toNamed(
           AppRoutes.parentCreatePassword,
           arguments: {
@@ -108,10 +112,10 @@ class ParentVerifyOtpViewController extends GetxController {
   @override
   void onClose() {
     for (final c in otpControllers) {
-      c.dispose();
+      c.clear();
     }
     for (final n in otpFocusNodes) {
-      n.dispose();
+      n.unfocus();
     }
     super.onClose();
   }

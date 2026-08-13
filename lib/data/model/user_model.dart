@@ -19,6 +19,23 @@ class UserModel {
     this.phone,
   });
 
+  static String _normalizeDisplayName(
+    String? raw,
+    String firstName,
+    String lastName,
+  ) {
+    final String value = raw?.trim() ?? '';
+    if (value.isEmpty) {
+      return '$firstName $lastName'.trim();
+    }
+
+    if (value.toLowerCase() == 'guardian') {
+      return '$firstName $lastName'.trim();
+    }
+
+    return value;
+  }
+
   String get displayName =>
       fullName.isNotEmpty ? fullName : '$firstName $lastName'.trim();
 
@@ -27,6 +44,16 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic>? json) {
     final data = json ?? <String, dynamic>{};
 
+    final String firstName = data['first_name']?.toString() ?? '';
+    final String lastName = data['last_name']?.toString() ?? '';
+    final String rawFullName = data['full_name']?.toString() ?? '';
+
+    final String sanitizedFullName = _normalizeDisplayName(
+      rawFullName,
+      firstName,
+      lastName,
+    );
+
     return UserModel(
       id: data['id'] is int
           ? data['id'] as int
@@ -34,20 +61,13 @@ class UserModel {
                 data['id']?.toString() ?? '',
               ) ??
               0,
-      firstName:
-          data['first_name']?.toString() ?? '',
-      lastName:
-          data['last_name']?.toString() ?? '',
-      fullName:
-          data['full_name']?.toString() ?? '',
-      email:
-          data['email']?.toString() ?? '',
-      role:
-          data['role']?.toString() ?? '',
-      avatarUrl:
-          data['avatar_url']?.toString(),
-      phone:
-          data['phone']?.toString(),
+      firstName: firstName,
+      lastName: lastName,
+      fullName: sanitizedFullName,
+      email: data['email']?.toString() ?? '',
+      role: data['role']?.toString() ?? '',
+      avatarUrl: data['avatar_url']?.toString(),
+      phone: data['phone']?.toString(),
     );
   }
 

@@ -26,6 +26,19 @@ class ProfileModel {
   factory ProfileModel.fromJson(Map<String, dynamic>? json) {
     final data = json ?? <String, dynamic>{};
 
+    String sanitizePlaceholderName(String? value) {
+      final String text = value?.trim() ?? '';
+      if (text.isEmpty) {
+        return '';
+      }
+
+      if (text.toLowerCase() == 'guardian') {
+        return '';
+      }
+
+      return text;
+    }
+
     int parseInt(dynamic value) {
       if (value is int) return value;
       if (value is num) return value.toInt();
@@ -41,7 +54,7 @@ class ProfileModel {
       className: data['class_name'] ?? '',
       rollNo: data['roll_no']?.toString(),
       gender: data['gender'] ?? '',
-      guardianName: data['guardian_name'] ?? '',
+      guardianName: sanitizePlaceholderName(data['guardian_name']),
       guardianPhone: data['guardian_phone'] ?? '',
       address: data['address'] ?? '',
     );

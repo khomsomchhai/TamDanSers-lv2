@@ -70,7 +70,9 @@ Map<String, String> kmKh = {
   'please_enter_otp': 'សូមបញ្ចូល OTP 6 ខ្ទង់។',
   'passwords_mismatch': 'ពាក្យសម្ងាត់ថ្មី និងពាក្យសម្ងាត់បញ្ជាក់មិនត្រូវគ្នា។',
   'password_changed_successfully': 'ពាក្យសម្ងាត់ត្រូវបានផ្លាស់ប្ដូរដោយជោគជ័យ។',
+  'parent_password_created_successfully': 'ពាក្យសម្ងាត់ឪពុកម្តាយត្រូវបានបង្កើតដោយជោគជ័យ។',
   'otp_resent_successfully': 'OTP ត្រូវបានផ្ញើម្តងទៀតដោយជោគជ័យ។',
+  'otp_verified_successfully': 'OTP ត្រូវបានផ្ទៀងផ្ទាត់ដោយជោគជ័យ។',
   'invalid_otp_password': 'OTP ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ។',
   'requested_information_not_found': 'ព័ត៌មានដែលបានស្នើរកមិនឃើញ។',
   'request_already_exists': 'ការស្នើរនេះមានរួចហើយ។',
@@ -406,6 +408,8 @@ Map<String, String> kmKh = {
 // Common
 'success': 'ជោគជ័យ',
 'error': 'មានបញ្ហា',
+'warning': 'ព្រមាន',
+'info': 'ព័ត៌មាន',
 
   //prent
   'hello_parent': 'សួស្ដីអាណាព្យាបាល\n សិស្ស',
