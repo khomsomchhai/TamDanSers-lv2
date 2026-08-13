@@ -1,42 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-
+import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/screens/student/attendance_scan/attendance_scan_controller.dart';
 
 part 'attendance_scan_binding.dart';
 
-class AttendanceScanView
-    extends GetView<AttendanceScanController> {
-  const AttendanceScanView({
-    super.key,
-  });
+class AttendanceScanView extends GetView<AttendanceScanController> {
+  const AttendanceScanView({super.key});
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
+  Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double scanSize = screenSize.width * 0.72;
+    final double scanLeft = (screenSize.width - scanSize) / 2;
+    final double scanTop = screenSize.height / 2.3 - scanSize / 2;
     return Scaffold(
-      backgroundColor:
-          Colors.black,
-
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title:
-            const Text(
-          'Scan Attendance',
-        ),
-
-        centerTitle: true,
-
-        backgroundColor:
-            Colors.black,
-
-        foregroundColor:
-            Colors.white,
-
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
+        leading: GestureDetector(
+          onTap: () => Get.back(),
+          child: Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.45),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+          ),
+        ),
+        title: Text(
+          'scan_title'.tr,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
       ),
-
       body: Stack(
         children: [
           // =================================================
@@ -44,116 +53,76 @@ class AttendanceScanView
           // =================================================
 
           Positioned.fill(
-            child:
-                MobileScanner(
-              controller:
-                  controller
-                      .scannerController,
-
-              onDetect: (
-                BarcodeCapture capture,
-              ) {
-                if (
-                    capture
-                        .barcodes
-                        .isEmpty) {
-                  return;
-                }
-
-                final String?
-                    token =
-                    capture
-                        .barcodes
-                        .first
-                        .rawValue;
-
-                if (token == null) {
-                  return;
-                }
-
-                controller.scanQr(
-                  token,
-                );
+            child: MobileScanner(
+              controller: controller.scannerController,
+              onDetect: (BarcodeCapture capture) {
+                if (capture.barcodes.isEmpty) return;
+                final String? token = capture.barcodes.first.rawValue;
+                if (token == null) return;
+                controller.scanQr(token);
               },
             ),
           ),
 
           // =================================================
-          // DARK OVERLAY
+          // DARK OVERLAY WITH CUTOUT
           // =================================================
 
           Positioned.fill(
-            child:
-                IgnorePointer(
-              child:
-                  CustomPaint(
-                painter:
-                    ScannerOverlayPainter(),
+            child: IgnorePointer(
+              child: CustomPaint(
+                painter: ScannerOverlayPainter(),
               ),
             ),
           ),
 
           // =================================================
-          // TOP INFO
+          // ANIMATED SCAN LINE
+          // =================================================
+
+          Positioned.fill(
+            child: IgnorePointer(
+              child: _ScanLineWidget(
+                scanLeft: scanLeft,
+                scanTop: scanTop,
+                scanSize: scanSize,
+              ),
+            ),
+          ),
+
+          // =================================================
+          // INSTRUCTION CHIP
           // =================================================
 
           Positioned(
-            top: 30,
-            left: 20,
-            right: 20,
-
-            child:
-                Container(
-              padding:
-                  const EdgeInsets
-                      .symmetric(
-                horizontal: 16,
-                vertical: 12,
+            top: kToolbarHeight + MediaQuery.of(context).padding.top + 8,
+            left: 36,
+            right: 36,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.55),
+                borderRadius: BorderRadius.circular(50),
+                border: Border.all(color: Colors.white.withOpacity(0.15)),
               ),
-
-              decoration:
-                  BoxDecoration(
-                color:
-                    Colors.black
-                        .withOpacity(
-                  0.60,
-                ),
-
-                borderRadius:
-                    BorderRadius
-                        .circular(
-                  16,
-                ),
-              ),
-
-              child:
-                  const Row(
-                mainAxisAlignment:
-                    MainAxisAlignment
-                        .center,
-
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons
-                        .qr_code_scanner_rounded,
-                    color:
-                        Colors.white,
-                    size: 20,
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    color: Colors.white70,
+                    size: 16,
                   ),
-
-                  SizedBox(
-                    width: 8,
-                  ),
-
-                  Text(
-                    'Point camera at teacher QR',
-                    style:
-                        TextStyle(
-                      color:
-                          Colors.white,
-                      fontWeight:
-                          FontWeight
-                              .w600,
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'scan_instruction'.tr,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
@@ -162,112 +131,67 @@ class AttendanceScanView
           ),
 
           // =================================================
-          // BOTTOM STATUS
+          // BOTTOM STATUS CARD
           // =================================================
 
           Positioned(
             left: 20,
             right: 20,
             bottom: 40,
-
-            child:
-                Container(
-              padding:
-                  const EdgeInsets.all(
-                18,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.78),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
               ),
-
-              decoration:
-                  BoxDecoration(
-                color:
-                    Colors.black
-                        .withOpacity(
-                  0.80,
-                ),
-
-                borderRadius:
-                    BorderRadius
-                        .circular(
-                  20,
-                ),
-              ),
-
-              child:
-                  Obx(
-                () =>
-                    Column(
-                  mainAxisSize:
-                      MainAxisSize.min,
-
+              child: Obx(
+                () => Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (
-                        controller
-                            .isLoading
-                            .value) ...[
+                    if (controller.isLoading.value) ...[
                       const SizedBox(
-                        width: 36,
-                        height: 36,
-
-                        child:
-                            CircularProgressIndicator(
-                          strokeWidth:
-                              3,
-                          color:
-                              Colors.white,
+                        width: 40,
+                        height: 40,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          color: Colors.white,
                         ),
                       ),
-
-                      const SizedBox(
-                        height: 14,
+                      const SizedBox(height: 14),
+                    ] else ...[
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.18),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.qr_code_scanner_rounded,
+                          color: AppColors.primary,
+                          size: 28,
+                        ),
                       ),
+                      const SizedBox(height: 12),
                     ],
-
                     Text(
-                      controller
-                          .scanStatus
-                          .value,
-
-                      textAlign:
-                          TextAlign.center,
-
-                      style:
-                          const TextStyle(
-                        color:
-                            Colors.white,
-
-                        fontSize:
-                            16,
-
-                        fontWeight:
-                            FontWeight.w600,
+                      controller.scanStatus.value,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-
-                    if (
-                        !controller
-                            .isLoading
-                            .value) ...[
-                      const SizedBox(
-                        height: 8,
-                      ),
-
+                    if (!controller.isLoading.value) ...[
+                      const SizedBox(height: 8),
                       Text(
-                        'Camera and location are required '
-                        'to verify your attendance.',
-
-                        textAlign:
-                            TextAlign.center,
-
-                        style:
-                            TextStyle(
-                          color:
-                              Colors.white
-                                  .withOpacity(
-                            0.65,
-                          ),
-
-                          fontSize:
-                              12,
+                        'scan_hint'.tr,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 12,
+                          height: 1.5,
                         ),
                       ),
                     ],
@@ -282,238 +206,162 @@ class AttendanceScanView
   }
 }
 
-
-// ===========================================================
-// SCANNER OVERLAY
-// ===========================================================
-
-class ScannerOverlayPainter
-    extends CustomPainter {
+class ScannerOverlayPainter extends CustomPainter {
+  static const double _r = 20.0;
+  static const double _cornerLen = 38.0;
 
   @override
-  void paint(
-    Canvas canvas,
-    Size size,
-  ) {
-    final Paint overlayPaint =
-        Paint()
-          ..color =
-              Colors.black
-                  .withOpacity(
-            0.48,
-          );
+  void paint(Canvas canvas, Size size) {
+    final double scanSize = size.width * 0.72;
 
-    final double scanSize =
-        size.width *
-            0.72;
-
-    final Rect scanRect =
-        Rect.fromCenter(
-      center:
-          Offset(
-        size.width / 2,
-        size.height / 2.3,
-      ),
-
-      width:
-          scanSize,
-
-      height:
-          scanSize,
+    final Rect scanRect = Rect.fromCenter(
+      center: Offset(size.width / 2, size.height / 2.3),
+      width: scanSize,
+      height: scanSize,
     );
 
-    final Path background =
-        Path()
-          ..addRect(
-            Rect.fromLTWH(
-              0,
-              0,
-              size.width,
-              size.height,
-            ),
-          );
-
-    final Path hole =
+    // Dark overlay with transparent cutout
+    canvas.drawPath(
+      Path.combine(
+        PathOperation.difference,
+        Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height)),
         Path()
           ..addRRect(
-            RRect.fromRectAndRadius(
-              scanRect,
-
-              const Radius.circular(
-                24,
-              ),
-            ),
-          );
-
-    final Path overlay =
-        Path.combine(
-      PathOperation.difference,
-      background,
-      hole,
+              RRect.fromRectAndRadius(scanRect, const Radius.circular(_r))),
+      ),
+      Paint()..color = Colors.black.withOpacity(0.58),
     );
 
-    canvas.drawPath(
-      overlay,
-      overlayPaint,
-    );
+    // Corner glow (blurred wide stroke drawn first, under the solid corners)
+    final Paint glowPaint = Paint()
+      ..color = AppColors.primary.withOpacity(0.35)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 14
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
 
-    final Paint borderPaint =
-        Paint()
-          ..color =
-              Colors.white
-          ..style =
-              PaintingStyle.stroke
-          ..strokeWidth =
-              3;
+    // Solid corners (L-shaped paths that follow the rounded rect corners)
+    final Paint cornerPaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        scanRect,
+    final List<Path> cornerPaths = [
+      // TOP LEFT
+      Path()
+        ..moveTo(scanRect.left, scanRect.top + _cornerLen)
+        ..lineTo(scanRect.left, scanRect.top + _r)
+        ..arcToPoint(Offset(scanRect.left + _r, scanRect.top),
+            radius: const Radius.circular(_r), clockwise: true)
+        ..lineTo(scanRect.left + _cornerLen, scanRect.top),
+      // TOP RIGHT
+      Path()
+        ..moveTo(scanRect.right - _cornerLen, scanRect.top)
+        ..lineTo(scanRect.right - _r, scanRect.top)
+        ..arcToPoint(Offset(scanRect.right, scanRect.top + _r),
+            radius: const Radius.circular(_r), clockwise: true)
+        ..lineTo(scanRect.right, scanRect.top + _cornerLen),
+      // BOTTOM RIGHT
+      Path()
+        ..moveTo(scanRect.right, scanRect.bottom - _cornerLen)
+        ..lineTo(scanRect.right, scanRect.bottom - _r)
+        ..arcToPoint(Offset(scanRect.right - _r, scanRect.bottom),
+            radius: const Radius.circular(_r), clockwise: true)
+        ..lineTo(scanRect.right - _cornerLen, scanRect.bottom),
+      // BOTTOM LEFT
+      Path()
+        ..moveTo(scanRect.left + _cornerLen, scanRect.bottom)
+        ..lineTo(scanRect.left + _r, scanRect.bottom)
+        ..arcToPoint(Offset(scanRect.left, scanRect.bottom - _r),
+            radius: const Radius.circular(_r), clockwise: true)
+        ..lineTo(scanRect.left, scanRect.bottom - _cornerLen),
+    ];
 
-        const Radius.circular(
-          24,
-        ),
-      ),
-
-      borderPaint,
-    );
-
-    final Paint cornerPaint =
-        Paint()
-          ..color =
-              Colors.greenAccent
-          ..style =
-              PaintingStyle.stroke
-          ..strokeWidth =
-              5
-          ..strokeCap =
-              StrokeCap.round;
-
-    const double corner =
-        30;
-
-    // TOP LEFT
-    canvas.drawLine(
-      Offset(
-        scanRect.left,
-        scanRect.top +
-            corner,
-      ),
-      Offset(
-        scanRect.left,
-        scanRect.top +
-            8,
-      ),
-      cornerPaint,
-    );
-
-    canvas.drawLine(
-      Offset(
-        scanRect.left +
-            8,
-        scanRect.top,
-      ),
-      Offset(
-        scanRect.left +
-            corner,
-        scanRect.top,
-      ),
-      cornerPaint,
-    );
-
-    // TOP RIGHT
-    canvas.drawLine(
-      Offset(
-        scanRect.right -
-            corner,
-        scanRect.top,
-      ),
-      Offset(
-        scanRect.right -
-            8,
-        scanRect.top,
-      ),
-      cornerPaint,
-    );
-
-    canvas.drawLine(
-      Offset(
-        scanRect.right,
-        scanRect.top +
-            8,
-      ),
-      Offset(
-        scanRect.right,
-        scanRect.top +
-            corner,
-      ),
-      cornerPaint,
-    );
-
-    // BOTTOM LEFT
-    canvas.drawLine(
-      Offset(
-        scanRect.left,
-        scanRect.bottom -
-            corner,
-      ),
-      Offset(
-        scanRect.left,
-        scanRect.bottom -
-            8,
-      ),
-      cornerPaint,
-    );
-
-    canvas.drawLine(
-      Offset(
-        scanRect.left +
-            8,
-        scanRect.bottom,
-      ),
-      Offset(
-        scanRect.left +
-            corner,
-        scanRect.bottom,
-      ),
-      cornerPaint,
-    );
-
-    // BOTTOM RIGHT
-    canvas.drawLine(
-      Offset(
-        scanRect.right -
-            corner,
-        scanRect.bottom,
-      ),
-      Offset(
-        scanRect.right -
-            8,
-        scanRect.bottom,
-      ),
-      cornerPaint,
-    );
-
-    canvas.drawLine(
-      Offset(
-        scanRect.right,
-        scanRect.bottom -
-            corner,
-      ),
-      Offset(
-        scanRect.right,
-        scanRect.bottom -
-            8,
-      ),
-      cornerPaint,
-    );
+    for (final path in cornerPaths) {
+      canvas.drawPath(path, glowPaint);
+    }
+    for (final path in cornerPaths) {
+      canvas.drawPath(path, cornerPaint);
+    }
   }
 
   @override
-  bool shouldRepaint(
-    ScannerOverlayPainter
-        oldDelegate,
-  ) {
-    return false;
+  bool shouldRepaint(ScannerOverlayPainter oldDelegate) => false;
+}
+
+class _ScanLineWidget extends StatefulWidget {
+  final double scanLeft;
+  final double scanTop;
+  final double scanSize;
+
+  const _ScanLineWidget({
+    required this.scanLeft,
+    required this.scanTop,
+    required this.scanSize,
+  });
+
+  @override
+  State<_ScanLineWidget> createState() => _ScanLineWidgetState();
+}
+
+class _ScanLineWidgetState extends State<_ScanLineWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    )..repeat(reverse: true);
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (_, __) => Stack(
+        children: [
+          Positioned(
+            left: widget.scanLeft + 14,
+            top: widget.scanTop + 6 + (widget.scanSize - 12) * _anim.value,
+            child: Container(
+              width: widget.scanSize - 28,
+              height: 2,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    AppColors.primary.withOpacity(0.6),
+                    AppColors.primary,
+                    AppColors.primary.withOpacity(0.6),
+                    Colors.transparent,
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.45),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

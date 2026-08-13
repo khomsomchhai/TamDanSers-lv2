@@ -54,8 +54,7 @@ Map<String, String> enUs = {
   'something_went_wrong': 'Something went wrong.',
   'change_password_title': 'Change Password',
   'create_new_password': 'Create a new password',
-  'otp_instructions':
-      'Enter the 6-digit code sent to your phone by SMS.',
+  'otp_instructions': 'Enter the 6-digit code sent to your phone by SMS.',
   'verification_code_otp': 'Verification Code (OTP)',
   'new_password': 'New Password',
   'enter_new_password': 'Enter new password',
@@ -73,7 +72,8 @@ Map<String, String> enUs = {
   'please_enter_otp': 'Please enter a 6-digit OTP.',
   'passwords_mismatch': 'New password and confirm password do not match.',
   'password_changed_successfully': 'Password changed successfully.',
-  'parent_password_created_successfully': 'Parent password created successfully.',
+  'parent_password_created_successfully':
+      'Parent password created successfully.',
   'otp_resent_successfully': 'OTP resent successfully.',
   'otp_verified_successfully': 'OTP verified successfully.',
   'invalid_otp_password': 'Invalid OTP or password.',
@@ -99,7 +99,7 @@ Map<String, String> enUs = {
   'saturday': 'Sat',
   'morning': 'Morning',
   'afternoon': 'Afternoon',
-  'Homework Details' : 'Homework Details',
+  'Homework Details': 'Homework Details',
   'child_summary': 'Child summary',
   'quick_access': 'Quick access',
   'guardian_contact_details': 'Guardian contact details',
@@ -203,7 +203,8 @@ Map<String, String> enUs = {
   'choose_new_profile_photo': 'Choose a new profile photo',
   'take_photo': 'Take Photo',
   'choose_from_gallery': 'Choose from Gallery',
-  'confirm_upload_photo': 'Do you want to upload this photo as your profile picture?',
+  'confirm_upload_photo':
+      'Do you want to upload this photo as your profile picture?',
   'theme': 'Theme',
   'choose_look_fits_style': 'Choose the look that fits your style',
   'light_mode': 'Light Mode',
@@ -238,9 +239,9 @@ Map<String, String> enUs = {
   'average_year': 'Yearly Average',
   'average_month': 'Monthly Average',
   'average_semester': 'Semester Average',
-    'semester_exam_average': 'Semester Exam Average',
-    'semester_result': 'Semester Result',
-    'no_result': 'No result',
+  'semester_exam_average': 'Semester Exam Average',
+  'semester_result': 'Semester Result',
+  'no_result': 'No result',
   'result_yearly': 'Yearly Results',
   'total_score': 'Total Score',
   'yearly': 'Yearly',
@@ -271,6 +272,16 @@ Map<String, String> enUs = {
   'Earth': 'Earth Science',
   'Social': 'Social Studies',
 
+  // Attendance scan screen
+  'scan_title': 'Scan QR Code',
+  'scan_instruction': 'Point your camera at the teacher\'s QR code',
+  'scan_hint': 'Camera and location are required to verify your attendance.',
+  'scan_default_status': 'Scan the QR code shown by your teacher',
+  'scan_getting_location': 'Getting your location...',
+  'scan_checking_qr': 'Checking QR code...',
+  'scan_checking_location': 'Checking attendance location...',
+  'scan_recorded': 'Attendance recorded',
+
   // Attendance
   'attendance_scan': 'Scan Attendance',
   'record': 'Record',
@@ -299,22 +310,20 @@ Map<String, String> enUs = {
   // Ask permission
 
   'ask_permission': 'Permission',
-'ask_permission_for': 'Permission for',
-'ask_permission_type_sick': 'Sick',
-'ask_permission_type_personal': 'Personal',
-'ask_permission_type_family': 'Family',
-'ask_permission_type_other': 'Other',
-'ask_permission_status_pending': 'Pending',
-'ask_permission_status_approved': 'Approved',
-'ask_permission_status_rejected': 'Rejected',
-'ask_permission_failed_load':
-    'Failed to load permission data',
-'ask_permission_student_not_found':
-    'Student not found',
-'success': 'Success',
-'error': 'Error',
-'warning': 'Warning',
-'info': 'Info',
+  'ask_permission_for': 'Permission for',
+  'ask_permission_type_sick': 'Sick',
+  'ask_permission_type_personal': 'Personal',
+  'ask_permission_type_family': 'Family',
+  'ask_permission_type_other': 'Other',
+  'ask_permission_status_pending': 'Pending',
+  'ask_permission_status_approved': 'Approved',
+  'ask_permission_status_rejected': 'Rejected',
+  'ask_permission_failed_load': 'Failed to load permission data',
+  'ask_permission_student_not_found': 'Student not found',
+  'success': 'Success',
+  'error': 'Error',
+  'warning': 'Warning',
+  'info': 'Info',
   'ask_permission_my_requests': 'My Permission Requests',
   'ask_permission_no_requests': 'No permission requests yet',
   'ask_permission_subject': 'Subject',
@@ -341,41 +350,38 @@ Map<String, String> enUs = {
       'You already requested permission for today.',
   'ask_permission_request_type_by_subject': 'By Subject',
   'ask_permission_request_type_full_day': 'Full Day',
-  'permission_edit_title':
-    'Edit Permission Request',
+  'permission_edit_title': 'Edit Permission Request',
   'permission_update': 'Update Request',
   'permission_updated': 'Permission request updated',
   'permission_deleted': 'Permission request deleted',
   'permission_delete_failed': 'Failed to delete permission request',
   'permission_delete_title': 'Delete Permission Request',
-  'permission_edit_title' : 'Update permission',
+  'permission_edit_title': 'Update permission',
   'permission_update': 'Update Permission',
 
-'permission_delete_message':
-    'Are you sure you want to delete this permission request?',
+  'permission_delete_message':
+      'Are you sure you want to delete this permission request?',
 
-'delete_notification_title': 'Delete Notification',
-'delete_notification_message': 'Are you sure you want to remove this notification?',
+  'delete_notification_title': 'Delete Notification',
+  'delete_notification_message':
+      'Are you sure you want to remove this notification?',
 
-'cancel':
-    'Cancel',
+  'cancel': 'Cancel',
 
-'delete':
-    'Delete',
+  'delete': 'Delete',
 
-'edit':
-    'Edit',
+  'edit': 'Edit',
 
-'permission_attendance_locked':
-    'Attendance has already been saved. This request cannot be edited or deleted.',
+  'permission_attendance_locked':
+      'Attendance has already been saved. This request cannot be edited or deleted.',
 
   //parent
   'hello_parent': 'Hello, Guardian!',
-  'parent_information' : 'Parent Information',
-  'view_your_information' : 'View your information',
-  'children_information' : 'Children Information',
-  'view_linked_children' : 'View linked children',
-  'phone_number' : 'Phone number',
+  'parent_information': 'Parent Information',
+  'view_your_information': 'View your information',
+  'children_information': 'Children Information',
+  'view_linked_children': 'View linked children',
+  'phone_number': 'Phone number',
   'legal_section': 'ACCOUNT',
   'enter_password': 'Enter your password',
   'enter_confirm_password': 'Confirm your password',

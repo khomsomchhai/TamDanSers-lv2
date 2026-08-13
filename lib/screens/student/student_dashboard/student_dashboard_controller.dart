@@ -19,6 +19,15 @@ class StudentDashboardViewController extends GetxController {
     }
   }
 
+  Future<void> scanAttendance() async {
+    final result = await Get.toNamed('/student/attendance-scan');
+    if (result == true) {
+      if (Get.isRegistered<AttendanceTabViewController>()) {
+        await Get.find<AttendanceTabViewController>().fetchAttendance();
+      }
+    }
+  }
+
   @override
   void onInit() {
     // TODO: implement onInit
