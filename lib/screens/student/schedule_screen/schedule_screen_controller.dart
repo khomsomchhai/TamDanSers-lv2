@@ -10,8 +10,8 @@ class ScheduleScreenViewController extends GetxController
   final isLoading = false.obs;
 
   final GetStorage _storage = GetStorage();
-  static const String _cacheKeySchedule = 'student_schedule_cache';
-  static const String _cacheKeyScheduleTimestamp = 'student_schedule_cache_timestamp';
+  static const String _cacheKeyScheduleBase = 'student_schedule_cache';
+  static const String _cacheKeyScheduleTimestampBase = 'student_schedule_cache_timestamp';
   static const Duration _cacheExpiryDuration = Duration(minutes: 15);
 
   final days = [
@@ -86,10 +86,10 @@ class ScheduleScreenViewController extends GetxController
       }
     }
   }
-
   bool _loadCachedSchedule() {
     try {
-      final dynamic cached = _storage.read(_cacheKeySchedule);
+      final String key = _cacheKeyFor();
+      final dynamic cached = _storage.read(key);
       if (cached is List && cached.isNotEmpty) {
         scheduleList.assignAll(cached);
         return _isScheduleCacheValid();
@@ -100,7 +100,8 @@ class ScheduleScreenViewController extends GetxController
 
   bool _isScheduleCacheValid() {
     try {
-      final dynamic rawTimestamp = _storage.read(_cacheKeyScheduleTimestamp);
+      final String tsKey = _cacheTimestampKeyFor();
+      final dynamic rawTimestamp = _storage.read(tsKey);
       if (rawTimestamp == null) {
         return false;
       }
@@ -118,12 +119,39 @@ class ScheduleScreenViewController extends GetxController
 
   void _saveScheduleCache(List<dynamic> response) {
     try {
-      _storage.write(_cacheKeySchedule, response);
-      _storage.write(
-        _cacheKeyScheduleTimestamp,
-        DateTime.now().toIso8601String(),
-      );
+      final String key = _cacheKeyFor();
+      final String tsKey = _cacheTimestampKeyFor();
+      _storage.write(key, response);
+      _storage.write(tsKey, DateTime.now().toIso8601String());
     } catch (_) {}
+  }
+
+  String _cacheKeyFor() {
+    try {
+      final dynamic storedId = _storage.read('student_id');
+      if (storedId != null) {
+        return '${_cacheKeyScheduleBase}_${storedId.toString()}';
+      }
+      if (Get.isRegistered<UserController>()) {
+        final id = Get.find<UserController>().profile?.id;
+        if (id != null) return '${_cacheKeyScheduleBase}_${id.toString()}';
+      }
+    } catch (_) {}
+    return '${_cacheKeyScheduleBase}_anon';
+  }
+
+  String _cacheTimestampKeyFor() {
+    try {
+      final dynamic storedId = _storage.read('student_id');
+      if (storedId != null) {
+        return '${_cacheKeyScheduleTimestampBase}_${storedId.toString()}';
+      }
+      if (Get.isRegistered<UserController>()) {
+        final id = Get.find<UserController>().profile?.id;
+        if (id != null) return '${_cacheKeyScheduleTimestampBase}_${id.toString()}';
+      }
+    } catch (_) {}
+    return '${_cacheKeyScheduleTimestampBase}_anon';
   }
 
   DateTime? _parseTime(String time) {

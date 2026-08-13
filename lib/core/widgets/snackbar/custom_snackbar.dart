@@ -7,12 +7,12 @@ enum SnackPositionType { top, bottom }
 class CustomSnackbar {
   static void success(
     String message, {
-    String title = "Success",
+    String title = 'success',
     SnackPositionType position = SnackPositionType.bottom,
   }) {
     _show(
       message: message,
-      title: title,
+      title: title == 'success' ? 'success'.tr : title,
       backgroundColor: AppColors.success,
       icon: Icons.check_circle,
       position: position,
@@ -21,12 +21,12 @@ class CustomSnackbar {
 
   static void error(
     String message, {
-    String title = "Error",
+    String title = 'error',
     SnackPositionType position = SnackPositionType.bottom,
   }) {
     _show(
       message: message,
-      title: title,
+      title: title == 'error' ? 'error'.tr : title,
       backgroundColor: AppColors.error,
       icon: Icons.error,
       position: position,
@@ -35,12 +35,12 @@ class CustomSnackbar {
 
   static void warning(
     String message, {
-    String title = "Warning",
+    String title = 'warning',
     SnackPositionType position = SnackPositionType.bottom,
   }) {
     _show(
       message: message,
-      title: title,
+      title: title == 'warning' ? 'warning'.tr : title,
       backgroundColor: AppColors.warning,
       icon: Icons.warning_amber_rounded,
       position: position,
@@ -49,12 +49,12 @@ class CustomSnackbar {
 
   static void info(
     String message, {
-    String title = "Info",
+    String title = 'info',
     SnackPositionType position = SnackPositionType.bottom,
   }) {
     _show(
       message: message,
-      title: title,
+      title: title == 'info' ? 'info'.tr : title,
       backgroundColor: AppColors.primary,
       icon: Icons.info,
       position: position,
