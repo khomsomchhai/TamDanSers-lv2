@@ -53,10 +53,6 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
               const SizedBox(
                 height: AppNumbers.spacingMedium,
               ),
-              _buildScanButton(),
-              const SizedBox(
-                height: AppNumbers.spacingMedium,
-              ),
               if (items.isEmpty)
                 SizedBox(
                   height: 260,
@@ -167,71 +163,6 @@ class AttendanceTabView extends GetView<AttendanceTabViewController> {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScanButton() {
-    return InkWell(
-      onTap: () async {
-        final result = await Get.toNamed(
-          '/student/attendance-scan',
-        );
-
-        if (result == true) {
-          await controller.fetchAttendance();
-        }
-      },
-      borderRadius: BorderRadius.circular(
-        AppNumbers.radiusMedium,
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppNumbers.spacingMedium,
-          vertical: 14,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(
-            AppNumbers.radiusMedium,
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Color.fromRGBO(
-                0,
-                0,
-                0,
-                0.08,
-              ),
-              blurRadius: AppNumbers.shadowBlur,
-              offset: Offset(
-                0,
-                6,
-              ),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.qr_code_scanner_rounded,
-              color: Colors.white,
-              size: AppNumbers.iconLarge,
-            ),
-            const SizedBox(
-              width: AppNumbers.spacingSmall,
-            ),
-            Text(
-              'attendance_scan'.tr,
-              style: Get.textTheme.bodyLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
         ),
       ),
     );

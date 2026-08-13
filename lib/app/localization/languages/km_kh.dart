@@ -70,7 +70,8 @@ Map<String, String> kmKh = {
   'please_enter_otp': 'សូមបញ្ចូល OTP 6 ខ្ទង់។',
   'passwords_mismatch': 'ពាក្យសម្ងាត់ថ្មី និងពាក្យសម្ងាត់បញ្ជាក់មិនត្រូវគ្នា។',
   'password_changed_successfully': 'ពាក្យសម្ងាត់ត្រូវបានផ្លាស់ប្ដូរដោយជោគជ័យ។',
-  'parent_password_created_successfully': 'ពាក្យសម្ងាត់ឪពុកម្តាយត្រូវបានបង្កើតដោយជោគជ័យ។',
+  'parent_password_created_successfully':
+      'ពាក្យសម្ងាត់ឪពុកម្តាយត្រូវបានបង្កើតដោយជោគជ័យ។',
   'otp_resent_successfully': 'OTP ត្រូវបានផ្ញើម្តងទៀតដោយជោគជ័យ។',
   'otp_verified_successfully': 'OTP ត្រូវបានផ្ទៀងផ្ទាត់ដោយជោគជ័យ។',
   'invalid_otp_password': 'OTP ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ។',
@@ -109,8 +110,7 @@ Map<String, String> kmKh = {
   'already_have_account': 'មានគណនីរួចហើយ?',
   'sign_in_prompt': 'ចូល',
   'create_parent_password': 'កំណត់ពាក្យសម្ងាត់',
-  'create_password_description':
-      'បង្កើតពាក្យសម្ងាត់ដើម្បីអាចចូលប្រើគណនី។',
+  'create_password_description': 'បង្កើតពាក្យសម្ងាត់ដើម្បីអាចចូលប្រើគណនី។',
   'no_account': 'គ្មានគណនី?',
   'register': 'ចុះឈ្មោះ',
   'sign_up': 'ចុះឈ្មោះ',
@@ -233,7 +233,6 @@ Map<String, String> kmKh = {
   'ranking_for_semester': 'ចំណាត់ថ្នាក់ប្រចាំឆមាស',
   'result_yearly': 'លទ្ធផលប្រចាំឆ្នាំ',
 
-
   // Months
   'month_1': 'មករា',
   'month_2': 'កុម្ភៈ',
@@ -257,169 +256,145 @@ Map<String, String> kmKh = {
   'Biology': 'ជីវវិទ្យា',
   'Earth': 'ផែនដីវិទ្យា',
   'Social': 'ពលរដ្ឋវិជ្ជា',
+// Attendance scan screen
+  'scan_title': 'ស្កេន QR Code',
+  'scan_instruction': 'ដាក់កាមេរ៉ាទៅ QR Code របស់គ្រូ',
+  'scan_hint': 'ត្រូវការកាមេរ៉ា និងទីតាំងដើម្បីផ្ទៀងផ្ទាត់វត្តមានរបស់អ្នក។',
+  'scan_default_status': 'ស្កេន QR Code ដែលគ្រូបង្ហាញ',
+  'scan_getting_location': 'កំពុងទទួលទីតាំងរបស់អ្នក...',
+  'scan_checking_qr': 'កំពុងពិនិត្យ QR Code...',
+  'scan_checking_location': 'កំពុងពិនិត្យទីតាំងវត្តមាន...',
+  'scan_recorded': 'បានកត់ត្រាវត្តមានរួចហើយ',
+
 // Attendance
-'attendance_scan': 'ស្កេនវត្តមាន',
-'record':'កំណត់ត្រា',
-'attendance_no_records': 'មិនមានកំណត់ត្រាវត្តមានទេ',
-'attendance_select_date': 'ជ្រើសកាលបរិច្ឆេទ',
-'attendance_all_days': 'ថ្ងៃទាំងអស់',
-'attendance_failed_load':
-    'មិនអាចទាញយកកំណត់ត្រាវត្តមានបានទេ',
-'attendance_status_present': 'មានវត្តមាន',
-'attendance_status_absent': 'អវត្តមាន',
-'attendance_status_late': 'យឺត',
-'attendance_status_permission': 'សុំច្បាប់',
-'attendance_recorded_for': 'បានកត់ត្រាវត្តមានសម្រាប់',
-'attendance_scan_success': 'វត្តមានត្រូវបានកត់ត្រា។',
-'attendance_scan_wrong_qr': 'QR មិនត្រឹមត្រូវ',
-'attendance_scan_expired': 'លេខកូដ QR បានផុតកំណត់',
-'attendance_scan_wrong_class': 'QR មិនសមសម្រាប់ថ្នាក់របស់អ្នក',
-'attendance_scan_already': 'បានកត់ត្រាវត្តមានរួចហើយ',
-'attendance_scan_forbidden': 'មិនមានសិទ្ធិ',
-'attendance_scan_network': 'កំហុសបណ្ដាញ',
-'attendance_scan_invalid': 'ការស្កេនវត្តមានមិនត្រឹមត្រូវ',
- 
+  'attendance_scan': 'ស្កេនវត្តមាន',
+  'record': 'កំណត់ត្រា',
+  'attendance_no_records': 'មិនមានកំណត់ត្រាវត្តមានទេ',
+  'attendance_select_date': 'ជ្រើសកាលបរិច្ឆេទ',
+  'attendance_all_days': 'ថ្ងៃទាំងអស់',
+  'attendance_failed_load': 'មិនអាចទាញយកកំណត់ត្រាវត្តមានបានទេ',
+  'attendance_status_present': 'មានវត្តមាន',
+  'attendance_status_absent': 'អវត្តមាន',
+  'attendance_status_late': 'យឺត',
+  'attendance_status_permission': 'សុំច្បាប់',
+  'attendance_recorded_for': 'បានកត់ត្រាវត្តមានសម្រាប់',
+  'attendance_scan_success': 'វត្តមានត្រូវបានកត់ត្រា។',
+  'attendance_scan_wrong_qr': 'QR មិនត្រឹមត្រូវ',
+  'attendance_scan_expired': 'លេខកូដ QR បានផុតកំណត់',
+  'attendance_scan_wrong_class': 'QR មិនសមសម្រាប់ថ្នាក់របស់អ្នក',
+  'attendance_scan_already': 'បានកត់ត្រាវត្តមានរួចហើយ',
+  'attendance_scan_forbidden': 'មិនមានសិទ្ធិ',
+  'attendance_scan_network': 'កំហុសបណ្ដាញ',
+  'attendance_scan_invalid': 'ការស្កេនវត្តមានមិនត្រឹមត្រូវ',
 
-'attendance_summary': 'សង្ខេបវត្តមាន',
-'attendance_history': 'ប្រវត្តិវត្តមាន',
-'attendance_today': 'វត្តមានថ្ងៃនេះ',
+  'attendance_summary': 'សង្ខេបវត្តមាន',
+  'attendance_history': 'ប្រវត្តិវត្តមាន',
+  'attendance_today': 'វត្តមានថ្ងៃនេះ',
 
-'present_days': 'វត្តមាន',
-'absent_days': 'អវត្តមាន',
-'permission_days': 'សុំច្បាប់',
-'attendance_total_days': 'ចំនួនថ្ងៃសរុប',
-'subjects': 'មុខវិជ្ជា',
-'days': 'ថ្ងៃ',
-'no_attendance': 'មិនមានទិន្នន័យវត្តមាន',
+  'present_days': 'វត្តមាន',
+  'absent_days': 'អវត្តមាន',
+  'permission_days': 'សុំច្បាប់',
+  'attendance_total_days': 'ចំនួនថ្ងៃសរុប',
+  'subjects': 'មុខវិជ្ជា',
+  'days': 'ថ្ងៃ',
+  'no_attendance': 'មិនមានទិន្នន័យវត្តមាន',
 
 // Days (full day names used in some student screens)
-'day_monday': 'ថ្ងៃច័ន្ទ',
-'day_tuesday': 'ថ្ងៃអង្គារ',
-'day_wednesday': 'ថ្ងៃពុធ',
-'day_thursday': 'ថ្ងៃព្រហស្បតិ៍',
-'day_friday': 'ថ្ងៃសុក្រ',
-'day_saturday': 'ថ្ងៃសៅរ៍',
-'day_sunday': 'ថ្ងៃអាទិត្យ',
+  'day_monday': 'ថ្ងៃច័ន្ទ',
+  'day_tuesday': 'ថ្ងៃអង្គារ',
+  'day_wednesday': 'ថ្ងៃពុធ',
+  'day_thursday': 'ថ្ងៃព្រហស្បតិ៍',
+  'day_friday': 'ថ្ងៃសុក្រ',
+  'day_saturday': 'ថ្ងៃសៅរ៍',
+  'day_sunday': 'ថ្ងៃអាទិត្យ',
 
 // UI / Misc
-'teacher': 'គ្រូ',
-'Upload failed': 'ការផ្ទុកបានបរាជ័យ',
+  'teacher': 'គ្រូ',
+  'Upload failed': 'ការផ្ទុកបានបរាជ័យ',
 
 // Result extras
-'semester_exam_average': 'មធ្យមភាគប្រឡងឆមាស',
-'semester_result': 'លទ្ធផលឆមាស',
-'no_result': 'មិនមានលទ្ធផល',
+  'semester_exam_average': 'មធ្យមភាគប្រឡងឆមាស',
+  'semester_result': 'លទ្ធផលឆមាស',
+  'no_result': 'មិនមានលទ្ធផល',
 
 // Ask permission
-'ask_permission': 'សុំច្បាប់',
-'ask_permission_for': 'សុំច្បាប់សម្រាប់',
-'ask_permission_my_requests':
-    'សំណើសុំច្បាប់របស់ខ្ញុំ',
-'ask_permission_no_requests':
-    'មិនទាន់មានសំណើសុំច្បាប់ទេ',
-'ask_permission_subject': 'មុខវិជ្ជា',
-'ask_permission_permission_type':
-    'ប្រភេទសុំច្បាប់',
-'ask_permission_reason': 'មូលហេតុ',
-'ask_permission_created': 'បានបង្កើត',
-'ask_permission_request_permission':
-    'ស្នើសុំច្បាប់',
-'ask_permission_request_type':
-    'ប្រភេទសំណើ',
-'ask_permission_loading_subjects':
-    'កំពុងទាញយកមុខវិជ្ជា...',
-'ask_permission_select_subject':
-    'ជ្រើសមុខវិជ្ជា',
-'ask_permission_select_permission_type':
-    'ជ្រើសប្រភេទសុំច្បាប់',
-'ask_permission_write_reason':
-    'សូមសរសេរមូលហេតុ...',
-'ask_permission_submit_request':
-    'ដាក់សំណើ',
-'ask_permission_please_select_request_type':
-    'សូមជ្រើសប្រភេទសំណើ',
-'ask_permission_please_select_subject':
-    'សូមជ្រើសមុខវិជ្ជា',
-'ask_permission_please_select_permission_type':
-    'សូមជ្រើសប្រភេទសុំច្បាប់',
-'ask_permission_please_enter_reason':
-    'សូមបញ្ចូលមូលហេតុ',
-'ask_permission_submitted':
-    'បានដាក់សំណើសុំច្បាប់រួចរាល់',
-'ask_permission_failed_submit':
-    'មិនអាចដាក់សំណើសុំច្បាប់បានទេ',
-'ask_permission_failed_load':
-    'មិនអាចទាញយកទិន្នន័យសុំច្បាប់បានទេ',
-'ask_permission_student_not_found':
-    'រកមិនឃើញព័ត៌មានសិស្ស',
-'ask_permission_no_schedule_today':
-    'ថ្ងៃនេះមិនមានកាលវិភាគទេ។ '
-    'មិនអាចសុំច្បាប់ពេញមួយថ្ងៃបានទេ។',
-'ask_permission_already_requested_today':
-    'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
-  'permission_edit_title':
-    'កែសម្រួលសំណើសុំច្បាប់',
+  'ask_permission': 'សុំច្បាប់',
+  'ask_permission_for': 'សុំច្បាប់សម្រាប់',
+  'ask_permission_my_requests': 'សំណើសុំច្បាប់របស់ខ្ញុំ',
+  'ask_permission_no_requests': 'មិនទាន់មានសំណើសុំច្បាប់ទេ',
+  'ask_permission_subject': 'មុខវិជ្ជា',
+  'ask_permission_permission_type': 'ប្រភេទសុំច្បាប់',
+  'ask_permission_reason': 'មូលហេតុ',
+  'ask_permission_created': 'បានបង្កើត',
+  'ask_permission_request_permission': 'ស្នើសុំច្បាប់',
+  'ask_permission_request_type': 'ប្រភេទសំណើ',
+  'ask_permission_loading_subjects': 'កំពុងទាញយកមុខវិជ្ជា...',
+  'ask_permission_select_subject': 'ជ្រើសមុខវិជ្ជា',
+  'ask_permission_select_permission_type': 'ជ្រើសប្រភេទសុំច្បាប់',
+  'ask_permission_write_reason': 'សូមសរសេរមូលហេតុ...',
+  'ask_permission_submit_request': 'ដាក់សំណើ',
+  'ask_permission_please_select_request_type': 'សូមជ្រើសប្រភេទសំណើ',
+  'ask_permission_please_select_subject': 'សូមជ្រើសមុខវិជ្ជា',
+  'ask_permission_please_select_permission_type': 'សូមជ្រើសប្រភេទសុំច្បាប់',
+  'ask_permission_please_enter_reason': 'សូមបញ្ចូលមូលហេតុ',
+  'ask_permission_submitted': 'បានដាក់សំណើសុំច្បាប់រួចរាល់',
+  'ask_permission_failed_submit': 'មិនអាចដាក់សំណើសុំច្បាប់បានទេ',
+  'ask_permission_failed_load': 'មិនអាចទាញយកទិន្នន័យសុំច្បាប់បានទេ',
+  'ask_permission_student_not_found': 'រកមិនឃើញព័ត៌មានសិស្ស',
+  'ask_permission_no_schedule_today': 'ថ្ងៃនេះមិនមានកាលវិភាគទេ។ '
+      'មិនអាចសុំច្បាប់ពេញមួយថ្ងៃបានទេ។',
+  'ask_permission_already_requested_today':
+      'អ្នកបានស្នើសុំច្បាប់សម្រាប់ថ្ងៃនេះរួចហើយ។',
+  'permission_edit_title': 'កែសម្រួលសំណើសុំច្បាប់',
   'permission_update': 'ធ្វើបច្ចុប្បន្នភាព',
   'permission_updated': 'បានធ្វើបច្ចុប្បន្នភាពសំណើសុំច្បាប់រួចរាល់',
   'permission_deleted': 'បានលុបសំណើសុំច្បាប់រួចរាល់',
   'permission_delete_failed': 'មិនអាចលុបសំណើសុំច្បាប់បានទេ',
-  'permission_delete_title':
-    'លុបសំណើសុំច្បាប់',
-  'permission_edit_title' : 'កែប្រែការសុំច្បាប់',
+  'permission_delete_title': 'លុបសំណើសុំច្បាប់',
+  'permission_edit_title': 'កែប្រែការសុំច្បាប់',
   'permission_update': 'កែប្រែការសុំច្បាប់',
 
-'permission_delete_message':
-    'តើអ្នកប្រាកដថាចង់លុបសំណើសុំច្បាប់នេះមែនទេ?',
+  'permission_delete_message': 'តើអ្នកប្រាកដថាចង់លុបសំណើសុំច្បាប់នេះមែនទេ?',
 
-'delete_notification_title': 'លុបការជូនដំណឹង',
-'delete_notification_message': 'តើអ្នកពិតជាចង់លុបការជូនដំណឹងនេះឬទេ?',
+  'delete_notification_title': 'លុបការជូនដំណឹង',
+  'delete_notification_message': 'តើអ្នកពិតជាចង់លុបការជូនដំណឹងនេះឬទេ?',
 
-'cancel':
-    'បោះបង់',
+  'cancel': 'បោះបង់',
 
-'delete':
-    'លុប',
-'edit':
-    'កែប្រែ',
+  'delete': 'លុប',
+  'edit': 'កែប្រែ',
 
-'permission_attendance_locked':
-    'គ្រូបានរក្សាទុកវត្តមានរួច មិនអាចកែប្រែ ឬលុបបានទេ',
+  'permission_attendance_locked':
+      'គ្រូបានរក្សាទុកវត្តមានរួច មិនអាចកែប្រែ ឬលុបបានទេ',
 
 // Request type
-'ask_permission_request_type_by_subject':
-    'តាមមុខវិជ្ជា',
-'ask_permission_request_type_full_day':
-    'ពេញមួយថ្ងៃ',
+  'ask_permission_request_type_by_subject': 'តាមមុខវិជ្ជា',
+  'ask_permission_request_type_full_day': 'ពេញមួយថ្ងៃ',
 
 // Permission type
-'ask_permission_type_sick': 'ឈឺ',
-'ask_permission_type_personal':
-    'មានធុរៈផ្ទាល់ខ្លួន',
-'ask_permission_type_family':
-    'មានធុរៈគ្រួសារ',
-'ask_permission_type_other': 'ផ្សេងៗ',
+  'ask_permission_type_sick': 'ឈឺ',
+  'ask_permission_type_personal': 'មានធុរៈផ្ទាល់ខ្លួន',
+  'ask_permission_type_family': 'មានធុរៈគ្រួសារ',
+  'ask_permission_type_other': 'ផ្សេងៗ',
 
 // Permission status
-'ask_permission_status_pending':
-    'កំពុងរង់ចាំ',
-'ask_permission_status_approved':
-    'បានអនុម័ត',
-'ask_permission_status_rejected':
-    'បានបដិសេធ',
+  'ask_permission_status_pending': 'កំពុងរង់ចាំ',
+  'ask_permission_status_approved': 'បានអនុម័ត',
+  'ask_permission_status_rejected': 'បានបដិសេធ',
 
 // Common
-'success': 'ជោគជ័យ',
-'error': 'មានបញ្ហា',
-'warning': 'ព្រមាន',
-'info': 'ព័ត៌មាន',
+  'success': 'ជោគជ័យ',
+  'error': 'មានបញ្ហា',
+  'warning': 'ព្រមាន',
+  'info': 'ព័ត៌មាន',
 
   //prent
   'hello_parent': 'សួស្ដីអាណាព្យាបាល\n សិស្ស',
-  'parent_information' : 'ព័ត៌មានឪពុកម្តាយ',
-  'view_your_information' : 'មើលព័ត៌មានរបស់អ្នក',
-  'children_information' : 'ព័ត៌មានរបស់កូនអ្នក',
-  'view_linked_children' : 'មើលគណនីកូនរបស់អ្នកទាំងអស់',
-  'phone_number' : 'លេខទូរស័ព្ទ',
+  'parent_information': 'ព័ត៌មានឪពុកម្តាយ',
+  'view_your_information': 'មើលព័ត៌មានរបស់អ្នក',
+  'children_information': 'ព័ត៌មានរបស់កូនអ្នក',
+  'view_linked_children': 'មើលគណនីកូនរបស់អ្នកទាំងអស់',
+  'phone_number': 'លេខទូរស័ព្ទ',
   'legal_section': 'គណនី',
   'enter_password': 'បញ្ចូលពាក្យសម្ងាត់',
   'enter_confirm_password': 'បញ្ចូលពាក្យសម្ងាត់ឡើងវិញ',
