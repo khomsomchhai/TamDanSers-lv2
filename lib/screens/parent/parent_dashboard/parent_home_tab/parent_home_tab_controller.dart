@@ -676,8 +676,6 @@ class ParentHomeTabViewController extends GetxController {
       }
     }
 
-    isResultExpanded.value = false;
-
     _resultRequestId++;
 
     dashboard.value = null;
@@ -695,8 +693,6 @@ class ParentHomeTabViewController extends GetxController {
     String subOption,
   ) {
     selectedSubResult.value = subOption;
-
-    isResultExpanded.value = false;
 
     _resultRequestId++;
 
