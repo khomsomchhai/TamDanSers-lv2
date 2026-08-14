@@ -559,100 +559,240 @@ class ProfileTabViewController extends GetxController {
     );
   }
 
-  void logout() {
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: Get.theme.colorScheme.error.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      PhosphorIconsRegular.signOut,
-                      color: Get.theme.colorScheme.error,
-                      size: 22,
+void logout() {
+  Get.dialog(
+    Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: Get.theme.colorScheme.error
+                        .withOpacity(0.12),
+                    borderRadius:
+                        BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    PhosphorIconsRegular.signOut,
+                    color:
+                        Get.theme.colorScheme.error,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'logout_action'.tr,
+                    style: Get.textTheme.titleMedium
+                        ?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'logout_action'.tr,
-                          style: Get.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'are_sure_logout'.tr,
-                textAlign: TextAlign.center,
-                style: Get.textTheme.bodyMedium?.copyWith(color: Get.theme.textTheme.bodySmall?.color?.withOpacity(0.7)),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Get.back(),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Get.theme.dividerColor),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: Text(
-                        'no'.tr,
-                        style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final userController = Get.find<UserController>();
+                ),
+              ],
+            ),
 
-                        // Clear memory
-                        userController.clearUser();
-                        await box.remove("token");
-                        await box.remove("role");
-                        Get.offAllNamed(AppRoutes.loginScreen);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Get.theme.colorScheme.error,
-                        foregroundColor: Get.theme.colorScheme.onError,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+            const SizedBox(height: 16),
+
+            Text(
+              'are_sure_logout'.tr,
+              textAlign: TextAlign.center,
+              style:
+                  Get.textTheme.bodyMedium?.copyWith(
+                color: Get
+                    .theme.textTheme.bodySmall?.color
+                    ?.withOpacity(0.7),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Get.back(),
+                    style:
+                        OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color:
+                            Get.theme.dividerColor,
                       ),
-                      child: Text(
-                        'yes'.tr,
-                        style: Get.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: Get.theme.colorScheme.onError),
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                          12,
+                        ),
+                      ),
+                      padding:
+                          const EdgeInsets.symmetric(
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(
+                      'no'.tr,
+                      style: Get
+                          .textTheme.bodyLarge
+                          ?.copyWith(
+                        fontWeight:
+                            FontWeight.w600,
                       ),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+
+                const SizedBox(width: 10),
+
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        // =====================================
+                        // 1. REMOVE FCM TOKEN FROM OLD ACCOUNT
+                        //
+                        // IMPORTANT:
+                        // Must happen BEFORE removing auth token.
+                        // =====================================
+
+                        try {
+                          final notificationApi =
+                              NotificationApi();
+
+                          await notificationApi
+                              .removeFcmToken();
+
+                          debugPrint(
+                            'FCM TOKEN REMOVED FROM OLD ACCOUNT',
+                          );
+                        } catch (e) {
+                          debugPrint(
+                            'REMOVE FCM TOKEN ERROR: $e',
+                          );
+                        }
+
+                        // =====================================
+                        // 2. CLEAR NOTIFICATION MEMORY
+                        // =====================================
+
+                        if (Get.isRegistered<
+                            NotificationController>()) {
+                          Get.find<
+                                  NotificationController>()
+                              .clearForLogout();
+                        }
+
+                        // =====================================
+                        // 3. CLEAR USER MEMORY
+                        // =====================================
+
+                        if (Get.isRegistered<
+                            UserController>()) {
+                          Get.find<UserController>()
+                              .clearUser();
+                        }
+
+                        // =====================================
+                        // 4. CLEAR ACCOUNT STORAGE
+                        // =====================================
+
+                        await box.remove(
+                          'token',
+                        );
+
+                        await box.remove(
+                          'role',
+                        );
+
+                        await box.remove(
+                          'student_id',
+                        );
+
+                        await box.remove(
+                          'parent',
+                        );
+
+                        await box.remove(
+                          'students',
+                        );
+
+                        // Optional old notification keys
+                        await box.remove(
+                          'notificationsCount',
+                        );
+
+                        await box.remove(
+                          'deletedNotificationIds',
+                        );
+
+                        // =====================================
+                        // 5. CLOSE DIALOG + GO LOGIN
+                        // =====================================
+
+                        Get.offAllNamed(
+                          AppRoutes.loginScreen,
+                        );
+                      } catch (e, stackTrace) {
+                        debugPrint(
+                          'LOGOUT ERROR: $e',
+                        );
+
+                        debugPrintStack(
+                          stackTrace: stackTrace,
+                        );
+                      }
+                    },
+                    style:
+                        ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Get.theme.colorScheme.error,
+                      foregroundColor: Get
+                          .theme.colorScheme.onError,
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                          12,
+                        ),
+                      ),
+                      padding:
+                          const EdgeInsets.symmetric(
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(
+                      'yes'.tr,
+                      style: Get
+                          .textTheme.bodyLarge
+                          ?.copyWith(
+                        fontWeight:
+                            FontWeight.w600,
+                        color: Get.theme
+                            .colorScheme.onError,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
-    );
-  }
-
+    ),
+  );
+}
 }

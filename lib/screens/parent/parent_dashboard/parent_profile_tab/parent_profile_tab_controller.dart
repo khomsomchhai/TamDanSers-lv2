@@ -9,7 +9,9 @@ import 'package:tamdansers_lv2/app/constants/app_icons.dart';
 import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
+import 'package:tamdansers_lv2/core/api/services/notication_api.dart';
 import 'package:tamdansers_lv2/core/services/theme_service.dart';
+import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
 import 'package:tamdansers_lv2/screens/parent/parent_dashboard/'
     'parent_home_tab/parent_home_tab_view.dart';
 
@@ -1017,17 +1019,59 @@ class ParentProfileTabViewController extends GetxController {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        userController.clearUser();
-                        linkedChildren.clear();
-                        pickedImagePath.value = null;
+  try {
+    // 1. Remove FCM token from current parent account
+    try {
+      final NotificationApi notificationApi =
+          NotificationApi();
 
-                        await box.remove('token');
-                        await box.remove('role');
+      await notificationApi.removeFcmToken();
 
-                        Get.offAllNamed(
-                          AppRoutes.loginScreen,
-                        );
-                      },
+      debugPrint(
+        'PARENT FCM TOKEN REMOVED',
+      );
+    } catch (e) {
+      debugPrint(
+        'REMOVE PARENT FCM TOKEN ERROR: $e',
+      );
+    }
+
+    // 2. Clear notification state
+    if (Get.isRegistered<NotificationController>()) {
+      Get.find<NotificationController>()
+          .clearForLogout();
+    }
+
+    // 3. Clear parent/user state
+    userController.clearUser();
+    linkedChildren.clear();
+    pickedImagePath.value = null;
+
+    // 4. Clear parent storage
+    await box.remove('token');
+    await box.remove('role');
+    await box.remove('parent');
+    await box.remove('students');
+    await box.remove('student_id');
+
+    // Optional old notification cache keys
+    await box.remove('notificationsCount');
+    await box.remove('deletedNotificationIds');
+
+    // 5. Go to login
+    Get.offAllNamed(
+      AppRoutes.loginScreen,
+    );
+  } catch (e, stackTrace) {
+    debugPrint(
+      'PARENT LOGOUT ERROR: $e',
+    );
+
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+  }
+},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Get.theme.colorScheme.error,
                         foregroundColor: Get.theme.colorScheme.onError,
