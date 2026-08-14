@@ -18,6 +18,7 @@ import 'package:tamdansers_lv2/core/utils/dio_exception_handler.dart';
 import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/core/widgets/textfield.dart/custom_textfield.dart';
+import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
 
 part 'login_screen_binding.dart';
 part 'login_screen_controller.dart';
