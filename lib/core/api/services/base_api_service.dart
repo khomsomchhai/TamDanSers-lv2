@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:tamdansers_lv2/core/api/api_config.dart';
+import 'package:tamdansers_lv2/core/services/auth_session_service.dart';
 
 class BaseApiService {
   final ApiConfig apiConfig = ApiConfig();
@@ -46,20 +47,27 @@ class BaseApiService {
   Future<dynamic> post({
     required String endpoint,
     required dynamic data,
+    CancelToken? cancelToken,
   }) {
     return _requestWithRetry(
-      () => apiConfig.dio.post(endpoint, data: data),
+      () => apiConfig.dio.post(
+        endpoint,
+        data: data,
+        cancelToken: cancelToken ?? AuthSessionService().activeRequestsToken,
+      ),
     );
   }
 
   Future<dynamic> get({
     required String endpoint,
     Map<String, dynamic>? queryParameters,
+    CancelToken? cancelToken,
   }) {
     return _requestWithRetry(
       () => apiConfig.dio.get(
         endpoint,
         queryParameters: queryParameters,
+        cancelToken: cancelToken ?? AuthSessionService().activeRequestsToken,
       ),
     );
   }
@@ -67,20 +75,26 @@ class BaseApiService {
   Future<dynamic> put({
     required String endpoint,
     dynamic data,
+    CancelToken? cancelToken,
   }) {
     return _requestWithRetry(
       () => apiConfig.dio.put(
         endpoint,
         data: data,
+        cancelToken: cancelToken ?? AuthSessionService().activeRequestsToken,
       ),
     );
   }
 
   Future<dynamic> delete({
     required String endpoint,
+    CancelToken? cancelToken,
   }) {
     return _requestWithRetry(
-      () => apiConfig.dio.delete(endpoint),
+      () => apiConfig.dio.delete(
+        endpoint,
+        cancelToken: cancelToken ?? AuthSessionService().activeRequestsToken,
+      ),
     );
   }
 }

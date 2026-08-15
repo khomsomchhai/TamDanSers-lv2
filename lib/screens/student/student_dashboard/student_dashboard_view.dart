@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
+import 'package:tamdansers_lv2/screens/student/result_screen/result_screen_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/attendance_tab/attendance_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/profile_tab/profile_tab_view.dart';

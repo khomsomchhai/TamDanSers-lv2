@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
-import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/screens/student/attendance_scan/attendance_scan_controller.dart';
 
 part 'attendance_scan_binding.dart';
@@ -43,7 +42,7 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
         ),
         title: Text(
           'scan_title'.tr,
-          style: AppTextStyles.titleMedium.copyWith(
+          style: Get.textTheme.titleMedium?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
@@ -120,7 +119,7 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
                   Flexible(
                     child: Text(
                       'scan_instruction'.tr,
-                      style: const TextStyle(
+                      style: Get.textTheme.bodySmall?.copyWith(
                         color: Colors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -180,7 +179,7 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
                     Text(
                       controller.scanStatus.value,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: Get.textTheme.titleSmall?.copyWith(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -191,7 +190,7 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
                       Text(
                         'scan_hint'.tr,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: Get.textTheme.bodySmall?.copyWith(
                           color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 12,
                           height: 1.5,

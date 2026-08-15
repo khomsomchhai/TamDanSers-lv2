@@ -4,17 +4,10 @@ class StudentDashboardViewBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => StudentDashboardViewController());
-    Get.lazyPut(
-      () => HomeTabViewController(),
-    );
-    Get.lazyPut(
-      () => HomeworkViewController(),
-    );
-    Get.lazyPut(
-      () => AttendanceTabViewController(),
-    );
-    Get.lazyPut(
-      () => ProfileTabViewController(),
-    );
+    Get.lazyPut(() => HomeTabViewController());
+    Get.lazyPut(() => HomeworkViewController());
+    Get.lazyPut(() => AttendanceTabViewController());
+    Get.lazyPut(() => ProfileTabViewController());
+    Get.lazyPut(() => ResultScreenViewController(), fenix: true);
   }
 }

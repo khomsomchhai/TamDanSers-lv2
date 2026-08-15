@@ -29,7 +29,11 @@ part 'home_tab_controller.dart';
 
 class HomeTabView extends GetView<HomeTabViewController> {
   HomeTabView({super.key});
-  final resultController = Get.put(ResultScreenViewController());
+
+  ResultScreenViewController? get resultController =>
+      Get.isRegistered<ResultScreenViewController>()
+          ? Get.find<ResultScreenViewController>()
+          : null;
 
   final NotificationController notificationController =
       Get.isRegistered<NotificationController>()
@@ -228,6 +232,9 @@ class HomeTabView extends GetView<HomeTabViewController> {
   }
 
   Widget _buildAttendanceCard() {
+    final String className =
+        controller.userController.profile?.className ?? '';
+
     return Column(
       children: [
         Row(
@@ -237,7 +244,7 @@ class HomeTabView extends GetView<HomeTabViewController> {
               style: Get.textTheme.titleSmall,
             ),
             Text(
-              controller.userController.profile!.className,
+              className.isEmpty ? '-' : className,
               style: Get.textTheme.titleSmall,
             ),
           ],
@@ -246,7 +253,15 @@ class HomeTabView extends GetView<HomeTabViewController> {
           height: 10,
         ),
         Obx(() {
-          if (resultController.isLoading.value) {
+          final activeResultController = resultController;
+
+          if (controller.userController.isLoading.value ||
+              controller.userController.profile == null ||
+              activeResultController == null) {
+            return _buildAttendanceCardSkeleton();
+          }
+
+          if (activeResultController.isLoading.value) {
             return _buildAttendanceCardSkeleton();
           }
 
