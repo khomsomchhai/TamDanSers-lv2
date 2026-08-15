@@ -215,6 +215,18 @@ Future<void> getSemesterRank() async {
       yearlyRank.value = null;
       selectedMonth.value = null;
 
+      final bool isAuthFailure = e is DioException && e.response?.statusCode == 401;
+      if (isAuthFailure) {
+        if (Get.currentRoute != AppRoutes.loginScreen) {
+          await AuthSessionService().handleUnauthorized();
+        }
+        return;
+      }
+
+      if (e is DioException && e.type == DioExceptionType.cancel) {
+        return;
+      }
+
       Get.snackbar(
         'Error',
         e.toString(),

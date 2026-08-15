@@ -80,7 +80,7 @@ class ParentHomeTabView extends GetView<ParentHomeTabViewController> {
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
         16,
-        topPadding + 12,
+        topPadding + 10,
         16,
         22,
       ),

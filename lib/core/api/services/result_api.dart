@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
-import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
+import 'package:tamdansers_lv2/core/api/services/base_api_service.dart';
 import 'package:tamdansers_lv2/data/model/parent_model.dart';
 import 'package:tamdansers_lv2/data/model/score_model.dart';
 
@@ -137,17 +136,17 @@ class ResultApi {
   // SAFE DOUBLE
   // =====================================================
 
-  double _double(dynamic value) {
-    if (value == null) {
-      return 0;
-    }
+  // double _double(dynamic value) {
+  //   if (value == null) {
+  //     return 0;
+  //   }
 
-    if (value is num) {
-      return value.toDouble();
-    }
+  //   if (value is num) {
+  //     return value.toDouble();
+  //   }
 
-    return double.tryParse(value.toString()) ?? 0;
-  }
+  //   return double.tryParse(value.toString()) ?? 0;
+  // }
 
   // =====================================================
   // STUDENT SCORES

@@ -45,7 +45,7 @@ class AskPermissionScreenView
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildPermissionForm(),
+                _buildPermissionForm(context),
                 const SizedBox(height: 24),
                 _buildHistoryHeader(),
                 const SizedBox(height: 12),
@@ -60,7 +60,7 @@ class AskPermissionScreenView
 
 
 
-  Widget _buildPermissionForm() {
+  Widget _buildPermissionForm(BuildContext context) {
     return Obx(() {
       final isEditing = controller.isEditing;
 
@@ -158,7 +158,10 @@ class AskPermissionScreenView
                       ? 'permission_update'.tr
                       : 'ask_permission_submit_request'.tr,
                   isLoading: controller.isLoading.value,
-                  onPressed: controller.submitPermission,
+                  onPressed: () {
+                    FocusScope.of(context).unfocus();
+                    controller.submitPermission();
+                  },
                 ),
               ),
               if (isEditing) ...[
@@ -166,7 +169,10 @@ class AskPermissionScreenView
                 SizedBox(
                   width: double.infinity,
                   child: TextButton.icon(
-                    onPressed: controller.cancelEditPermission,
+                    onPressed: () {
+                      FocusScope.of(context).unfocus();
+                      controller.cancelEditPermission();
+                    },
                     icon: const Icon(
                       Icons.close_rounded,
                       size: 18,

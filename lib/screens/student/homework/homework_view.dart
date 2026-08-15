@@ -29,7 +29,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
         : Get.put(HomeworkViewController());
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: 'homework'.tr,
         showBackButton: false,
@@ -44,9 +44,9 @@ class HomeworkView extends GetView<HomeworkViewController> {
                 height: 54,
                 padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.light
-                      ? const Color(0xffEBEBF1)
-                      : Colors.black26,
+                  color: Get.isDarkMode
+                      ? Colors.black26
+                      : const Color(0xffEBEBF1),
                   borderRadius: BorderRadius.circular(27),
                 ),
                 child: Obx(
@@ -60,10 +60,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: controller.selectedTabIndex.value == 0
-                                  ? (Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? AppColors.white
-                                      : Colors.grey[850])
+                                  ? Get.theme.cardColor
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(22),
                               boxShadow: controller.selectedTabIndex.value == 0
@@ -100,10 +97,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: controller.selectedTabIndex.value == 1
-                                  ? (Theme.of(context).brightness ==
-                                          Brightness.light
-                                      ? AppColors.white
-                                      : Colors.grey[850])
+                                  ? Get.theme.cardColor
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(22),
                               boxShadow: controller.selectedTabIndex.value == 1
@@ -288,7 +282,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
     HomeworkViewController controller,
     SubjectHomeworkGroup group,
   ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = Get.isDarkMode;
     final isKm = Get.locale?.languageCode == 'km';
 
     final subjectColor = group.iconColor;
@@ -307,7 +301,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[900] : AppColors.white,
+          color: Get.theme.cardColor,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
             color: isDarkMode
@@ -386,9 +380,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                                     style: Get.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 17,
-                                      color: isDarkMode
-                                          ? AppColors.white
-                                          : AppColors.dark,
+                                      color: Get.theme.colorScheme.onSurface,
                                       letterSpacing: 0.2,
                                     ),
                                     maxLines: 1,
@@ -718,7 +710,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
     HomeworkItem item,
     Color subjectColor,
   ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = Get.isDarkMode;
     final isKm = Get.locale?.languageCode == 'km';
 
     String badgeText = '';
@@ -748,7 +740,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900] : AppColors.white,
+        color: Get.theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDarkMode
@@ -790,9 +782,7 @@ class HomeworkView extends GetView<HomeworkViewController> {
                               style: Get.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                color: isDarkMode
-                                    ? AppColors.white
-                                    : AppColors.dark,
+                                color: Get.theme.colorScheme.onSurface,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,

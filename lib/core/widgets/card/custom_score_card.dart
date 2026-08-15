@@ -17,36 +17,44 @@ class CustomScoreCard extends StatelessWidget {
   /// CustomScoreCard()
   final ResultViewMode? mode;
 
-  final ResultScreenViewController controller =
-      Get.find<ResultScreenViewController>();
+  ResultScreenViewController? get controller =>
+      Get.isRegistered<ResultScreenViewController>()
+          ? Get.find<ResultScreenViewController>()
+          : null;
 
-  CustomScoreCard({
+  const CustomScoreCard({
     super.key,
     this.mode,
   });
 
   @override
   Widget build(BuildContext context) {
+    final ResultScreenViewController? activeController = controller;
+
+    if (activeController == null) {
+      return _loadingCard();
+    }
+
     return Obx(() {
       final ResultViewMode currentMode =
-          mode ?? controller.selectedView.value;
+          mode ?? activeController.selectedView.value;
 
       // =====================================================
       // LOADING
       // =====================================================
 
       if (currentMode == ResultViewMode.monthly &&
-          controller.isRankLoading.value) {
+          activeController.isRankLoading.value) {
         return _loadingCard();
       }
 
       if (currentMode == ResultViewMode.semester &&
-          controller.isSemesterRankLoading.value) {
+          activeController.isSemesterRankLoading.value) {
         return _loadingCard();
       }
 
       if (currentMode == ResultViewMode.yearly &&
-          controller.isYearRankLoading.value) {
+          activeController.isYearRankLoading.value) {
         return _loadingCard();
       }
 
@@ -79,20 +87,16 @@ class CustomScoreCard extends StatelessWidget {
   // =========================================================
 
   Widget _monthlyCard() {
-    final ScoreModel? data = controller.rank.value;
+    final ScoreModel? data = controller?.rank.value;
 
-    final int? month = controller.selectedMonth.value;
+    final int? month = controller?.selectedMonth.value;
 
     final String monthName = month == null
         ? ''
-        : (controller.months[month]?.tr ?? '');
+        : (controller?.months[month]?.tr ?? '');
 
-    final double totalScore =
-        (data?.totalScore ?? 0).toDouble();
-
-    final double maxScore =
-        (data?.maxScore ?? 100).toDouble();
-
+    final double totalScore = (data?.totalScore ?? 0).toDouble();
+    final double maxScore = (data?.maxScore ?? 100).toDouble();
     final double progress = maxScore > 0
         ? (totalScore / maxScore).clamp(0.0, 1.0)
         : 0;
@@ -113,29 +117,19 @@ class CustomScoreCard extends StatelessWidget {
   // =========================================================
 
   Widget _semesterCard() {
-    final ScoreModel? data =
-        controller.semesterRank.value;
-
-    final int semester =
-        controller.selectedSemester.value;
-
-    final double semesterResult =
-        controller.semesterResult;
-
-    final double monthlyAverage =
-        controller.semesterMonthlyAverage;
+    final ScoreModel? data = controller?.semesterRank.value;
+    final int semester = controller?.selectedSemester.value ?? 1;
+    final double semesterResult = controller?.semesterResult ?? 0;
+    final double monthlyAverage = controller?.semesterMonthlyAverage ?? 0;
 
     return _buildCard(
-      title:
-          '${'ranking_for_semester'.tr} $semester',
+      title: '${'ranking_for_semester'.tr} $semester',
       rank: _rank(data),
-      totalScore:
-          semesterResult.toStringAsFixed(2),
+      totalScore: semesterResult.toStringAsFixed(2),
       average: data?.average.isNotEmpty == true
-          ? data!.average
+          ? (data?.average ?? '-')
           : monthlyAverage.toStringAsFixed(2),
-      progress:
-          (semesterResult / 100).clamp(0.0, 1.0),
+      progress: (semesterResult / 100).clamp(0.0, 1.0),
     );
   }
 
@@ -144,22 +138,17 @@ class CustomScoreCard extends StatelessWidget {
   // =========================================================
 
   Widget _yearlyCard() {
-    final ScoreModel? data =
-        controller.yearlyRank.value;
-
-    final double yearlyAverage =
-        controller.yearlyAverage;
+    final ScoreModel? data = controller?.yearlyRank.value;
+    final double yearlyAverage = controller?.yearlyAverage ?? 0;
 
     return _buildCard(
       title: 'ranking_for_year'.tr,
       rank: _rank(data),
-      totalScore:
-          yearlyAverage.toStringAsFixed(2),
+      totalScore: yearlyAverage.toStringAsFixed(2),
       average: data?.average.isNotEmpty == true
-          ? data!.average
+          ? (data?.average ?? '-')
           : yearlyAverage.toStringAsFixed(2),
-      progress:
-          (yearlyAverage / 100).clamp(0.0, 1.0),
+      progress: (yearlyAverage / 100).clamp(0.0, 1.0),
     );
   }
 
@@ -289,22 +278,25 @@ class CustomScoreCard extends StatelessWidget {
                     // SCORE INFO
                     // =====================================
 
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 8,
+                    Row(
                       children: [
-                        _infoBox(
-                          title:
-                              'total_score'.tr,
-                          value: totalScore,
-                          valueColor:
-                              AppColors.error,
+                        Expanded(
+                          child: _infoBox(
+                            title:
+                                'total_score'.tr,
+                            value: totalScore,
+                            valueColor:
+                                AppColors.warning,
+                          ),
                         ),
-                        _infoBox(
-                          title: 'average'.tr,
-                          value: average,
-                          valueColor:
-                              AppColors.info,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _infoBox(
+                            title: 'average'.tr,
+                            value: average,
+                            valueColor:
+                                AppColors.info,
+                          ),
                         ),
                       ],
                     ),
@@ -378,26 +370,30 @@ class CustomScoreCard extends StatelessWidget {
           AppNumbers.radiusSmall,
         ),
       ),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: '$title: ',
-              style:
-                  AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.info,
-                fontWeight: FontWeight.bold,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: '$title: ',
+                style:
+                    AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            TextSpan(
-              text: value,
-              style:
-                  AppTextStyles.bodyMedium.copyWith(
-                color: valueColor,
-                fontWeight: FontWeight.bold,
+              TextSpan(
+                text: value,
+                style:
+                    AppTextStyles.bodyMedium.copyWith(
+                  color: valueColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

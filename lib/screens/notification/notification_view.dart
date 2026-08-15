@@ -69,7 +69,7 @@ class NotificationView extends GetView<NotificationController> {
                   ),
                   child: Text(
                     groupTitle.toUpperCase(),
-                    style: theme.textTheme.labelSmall?.copyWith(
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.8,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.68),

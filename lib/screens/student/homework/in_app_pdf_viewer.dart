@@ -55,10 +55,10 @@ class _InAppPdfViewerState extends State<InAppPdfViewer> {
   @override
   Widget build(BuildContext context) {
     final isKm = Get.locale?.languageCode == 'km';
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Get.isDarkMode;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor:
             isDark ? const Color(0xff1A1A1E) : const Color(0xff1A1A2E),
@@ -69,7 +69,7 @@ class _InAppPdfViewerState extends State<InAppPdfViewer> {
           children: [
             Text(
               widget.title,
-              style: const TextStyle(
+              style: Get.textTheme.titleSmall?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
@@ -80,7 +80,10 @@ class _InAppPdfViewerState extends State<InAppPdfViewer> {
             if (_loadingProgress < 100)
               Text(
                 isKm ? 'កំពុងទាញយក...' : 'Loading...',
-                style: const TextStyle(color: Colors.white60, fontSize: 11),
+                style: Get.textTheme.bodySmall?.copyWith(
+                  color: Colors.white60,
+                  fontSize: 11,
+                ),
               ),
           ],
         ),
@@ -120,7 +123,7 @@ class _InAppPdfViewerState extends State<InAppPdfViewer> {
                     const SizedBox(height: 16),
                     Text(
                       isKm ? 'មិនអាចបើកឯកសារ PDF បានទេ' : 'Failed to load PDF',
-                      style: const TextStyle(
+                      style: Get.textTheme.titleSmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 15,

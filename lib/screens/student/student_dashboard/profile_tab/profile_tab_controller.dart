@@ -685,66 +685,8 @@ void logout() {
                           );
                         }
 
-                        // =====================================
-                        // 2. CLEAR NOTIFICATION MEMORY
-                        // =====================================
-
-                        if (Get.isRegistered<
-                            NotificationController>()) {
-                          Get.find<
-                                  NotificationController>()
-                              .clearForLogout();
-                        }
-
-                        // =====================================
-                        // 3. CLEAR USER MEMORY
-                        // =====================================
-
-                        if (Get.isRegistered<
-                            UserController>()) {
-                          Get.find<UserController>()
-                              .clearUser();
-                        }
-
-                        // =====================================
-                        // 4. CLEAR ACCOUNT STORAGE
-                        // =====================================
-
-                        await box.remove(
-                          'token',
-                        );
-
-                        await box.remove(
-                          'role',
-                        );
-
-                        await box.remove(
-                          'student_id',
-                        );
-
-                        await box.remove(
-                          'parent',
-                        );
-
-                        await box.remove(
-                          'students',
-                        );
-
-                        // Optional old notification keys
-                        await box.remove(
-                          'notificationsCount',
-                        );
-
-                        await box.remove(
-                          'deletedNotificationIds',
-                        );
-
-                        // =====================================
-                        // 5. CLOSE DIALOG + GO LOGIN
-                        // =====================================
-
-                        Get.offAllNamed(
-                          AppRoutes.loginScreen,
+                        await AuthSessionService().clearSessionData(
+                          navigateToLogin: true,
                         );
                       } catch (e, stackTrace) {
                         debugPrint(
