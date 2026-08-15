@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
+import 'package:tamdansers_lv2/app/themes/app_text_styles.dart';
 import 'package:tamdansers_lv2/screens/student/attendance_scan/attendance_scan_controller.dart';
 
 part 'attendance_scan_binding.dart';
@@ -16,18 +18,20 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
     final double scanLeft = (screenSize.width - scanSize) / 2;
     final double scanTop = screenSize.height / 2.3 - scanSize / 2;
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        automaticallyImplyLeading: false,
         centerTitle: true,
+        elevation: 0,
+        backgroundColor: AppColors.darkBackground,
+        surfaceTintColor: AppColors.darkBackground,
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         leading: GestureDetector(
           onTap: () => Get.back(),
           child: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.45),
+              color: Colors.white.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -39,10 +43,9 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
         ),
         title: Text(
           'scan_title'.tr,
-          style: const TextStyle(
+          style: AppTextStyles.titleMedium.copyWith(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -101,9 +104,9 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.55),
+                color: Colors.black.withValues(alpha: 0.55),
                 borderRadius: BorderRadius.circular(50),
-                border: Border.all(color: Colors.white.withOpacity(0.15)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -141,9 +144,9 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.78),
+                color: Colors.black.withValues(alpha: 0.78),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               child: Obx(
                 () => Column(
@@ -163,7 +166,7 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.18),
+                          color: AppColors.primary.withValues(alpha: 0.18),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -189,7 +192,7 @@ class AttendanceScanView extends GetView<AttendanceScanController> {
                         'scan_hint'.tr,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Colors.white.withValues(alpha: 0.6),
                           fontSize: 12,
                           height: 1.5,
                         ),
@@ -229,12 +232,12 @@ class ScannerOverlayPainter extends CustomPainter {
           ..addRRect(
               RRect.fromRectAndRadius(scanRect, const Radius.circular(_r))),
       ),
-      Paint()..color = Colors.black.withOpacity(0.58),
+      Paint()..color = Colors.black.withValues(alpha: 0.58),
     );
 
     // Corner glow (blurred wide stroke drawn first, under the solid corners)
     final Paint glowPaint = Paint()
-      ..color = AppColors.primary.withOpacity(0.35)
+      ..color = AppColors.primary.withValues(alpha: 0.35)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 14
       ..strokeCap = StrokeCap.round
@@ -344,15 +347,15 @@ class _ScanLineWidgetState extends State<_ScanLineWidget>
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    AppColors.primary.withOpacity(0.6),
+                    AppColors.primary.withValues(alpha: 0.6),
                     AppColors.primary,
-                    AppColors.primary.withOpacity(0.6),
+                    AppColors.primary.withValues(alpha: 0.6),
                     Colors.transparent,
                   ],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.45),
+                    color: AppColors.primary.withValues(alpha: 0.45),
                     blurRadius: 8,
                     spreadRadius: 1,
                   ),

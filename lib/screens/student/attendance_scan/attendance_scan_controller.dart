@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/api/services/attendance_service.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/attendance_tab/attendance_tab_view.dart';
 import 'package:tamdansers_lv2/screens/student/student_dashboard/home_tab/home_tab_view.dart';
@@ -19,7 +20,7 @@ class AttendanceScanController extends GetxController {
   final locationReady = false.obs;
 
   final scanStatus =
-      'Preparing location...'.obs;
+      'scan_getting_location'.tr.obs;
 
 
   // =========================================================
@@ -45,7 +46,7 @@ class AttendanceScanController extends GetxController {
   Future<void> prepareLocation() async {
     try {
       scanStatus.value =
-          'Checking location permission...';
+          'scan_checking_location'.tr;
 
       final bool serviceEnabled =
           await Geolocator
@@ -55,7 +56,7 @@ class AttendanceScanController extends GetxController {
         locationReady.value = false;
 
         scanStatus.value =
-            'Please turn on GPS / Location';
+            'location_service_required'.tr;
 
         await _showLocationServiceDialog();
 
@@ -89,11 +90,11 @@ class AttendanceScanController extends GetxController {
         locationReady.value = false;
 
         scanStatus.value =
-            'Location permission is required';
+            'location_permission_required'.tr;
 
         Get.snackbar(
-          'Location Required',
-          'Please allow location permission to scan attendance.',
+          'location_required'.tr,
+          'please_allow_location_permission'.tr,
           snackPosition:
               SnackPosition.BOTTOM,
           backgroundColor:
@@ -116,7 +117,7 @@ class AttendanceScanController extends GetxController {
         locationReady.value = false;
 
         scanStatus.value =
-            'Enable Location permission in Settings';
+            'enable_location_permission_settings'.tr;
 
         await _showAppSettingsDialog();
 
@@ -130,7 +131,7 @@ class AttendanceScanController extends GetxController {
       locationReady.value = true;
 
       scanStatus.value =
-          'Scan the QR code shown by your teacher';
+          'scan_default_status'.tr;
 
     } catch (error) {
       debugPrint(
@@ -140,7 +141,7 @@ class AttendanceScanController extends GetxController {
       locationReady.value = false;
 
       scanStatus.value =
-          'Cannot access location';
+          'cannot_access_location'.tr;
     }
   }
 
@@ -192,7 +193,7 @@ class AttendanceScanController extends GetxController {
     }
 
     scanStatus.value =
-        'Getting your current location...';
+        'scan_getting_location'.tr;
 
     final Position position =
         await Geolocator
@@ -295,7 +296,7 @@ class AttendanceScanController extends GetxController {
       }
 
       scanStatus.value =
-          'Checking your distance from teacher...';
+          'scan_checking_location'.tr;
 
       // =====================================================
       // CALL BACKEND
@@ -331,7 +332,7 @@ class AttendanceScanController extends GetxController {
       final String message =
           response['message']
                   ?.toString() ??
-              'Attendance recorded successfully';
+              'scan_recorded'.tr;
 
       final dynamic distanceValue = response['distance_m'];
 
@@ -428,7 +429,7 @@ class AttendanceScanController extends GetxController {
       } catch (_) {}
 
       Get.snackbar(
-        'Error',
+        'error'.tr,
         _getErrorMessage(
           error,
         ),
@@ -497,7 +498,7 @@ class AttendanceScanController extends GetxController {
                   ?.statusCode ==
               404) {
 
-        return 'QR attendance session not found.';
+        return 'scan_not_found'.tr;
       }
 
       if (
@@ -505,11 +506,11 @@ class AttendanceScanController extends GetxController {
                   ?.statusCode ==
               403) {
 
-        return 'You are not allowed to scan this attendance.';
+        return 'attendance_scan_forbidden'.tr;
       }
 
       return error.message ??
-          'Attendance scan failed.';
+          'attendance_scan_failed'.tr;
     }
 
 
@@ -531,7 +532,7 @@ class AttendanceScanController extends GetxController {
           'location_not_ready',
         )) {
 
-      return 'Please turn on GPS / Location and try again.';
+      return 'please_turn_on_gps'.tr;
     }
 
 
@@ -540,8 +541,7 @@ class AttendanceScanController extends GetxController {
           'location_permission_denied_forever',
         )) {
 
-      return 'Location permission is permanently denied. '
-          'Please enable Location permission in Settings.';
+      return 'location_permission_denied_forever'.tr;
     }
 
 
@@ -550,7 +550,7 @@ class AttendanceScanController extends GetxController {
           'location_permission_denied',
         )) {
 
-      return 'Please allow Location permission to scan attendance.';
+      return 'location_permission_denied'.tr;
     }
 
 
@@ -562,8 +562,7 @@ class AttendanceScanController extends GetxController {
           'not accurate enough',
         )) {
 
-      return 'Your GPS accuracy is too low. '
-          'Please enable precise location and try again.';
+      return 'gps_accuracy_too_low'.tr;
     }
 
 
@@ -578,7 +577,7 @@ class AttendanceScanController extends GetxController {
       return _extractBackendDetail(
         originalMessage,
         fallback:
-            'You are too far from the teacher.',
+            'too_far_from_teacher'.tr,
       );
     }
 
@@ -591,7 +590,7 @@ class AttendanceScanController extends GetxController {
           '404',
         )) {
 
-      return 'QR attendance session not found.';
+      return 'scan_not_found'.tr;
     }
 
 
@@ -600,7 +599,7 @@ class AttendanceScanController extends GetxController {
           'expired',
         )) {
 
-      return 'This QR code has expired. Please scan a new QR.';
+      return 'scan_expired'.tr;
     }
 
 
@@ -608,7 +607,7 @@ class AttendanceScanController extends GetxController {
     if (message.contains(
       'not for your class',
     )) {
-      return 'attendance_scan_wrong_class'.tr;
+      return 'scan_wrong_class'.tr;
     }
 
     // Already recorded
@@ -620,7 +619,7 @@ class AttendanceScanController extends GetxController {
           'already recorded',
         )) {
 
-      return 'Attendance already recorded.';
+      return 'attendance_already_recorded'.tr;
     }
 
 
@@ -635,14 +634,14 @@ class AttendanceScanController extends GetxController {
           'socket',
         )) {
 
-      return 'Cannot connect to server. Please check your internet.';
+      return 'cannot_connect_server'.tr;
     }
 
 
     return _extractBackendDetail(
       originalMessage,
       fallback:
-          'Attendance scan failed. Please try again.',
+          'attendance_scan_failed'.tr,
     );
   }
 
@@ -696,46 +695,149 @@ class AttendanceScanController extends GetxController {
   // LOCATION SERVICE DIALOG
   // =========================================================
 
-  Future<void>
-      _showLocationServiceDialog() async {
+  Future<void> _showLocationServiceDialog() async {
 
     await Get.dialog(
-      AlertDialog(
-        title:
-            const Text(
-          'Turn On Location',
+      Dialog(
+        shape:
+            RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(24),
         ),
+        child: Container(
+          padding:
+              const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Get.theme
+                .scaffoldBackgroundColor,
+            borderRadius:
+                BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize:
+                MainAxisSize.min,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.warning
+                      .withValues(alpha: 0.15),
+                  shape:
+                      BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.location_disabled,
+                  color: AppColors.warning,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(
+                height: 18,
+              ),
+              Text(
+                'turn_on_location'.tr,
+                textAlign:
+                    TextAlign.center,
+                style: Get.textTheme
+                    .titleLarge,
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              Text(
+                'location_gps_required_message'
+                    .tr,
+                textAlign:
+                    TextAlign.center,
+                style: Get.textTheme
+                    .bodyMedium
+                    ?.copyWith(
+                      color: Get.theme
+                          .colorScheme
+                          .onSurface
+                          .withValues(
+                            alpha: 0.7,
+                          ),
+                      height: 1.6,
+                    ),
+              ),
+              const SizedBox(
+                height: 28,
+              ),
+              SizedBox(
+                width:
+                    double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    Get.back();
 
-        content:
-            const Text(
-          'Location/GPS must be turned on before you can scan attendance.',
+                    await Geolocator
+                        .openLocationSettings();
+                  },
+                  style: ElevatedButton
+                      .styleFrom(
+                    backgroundColor:
+                        AppColors.warning,
+                    padding:
+                        const EdgeInsets
+                            .symmetric(
+                          vertical: 14,
+                        ),
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius
+                              .circular(
+                        12,
+                      ),
+                    ),
+                    textStyle:
+                        Get.textTheme
+                            .bodyLarge,
+                  ),
+                  child: Text(
+                    'open_settings'.tr,
+                    style: Get.textTheme
+                        .bodyLarge
+                        ?.copyWith(
+                          color: Colors
+                              .white,
+                        ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                width:
+                    double.infinity,
+                child: TextButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  style: TextButton
+                      .styleFrom(
+                    padding:
+                        const EdgeInsets
+                            .symmetric(
+                          vertical: 12,
+                        ),
+                    textStyle:
+                        Get.textTheme
+                            .bodyLarge,
+                  ),
+                  child: Text(
+                    'cancel'.tr,
+                    style: Get.textTheme
+                        .bodyLarge,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back();
-            },
-            child:
-                const Text(
-              'Cancel',
-            ),
-          ),
-
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-
-              await Geolocator
-                  .openLocationSettings();
-            },
-
-            child:
-                const Text(
-              'Open Settings',
-            ),
-          ),
-        ],
       ),
       barrierDismissible:
           false,
@@ -747,46 +849,151 @@ class AttendanceScanController extends GetxController {
   // APP SETTINGS DIALOG
   // =========================================================
 
-  Future<void>
-      _showAppSettingsDialog() async {
+  Future<void> _showAppSettingsDialog() async {
 
     await Get.dialog(
-      AlertDialog(
-        title:
-            const Text(
-          'Location Permission',
+      Dialog(
+        shape:
+            RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(24),
         ),
-
-        content:
-            const Text(
-          'Please allow Location permission for TamDanSers in Settings.',
+        child: Container(
+          padding:
+              const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Get.theme.scaffoldBackgroundColor,
+            borderRadius:
+                BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize:
+                MainAxisSize.min,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.info
+                      .withValues(alpha: 0.15),
+                  shape:
+                      BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons
+                      .location_on_rounded,
+                  color: AppColors.info,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(
+                height: 18,
+              ),
+              Text(
+                'location_permission_title'
+                    .tr,
+                textAlign:
+                    TextAlign.center,
+                style:
+                    Get.textTheme
+                        .titleLarge,
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              Text(
+                'location_permission_settings_message'
+                    .tr,
+                textAlign:
+                    TextAlign.center,
+                style: Get.textTheme
+                    .bodyMedium
+                    ?.copyWith(
+                      color: Get.theme
+                          .colorScheme
+                          .onSurface
+                          .withValues(
+                            alpha:
+                                0.7,
+                          ),
+                      height: 1.6,
+                    ),
+              ),
+              const SizedBox(
+                height: 28,
+              ),
+              SizedBox(
+                width:
+                    double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    Get.back();
+                    await Geolocator
+                        .openAppSettings();
+                  },
+                  style: ElevatedButton
+                      .styleFrom(
+                    backgroundColor:
+                        AppColors.info,
+                    padding:
+                        const EdgeInsets
+                            .symmetric(
+                          vertical: 14,
+                        ),
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius
+                              .circular(
+                        12,
+                      ),
+                    ),
+                    textStyle:
+                        Get.textTheme
+                            .labelLarge,
+                  ),
+                  child: Text(
+                    'open_settings'.tr,
+                    style: Get.textTheme
+                        .labelLarge
+                        ?.copyWith(
+                          color: Colors
+                              .white,
+                        ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                width:
+                    double.infinity,
+                child: TextButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  style: TextButton
+                      .styleFrom(
+                    padding:
+                        const EdgeInsets
+                            .symmetric(
+                          vertical: 12,
+                        ),
+                    textStyle:
+                        Get.textTheme
+                            .labelLarge,
+                  ),
+                  child: Text(
+                    'cancel'.tr,
+                    style: Get.textTheme
+                        .labelLarge,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back();
-            },
-            child:
-                const Text(
-              'Cancel',
-            ),
-          ),
-
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-
-              await Geolocator
-                  .openAppSettings();
-            },
-
-            child:
-                const Text(
-              'Open Settings',
-            ),
-          ),
-        ],
       ),
       barrierDismissible:
           false,
@@ -830,143 +1037,213 @@ class AttendanceScanController extends GetxController {
               'already recorded',
             );
 
+    final Color iconColor =
+        alreadyRecorded
+            ? AppColors.info
+            : AppColors.success;
+
     await Get.dialog(
-      AlertDialog(
+      Dialog(
         shape:
             RoundedRectangleBorder(
           borderRadius:
-              BorderRadius.circular(
-            24,
+              BorderRadius.circular(24),
+        ),
+        child: Container(
+          padding:
+              const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: Get.theme
+                .scaffoldBackgroundColor,
+            borderRadius:
+                BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize:
+                MainAxisSize.min,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: iconColor
+                      .withValues(alpha: 0.15),
+                  shape:
+                      BoxShape.circle,
+                ),
+                child: Icon(
+                  alreadyRecorded
+                      ? Icons
+                          .info_outline_rounded
+                      : Icons
+                          .check_circle_rounded,
+                  size: 56,
+                  color: iconColor,
+                ),
+              ),
+              const SizedBox(
+                height: 24,
+              ),
+              Text(
+                alreadyRecorded
+                    ? 'attendance_already_recorded_title'
+                        .tr
+                    : 'attendance_successful'
+                        .tr,
+                textAlign:
+                    TextAlign.center,
+                style: Get.textTheme
+                    .headlineSmall
+                    ?.copyWith(
+                      color: Get.theme
+                          .colorScheme
+                          .onSurface,
+                    ),
+              ),
+              if (subjectName
+                  .isNotEmpty) ...[
+                const SizedBox(
+                  height: 12,
+                ),
+                Text(
+                  subjectName,
+                  style: Get.textTheme
+                      .titleMedium
+                      ?.copyWith(
+                        color: AppColors
+                            .primary,
+                      ),
+                ),
+              ],
+              const SizedBox(
+                height: 14,
+              ),
+              Text(
+                message,
+                textAlign:
+                    TextAlign.center,
+                style: Get.textTheme
+                    .bodyMedium
+                    ?.copyWith(
+                      color: Get.theme
+                          .colorScheme
+                          .onSurface
+                          .withValues(
+                            alpha: 0.75,
+                          ),
+                      height: 1.5,
+                    ),
+              ),
+              if (distance != null) ...[
+                const SizedBox(
+                  height: 16,
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets
+                          .symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration:
+                      BoxDecoration(
+                    color: Get.theme
+                        .colorScheme
+                        .surface,
+                    borderRadius:
+                        BorderRadius
+                            .circular(12),
+                    border: Border.all(
+                      color: Get.theme
+                          .dividerColor,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment
+                            .center,
+                    children: [
+                      Icon(
+                        Icons
+                            .straighten_rounded,
+                        size: 18,
+                        color:
+                            AppColors
+                                .primary,
+                      ),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        '${'distance_from_teacher'.tr}: ${distance.toStringAsFixed(1)} m',
+                        style: Get
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                              fontWeight:
+                                  FontWeight
+                                      .w600,
+                              color: Get
+                                  .theme
+                                  .colorScheme
+                                  .onSurface,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(
+                height: 28,
+              ),
+              SizedBox(
+                width:
+                    double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Dialog
+                    Get.back();
+
+                    // Scanner screen
+                    Get.back(
+                      result: true,
+                    );
+                  },
+                  style: ElevatedButton
+                      .styleFrom(
+                    backgroundColor:
+                        iconColor,
+                    padding:
+                        const EdgeInsets
+                            .symmetric(
+                          vertical: 14,
+                        ),
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius
+                              .circular(12),
+                    ),
+                    textStyle:
+                        Get.textTheme
+                            .bodyLarge,
+                  ),
+                  child: Text(
+                    'ok'.tr,
+                    style: Get.textTheme
+                        .bodyLarge
+                        ?.copyWith(
+                          color: Colors
+                              .white,
+                        ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-
-        content:
-            Column(
-          mainAxisSize:
-              MainAxisSize.min,
-
-          children: [
-            Icon(
-              Icons
-                  .check_circle_rounded,
-
-              size:
-                  80,
-
-              color:
-                  alreadyRecorded
-                      ? Colors.blue
-                      : Colors.green,
-            ),
-
-            const SizedBox(
-              height: 18,
-            ),
-
-            Text(
-              alreadyRecorded
-                  ? 'Attendance Already Recorded'
-                  : 'Attendance Successful',
-
-              textAlign:
-                  TextAlign.center,
-
-              style:
-                  const TextStyle(
-                fontSize:
-                    20,
-
-                fontWeight:
-                    FontWeight.bold,
-              ),
-            ),
-
-            if (
-                subjectName
-                    .isNotEmpty) ...[
-              const SizedBox(
-                height:
-                    10,
-              ),
-
-              Text(
-                subjectName,
-
-                style:
-                    const TextStyle(
-                  fontSize:
-                      17,
-
-                  fontWeight:
-                      FontWeight.w600,
-                ),
-              ),
-            ],
-
-            const SizedBox(
-              height:
-                  10,
-            ),
-
-            Text(
-              message,
-
-              textAlign:
-                  TextAlign.center,
-            ),
-
-            if (distance != null) ...[
-              const SizedBox(
-                height:
-                    12,
-              ),
-
-              Text(
-                'Distance from teacher: '
-                '${distance.toStringAsFixed(1)} m',
-
-                style:
-                    const TextStyle(
-                  fontWeight:
-                      FontWeight.w600,
-                ),
-              ),
-            ],
-
-            const SizedBox(
-              height:
-                  20,
-            ),
-
-            SizedBox(
-              width:
-                  double.infinity,
-
-              child:
-                  ElevatedButton(
-                onPressed: () {
-                  // Dialog
-                  Get.back();
-
-                  // Scanner screen
-                  Get.back(
-                    result:
-                        true,
-                  );
-                },
-
-                child:
-                    const Text(
-                  'OK',
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
-
-      barrierDismissible:
-          false,
+      barrierDismissible: false,
     );
   }
 

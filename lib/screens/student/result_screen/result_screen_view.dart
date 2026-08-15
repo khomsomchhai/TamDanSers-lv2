@@ -308,28 +308,28 @@ Widget monthlyView() {
             return rankSkeleton();
           }
 
-          final ScoreModel? data =
-              controller.rank.value;
+          // final ScoreModel? data =
+          //     controller.rank.value;
 
-          final double totalScore =
-              (data?.totalScore ?? 0).toDouble();
+          // final double totalScore =
+          //     (data?.totalScore ?? 0).toDouble();
 
-          final double maxScore =
-              (data?.maxScore ?? 100).toDouble();
+          // final double maxScore =
+          //     (data?.maxScore ?? 100).toDouble();
 
-          final double progress = maxScore > 0
-              ? (totalScore / maxScore)
-                  .clamp(0.0, 1.0)
-              : 0;
+          // final double progress = maxScore > 0
+          //     ? (totalScore / maxScore)
+          //         .clamp(0.0, 1.0)
+          //     : 0;
 
-          final int? month =
-              controller.selectedMonth.value;
+          // final int? month =
+          //     controller.selectedMonth.value;
 
-          final String monthName =
-              month == null
-                  ? ''
-                  : (controller.months[month]?.tr ??
-                      '');
+          // final String monthName =
+          //     month == null
+          //         ? ''
+          //         : (controller.months[month]?.tr ??
+          //             '');
 
           return CustomScoreCard(
   mode: ResultViewMode.monthly,
@@ -810,27 +810,27 @@ Widget yearlyView() {
 
   return Obx(
     () {
-      final double finalAverage =
-          controller.yearlyAverage;
+      // final double finalAverage =
+      //     controller.yearlyAverage;
 
-      final ScoreModel? rankData =
-          controller.yearlyRank.value;
+      // final ScoreModel? rankData =
+      //     controller.yearlyRank.value;
 
-      final String rank =
-          rankData?.rank.isNotEmpty == true
-              ? rankData!.rank
-              : '-';
+      // final String rank =
+      //     rankData?.rank.isNotEmpty == true
+      //         ? rankData!.rank
+      //         : '-';
 
-      final String average =
-          rankData?.average.isNotEmpty == true
-              ? rankData!.average
-              : finalAverage.toStringAsFixed(2);
+      // final String average =
+      //     rankData?.average.isNotEmpty == true
+      //         ? rankData!.average
+      //         : finalAverage.toStringAsFixed(2);
 
-      final double progress =
-          (finalAverage / 100).clamp(
-        0.0,
-        1.0,
-      );
+      // final double progress =
+      //     (finalAverage / 100).clamp(
+      //   0.0,
+      //   1.0,
+      // );
 
       return RefreshIndicator(
         onRefresh: controller.refreshResult,

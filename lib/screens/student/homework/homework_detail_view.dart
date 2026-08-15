@@ -6,6 +6,7 @@ import 'package:get/get.dart' hide MultipartFile;
 import 'package:image_picker/image_picker.dart';
 import 'package:tamdansers_lv2/app/themes/app_colors.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
+import 'package:tamdansers_lv2/core/widgets/button/custom_button.dart';
 import 'package:tamdansers_lv2/core/widgets/snackbar/custom_snackbar.dart';
 import 'package:tamdansers_lv2/screens/student/homework/homework_view.dart';
 import 'package:tamdansers_lv2/screens/student/homework/in_app_pdf_viewer.dart';
@@ -179,7 +180,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
       Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: Get.theme.scaffoldBackgroundColor,
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(20),
           ),
@@ -306,7 +307,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
             Expanded(
               child: Text(
                 _isKhmer ? 'លុបកិច្ចការ?' : 'Delete submission?',
-                style: const TextStyle(
+                style: Get.textTheme.titleMedium?.copyWith(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
                 ),
@@ -318,7 +319,10 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
           _isKhmer
               ? 'តើអ្នកពិតជាចង់លុបកិច្ចការដែលបានប្រគល់នេះមែនទេ?'
               : 'Are you sure you want to delete this submission?',
-          style: const TextStyle(fontSize: 14, height: 1.4),
+          style: Get.textTheme.bodyMedium?.copyWith(
+            fontSize: 14,
+            height: 1.4,
+          ),
         ),
         actions: [
           TextButton(
@@ -391,7 +395,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
   @override
   Widget build(BuildContext context) {
     final item = widget.item;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Get.isDarkMode;
     final primaryThemeColor = _getSubjectColor(item.subjectName);
 
     String statusText;
@@ -418,7 +422,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
       appBar: CustomAppBar(title: 'Homework Details'.tr),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -479,18 +483,16 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
     required Color statusBackground,
     required Color primaryThemeColor,
   }) {
-    final isLight = Theme.of(context).brightness == Brightness.light;
+    final isLight = !Get.isDarkMode;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isLight ? Colors.white : const Color(0xff1A1A1E),
+        color: Get.theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isLight
-              ? const Color(0xffE2E8F0)
-              : Colors.white.withValues(alpha: 0.05),
+          color: Get.theme.dividerColor,
         ),
       ),
       child: Column(
@@ -519,7 +521,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                     const SizedBox(width: 6),
                     Text(
                       item.subjectName.toUpperCase(),
-                      style: TextStyle(
+                      style: Get.textTheme.bodySmall?.copyWith(
                         color: primaryThemeColor,
                         fontWeight: FontWeight.w700,
                         fontSize: 10,
@@ -539,7 +541,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                 ),
                 child: Text(
                   statusText,
-                  style: TextStyle(
+                  style: Get.textTheme.bodySmall?.copyWith(
                     color: statusColor,
                     fontWeight: FontWeight.w600,
                     fontSize: 11,
@@ -551,7 +553,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
           const SizedBox(height: 16),
           Text(
             item.title,
-            style: const TextStyle(
+            style: Get.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
               fontSize: 18,
             ),
@@ -560,7 +562,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
             const SizedBox(height: 8),
             Text(
               item.description,
-              style: TextStyle(
+              style: Get.textTheme.bodyMedium?.copyWith(
                 color:
                     isLight ? const Color(0xff475569) : const Color(0xff94A3B8),
                 fontSize: 13.5,
@@ -584,7 +586,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                   item.teacherName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: Get.textTheme.bodySmall?.copyWith(
                     color: Colors.grey,
                     fontSize: 12.5,
                   ),
@@ -612,7 +614,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                           : 'Submitted: ${item.date}'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: Get.textTheme.bodySmall?.copyWith(
                     color: (item.status == HomeworkStatus.none ||
                             item.status == HomeworkStatus.pending)
                         ? Colors.orange
@@ -642,7 +644,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
       children: [
         Text(
           _isKhmer ? 'ឯកសារភ្ជាប់ពីគ្រូ' : "Teacher's Attachment",
-          style: const TextStyle(
+          style: Get.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -717,7 +719,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                 path.split('/').last,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: Get.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
@@ -746,36 +748,38 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
         SizedBox(
           width: double.infinity,
           height: 48,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              elevation: 0,
-            ),
+          child: CustomButton(
+            text: _isKhmer
+                ? 'បញ្ជូនកិច្ចការ'
+                : 'Submit Homework',
+            variant: ButtonVariant.primary,
             onPressed: () {
-              final text = _answerController.text.trim();
+              final text =
+                  _answerController.text
+                      .trim();
 
-              if (text.isEmpty && _selectedFiles.isEmpty) {
+              if (text.isEmpty &&
+                  _selectedFiles
+                      .isEmpty) {
                 CustomSnackbar.warning(
                   _isKhmer
                       ? 'សូមបញ្ចូលចម្លើយ ឬភ្ជាប់ឯកសារ'
                       : 'Please enter an answer or attach a file',
-                  title: _isKhmer ? 'កំហុស' : 'Error',
+                  title: _isKhmer
+                      ? 'កំហុស'
+                      : 'Error',
                 );
                 return;
               }
 
-              widget.controller.executeSubmitHomework(
+              widget.controller
+                  .executeSubmitHomework(
                 context,
                 widget.item.id,
                 text,
                 _selectedFiles,
               );
             },
-            child: Text(
-              _isKhmer ? 'បញ្ជូនកិច្ចការ' : 'Submit Homework',
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
           ),
         ),
       ],
@@ -805,7 +809,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                   _isKhmer
                       ? 'អ្នកកំពុងកែប្រែកិច្ចការដែលបានប្រគល់'
                       : 'You are editing your submission',
-                  style: const TextStyle(
+                  style: Get.textTheme.bodyMedium?.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
@@ -823,7 +827,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
           activeThumbColor: AppColors.primary,
           title: Text(
             _isKhmer ? 'រក្សាឯកសារចាស់' : 'Keep existing files',
-            style: const TextStyle(
+            style: Get.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
@@ -832,7 +836,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
             _isKhmer
                 ? 'បិទ ដើម្បីដកឯកសារចាស់ចេញពីកិច្ចការ'
                 : 'Turn off to remove existing files from the submission',
-            style: const TextStyle(fontSize: 12),
+            style: Get.textTheme.bodySmall?.copyWith(fontSize: 12),
           ),
           onChanged: (value) {
             setState(() => _keepOldFiles = value);
@@ -896,7 +900,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
       children: [
         Text(
           _isKhmer ? 'មតិឬចំណាំ' : 'Comment or Note',
-          style: const TextStyle(
+          style: Get.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -949,7 +953,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                   _isKhmer
                       ? 'ភ្ជាប់ឯកសារ (រូបភាព ឬ PDF)'
                       : 'Attach file (Image or PDF)',
-                  style: const TextStyle(
+                  style: Get.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     fontSize: 13.5,
                   ),
@@ -997,7 +1001,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                     file.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: Get.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),
@@ -1055,7 +1059,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                     _isKhmer
                         ? 'បានប្រគល់រួច និងកំពុងរង់ចាំគ្រូពិនិត្យ'
                         : 'Submitted and waiting for teacher review',
-                    style: const TextStyle(
+                    style: Get.textTheme.bodyMedium?.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1086,7 +1090,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
                     _isKhmer
                         ? 'គ្រូបានពិនិត្យរួច ដូច្នេះមិនអាចកែប្រែ ឬលុបបានទេ។'
                         : 'The teacher has checked this submission. It cannot be edited or deleted.',
-                    style: const TextStyle(
+                    style: Get.textTheme.bodyMedium?.copyWith(
                       color: AppColors.success,
                       fontWeight: FontWeight.w600,
                     ),
@@ -1099,7 +1103,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
           if (score != null)
             Text(
               _isKhmer ? 'ពិន្ទុ៖ $score' : 'Score: $score',
-              style: const TextStyle(
+              style: Get.textTheme.titleMedium?.copyWith(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: AppColors.success,
@@ -1109,7 +1113,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
         ],
         Text(
           _isKhmer ? 'ចម្លើយរបស់អ្នក' : 'Your Submission',
-          style: const TextStyle(
+          style: Get.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -1127,7 +1131,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
             answerText.trim().isEmpty
                 ? (_isKhmer ? '(មិនមានអត្ថបទចម្លើយ)' : '(No answer text)')
                 : answerText,
-            style: TextStyle(
+            style: Get.textTheme.bodyMedium?.copyWith(
               fontSize: 13.5,
               height: 1.4,
               color: answerText.trim().isEmpty ? Colors.grey : null,
@@ -1141,7 +1145,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
           const SizedBox(height: 20),
           Text(
             _isKhmer ? 'ឯកសារដែលបានប្រគល់' : 'Submitted Files',
-            style: const TextStyle(
+            style: Get.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
@@ -1183,7 +1187,7 @@ class _HomeworkDetailViewState extends State<HomeworkDetailView> {
               children: [
                 Text(
                   _isKhmer ? 'មតិយោបល់របស់គ្រូ' : "Teacher's Comment",
-                  style: const TextStyle(
+                  style: Get.textTheme.titleSmall?.copyWith(
                     color: AppColors.success,
                     fontWeight: FontWeight.w700,
                   ),

@@ -289,22 +289,25 @@ class CustomScoreCard extends StatelessWidget {
                     // SCORE INFO
                     // =====================================
 
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 8,
+                    Row(
                       children: [
-                        _infoBox(
-                          title:
-                              'total_score'.tr,
-                          value: totalScore,
-                          valueColor:
-                              AppColors.error,
+                        Expanded(
+                          child: _infoBox(
+                            title:
+                                'total_score'.tr,
+                            value: totalScore,
+                            valueColor:
+                                AppColors.warning,
+                          ),
                         ),
-                        _infoBox(
-                          title: 'average'.tr,
-                          value: average,
-                          valueColor:
-                              AppColors.info,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _infoBox(
+                            title: 'average'.tr,
+                            value: average,
+                            valueColor:
+                                AppColors.info,
+                          ),
                         ),
                       ],
                     ),
@@ -378,26 +381,30 @@ class CustomScoreCard extends StatelessWidget {
           AppNumbers.radiusSmall,
         ),
       ),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: '$title: ',
-              style:
-                  AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.info,
-                fontWeight: FontWeight.bold,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: '$title: ',
+                style:
+                    AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            TextSpan(
-              text: value,
-              style:
-                  AppTextStyles.bodyMedium.copyWith(
-                color: valueColor,
-                fontWeight: FontWeight.bold,
+              TextSpan(
+                text: value,
+                style:
+                    AppTextStyles.bodyMedium.copyWith(
+                  color: valueColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
