@@ -74,74 +74,40 @@ class NotificationController
   // LOAD NOTIFICATIONS
   // =========================================================
 
- Future<void> loadNotifications() async {
+Future<void> loadNotifications() async {
+  final String token =
+      box.read('token')?.toString().trim() ?? '';
+
+  if (token.isEmpty) {
+    notifications.clear();
+    unreadCount.value = 0;
+    isLoading.value = false;
+
+    debugPrint(
+      'SKIP NOTIFICATIONS: NO AUTH TOKEN',
+    );
+
+    return;
+  }
+
   try {
     isLoading.value = true;
-
-    debugPrint(
-      '========== LOAD NOTIFICATIONS =========='
-    );
-
-    debugPrint(
-      'ACCOUNT KEY: $_accountKey',
-    );
-
-    final String token =
-        box.read('token')?.toString() ?? '';
-
-    debugPrint(
-      'HAS TOKEN: ${token.isNotEmpty}',
-    );
 
     final List<NotificationModel> fetched =
         await api.getNotifications();
 
-    debugPrint(
-      'FETCHED COUNT: ${fetched.length}',
-    );
-
-    for (final item in fetched) {
-      debugPrint(
-        'NOTIFICATION => '
-        'id=${item.id}, '
-        'title=${item.title}, '
-        'message=${item.message}',
-      );
-    }
-
     fetched.sort(
       (a, b) =>
-          b.createdAt.compareTo(
-        a.createdAt,
-      ),
+          b.createdAt.compareTo(a.createdAt),
     );
 
-    notifications.assignAll(
-      fetched,
-    );
-
-    debugPrint(
-      'CONTROLLER COUNT: '
-      '${notifications.length}',
-    );
+    notifications.assignAll(fetched);
 
     _updateUnreadCount();
-
+  } catch (e) {
     debugPrint(
-      '========================================',
+      'LOAD NOTIFICATION ERROR: $e',
     );
-  } catch (e, stackTrace) {
-    debugPrint(
-      'LOAD NOTIFICATIONS ERROR: $e',
-    );
-
-    debugPrintStack(
-      stackTrace: stackTrace,
-    );
-
-    notifications.clear();
-    expandedNotificationIds.clear();
-    unreadCount.value = 0;
   } finally {
     isLoading.value = false;
   }
