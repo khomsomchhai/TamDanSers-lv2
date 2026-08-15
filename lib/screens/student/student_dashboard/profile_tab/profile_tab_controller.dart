@@ -660,102 +660,161 @@ void logout() {
 
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        // =====================================
-                        // 1. REMOVE FCM TOKEN FROM OLD ACCOUNT
-                        //
-                        // IMPORTANT:
-                        // Must happen BEFORE removing auth token.
-                        // =====================================
+onPressed: () async {
+  try {
+    // =====================================================
+    // 1. REMOVE FCM TOKEN
+    // JWT still exists here.
+    // =====================================================
 
-                        try {
-                          final notificationApi =
-                              NotificationApi();
+    try {
+      final NotificationApi notificationApi =
+          NotificationApi();
 
-                          await notificationApi
-                              .removeFcmToken();
+      await notificationApi.removeFcmToken();
 
-                          debugPrint(
-                            'FCM TOKEN REMOVED FROM OLD ACCOUNT',
-                          );
-                        } catch (e) {
-                          debugPrint(
-                            'REMOVE FCM TOKEN ERROR: $e',
-                          );
-                        }
+      debugPrint(
+        'FCM TOKEN REMOVED FROM CURRENT ACCOUNT',
+      );
+    } on DioException catch (e) {
+      // Don't show 401 during logout.
+      if (e.response?.statusCode != 401) {
+        debugPrint(
+          'REMOVE FCM TOKEN ERROR: $e',
+        );
+      }
+    } catch (e) {
+      debugPrint(
+        'REMOVE FCM TOKEN ERROR: $e',
+      );
+    }
 
-                        // =====================================
-                        // 2. CLEAR NOTIFICATION MEMORY
-                        // =====================================
+    // =====================================================
+    // 2. STOP NOTIFICATION CONTROLLER
+    // =====================================================
 
-                        if (Get.isRegistered<
-                            NotificationController>()) {
-                          Get.find<
-                                  NotificationController>()
-                              .clearForLogout();
-                        }
+    if (Get.isRegistered<NotificationController>()) {
+      final NotificationController notificationController =
+          Get.find<NotificationController>();
 
-                        // =====================================
-                        // 3. CLEAR USER MEMORY
-                        // =====================================
+      notificationController.clearForLogout();
 
-                        if (Get.isRegistered<
-                            UserController>()) {
-                          Get.find<UserController>()
-                              .clearUser();
-                        }
+      Get.delete<NotificationController>(
+        force: true,
+      );
 
-                        // =====================================
-                        // 4. CLEAR ACCOUNT STORAGE
-                        // =====================================
+      debugPrint(
+        'NOTIFICATION CONTROLLER DELETED',
+      );
+    }
 
-                        await box.remove(
-                          'token',
-                        );
+    // =====================================================
+    // 3. STOP RESULT CONTROLLER
+    //
+    // IMPORTANT:
+    // Prevent getResult/getRank from running after logout.
+    // =====================================================
 
-                        await box.remove(
-                          'role',
-                        );
+    if (Get.isRegistered<ResultScreenViewController>()) {
+      Get.delete<ResultScreenViewController>(
+        force: true,
+      );
 
-                        await box.remove(
-                          'student_id',
-                        );
+      debugPrint(
+        'RESULT CONTROLLER DELETED',
+      );
+    }
 
-                        await box.remove(
-                          'parent',
-                        );
+    // =====================================================
+    // 4. CLEAR USER MEMORY
+    // =====================================================
 
-                        await box.remove(
-                          'students',
-                        );
+    if (Get.isRegistered<UserController>()) {
+      Get.find<UserController>().clearUser();
 
-                        // Optional old notification keys
-                        await box.remove(
-                          'notificationsCount',
-                        );
+      debugPrint(
+        'USER CONTROLLER CLEARED',
+      );
+    }
 
-                        await box.remove(
-                          'deletedNotificationIds',
-                        );
+    // =====================================================
+    // 5. CLEAR STUDENT LOCAL SESSION DATA
+    // =====================================================
 
-                        // =====================================
-                        // 5. CLOSE DIALOG + GO LOGIN
-                        // =====================================
+    await box.remove(
+      'student_id',
+    );
 
-                        Get.offAllNamed(
-                          AppRoutes.loginScreen,
-                        );
-                      } catch (e, stackTrace) {
-                        debugPrint(
-                          'LOGOUT ERROR: $e',
-                        );
+    // Old notification local keys.
+    await box.remove(
+      'notificationsCount',
+    );
 
-                        debugPrintStack(
-                          stackTrace: stackTrace,
-                        );
-                      }
-                    },
+    await box.remove(
+      'deletedNotificationIds',
+    );
+
+    // =====================================================
+    // 6. REMOVE ROLE
+    // =====================================================
+
+    await box.remove(
+      'role',
+    );
+
+    // =====================================================
+    // 7. REMOVE JWT LAST
+    //
+    // Do not move this above the API/controller cleanup.
+    // =====================================================
+
+    await box.remove(
+      'token',
+    );
+
+    debugPrint(
+      'STUDENT LOCAL SESSION CLEARED',
+    );
+
+    // =====================================================
+    // 8. GO TO LOGIN
+    // =====================================================
+
+    Get.offAllNamed(
+      AppRoutes.loginScreen,
+    );
+  } catch (e, stackTrace) {
+    debugPrint(
+      'STUDENT LOGOUT ERROR: $e',
+    );
+
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+
+    // =====================================================
+    // FALLBACK LOCAL LOGOUT
+    // =====================================================
+
+    try {
+      await box.remove(
+        'student_id',
+      );
+
+      await box.remove(
+        'role',
+      );
+
+      await box.remove(
+        'token',
+      );
+    } catch (_) {}
+
+    Get.offAllNamed(
+      AppRoutes.loginScreen,
+    );
+  }
+},
                     style:
                         ElevatedButton.styleFrom(
                       backgroundColor:
@@ -795,4 +854,5 @@ void logout() {
     ),
   );
 }
+
 }

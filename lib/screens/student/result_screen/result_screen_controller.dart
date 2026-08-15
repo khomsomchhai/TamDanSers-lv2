@@ -8,9 +8,20 @@ enum ResultViewMode {
 
 class ResultScreenViewController extends GetxController
     with GetSingleTickerProviderStateMixin {
-  final ResultApi resultApi = ResultApi();
-  final GetStorage _storage = GetStorage();
-  static const String _cacheKeyResult = 'student_result_cache';
+final ResultApi resultApi = ResultApi();
+final GetStorage _storage = GetStorage();
+
+static const String _cacheKeyResult =
+    'student_result_cache';
+
+bool _isClosed = false;
+
+bool get _hasAuthToken {
+  final String token =
+      _storage.read('token')?.toString().trim() ?? '';
+
+  return token.isNotEmpty;
+}
 
   late final TabController tabController;
 
@@ -186,45 +197,89 @@ Future<void> getSemesterRank() async {
   // LOAD RESULT
   // =========================================================
 
-  Future<void> getResult() async {
-    final bool hasCache = result.isNotEmpty;
-    if (!hasCache) {
-      isLoading.value = true;
+Future<void> getResult() async {
+  // Don't request after logout.
+  if (_isClosed || !_hasAuthToken) {
+    debugPrint(
+      'SKIP GET RESULT: NO AUTH TOKEN',
+    );
+
+    isLoading.value = false;
+    return;
+  }
+
+  final bool hasCache = result.isNotEmpty;
+
+  if (!hasCache) {
+    isLoading.value = true;
+  }
+
+  try {
+    final List<ScoreModel> response =
+        await resultApi.getResult();
+
+    // User may logout while request is running.
+    if (_isClosed || !_hasAuthToken) {
+      debugPrint(
+        'IGNORE RESULT RESPONSE AFTER LOGOUT',
+      );
+      return;
     }
 
-    try {
-      final List<ScoreModel> response = await resultApi.getResult();
+    result.assignAll(response);
 
-      result.assignAll(response);
-      _storage.write(
-        _cacheKeyResult,
-        response.map((e) => e.toJson()).toList(),
+    await _storage.write(
+      _cacheKeyResult,
+      response
+          .map(
+            (ScoreModel item) =>
+                item.toJson(),
+          )
+          .toList(),
+    );
+
+    debugPrint(
+      'TOTAL SCORE RECORDS: ${result.length}',
+    );
+
+    _selectInitialSemesterAndMonth();
+
+    if (_isClosed || !_hasAuthToken) {
+      return;
+    }
+
+    await getRank();
+  } on DioException catch (e, stackTrace) {
+    // Logout / expired token
+    if (e.response?.statusCode == 401) {
+      debugPrint(
+        'IGNORE GET RESULT 401',
       );
+      return;
+    }
 
-      debugPrint('TOTAL SCORE RECORDS: ${result.length}');
+    debugPrint(
+      'GET RESULT DIO ERROR: '
+      '${e.response?.data ?? e.message}',
+    );
 
-      _selectInitialSemesterAndMonth();
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+  } catch (e, stackTrace) {
+    debugPrint(
+      'GET RESULT ERROR: $e',
+    );
 
-      await getRank();
-    } catch (e, stackTrace) {
-      debugPrint('GET RESULT ERROR: $e');
-      debugPrintStack(stackTrace: stackTrace);
-
-      result.clear();
-      rank.value = null;
-      yearlyRank.value = null;
-      selectedMonth.value = null;
-
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+  } finally {
+    if (!_isClosed) {
       isLoading.value = false;
     }
   }
-
+}
   // =========================================================
   // SEMESTERS
   // =========================================================
@@ -732,38 +787,69 @@ Future<void> changeSemester(
   // MONTHLY RANK
   // =========================================================
 
-  Future<void> getRank() async {
-    final int? month = selectedMonth.value;
+Future<void> getRank() async {
+  if (_isClosed || !_hasAuthToken) {
+    debugPrint(
+      'SKIP GET RANK: NO AUTH TOKEN',
+    );
+    return;
+  }
 
-    if (month == null) {
-      rank.value = null;
+  final int? month = selectedMonth.value;
+
+  if (month == null) {
+    rank.value = null;
+    return;
+  }
+
+  try {
+    isRankLoading.value = true;
+
+    final ScoreModel? response =
+        await resultApi.getRankStudent(
+      month: month,
+      semester: selectedSemester.value,
+    );
+
+    if (_isClosed || !_hasAuthToken) {
       return;
     }
 
-    try {
-      isRankLoading.value = true;
-
-      final ScoreModel? response = await resultApi.getRankStudent(
-        month: month,
-        semester: selectedSemester.value,
-      );
-
-      rank.value = response;
-    } catch (e, stackTrace) {
+    rank.value = response;
+  } on DioException catch (e, stackTrace) {
+    if (e.response?.statusCode == 401) {
       debugPrint(
-        'GET RANK ERROR: $e',
+        'IGNORE GET RANK 401',
       );
+      return;
+    }
 
-      debugPrintStack(
-        stackTrace: stackTrace,
-      );
+    debugPrint(
+      'GET RANK DIO ERROR: '
+      '${e.response?.data ?? e.message}',
+    );
 
-      rank.value = null;
-    } finally {
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+
+    rank.value = null;
+  } catch (e, stackTrace) {
+    debugPrint(
+      'GET RANK ERROR: $e',
+    );
+
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+
+    rank.value = null;
+  } finally {
+    if (!_isClosed) {
       isRankLoading.value = false;
     }
   }
-
+}
   // =========================================================
   // REFRESH
   // =========================================================
@@ -826,14 +912,20 @@ Future<void> refreshResult() async {
   // CLOSE
   // =========================================================
 
-  @override
-  void onClose() {
-    tabController.removeListener(
-      _handleSemesterTabChange,
-    );
+ @override
+void onClose() {
+  _isClosed = true;
 
-    tabController.dispose();
+  tabController.removeListener(
+    _handleSemesterTabChange,
+  );
 
-    super.onClose();
-  }
+  tabController.dispose();
+
+  debugPrint(
+    'RESULT SCREEN CONTROLLER CLOSED',
+  );
+
+  super.onClose();
+}
 }

@@ -1,5 +1,6 @@
 ﻿import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -16,6 +17,7 @@ import 'package:tamdansers_lv2/core/services/theme_service.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/data/model/user_model.dart';
 import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
+import 'package:tamdansers_lv2/screens/student/result_screen/result_screen_view.dart';
 
 part 'profile_tab_binding.dart';
 part 'profile_tab_controller.dart';
