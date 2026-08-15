@@ -11,9 +11,11 @@ import 'package:tamdansers_lv2/app/localization/localization_service.dart';
 import 'package:tamdansers_lv2/app/routes/app_routes.dart';
 import 'package:tamdansers_lv2/app/themes/skeleton_theme.dart';
 import 'package:tamdansers_lv2/core/api/controllers/user_controller.dart';
+import 'package:tamdansers_lv2/core/api/services/notication_api.dart';
 import 'package:tamdansers_lv2/core/services/theme_service.dart';
 import 'package:tamdansers_lv2/core/widgets/appbar/custom_appbar.dart';
 import 'package:tamdansers_lv2/data/model/user_model.dart';
+import 'package:tamdansers_lv2/screens/notification/notification_view.dart';
 
 part 'profile_tab_binding.dart';
 part 'profile_tab_controller.dart';
