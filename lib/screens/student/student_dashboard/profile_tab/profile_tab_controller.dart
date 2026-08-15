@@ -689,15 +689,6 @@ onPressed: () async {
       );
     }
 
-<<<<<<< HEAD
-                        await AuthSessionService().clearSessionData(
-                          navigateToLogin: true,
-                        );
-                      } catch (e, stackTrace) {
-                        debugPrint(
-                          'LOGOUT ERROR: $e',
-                        );
-=======
     // =====================================================
     // 2. STOP NOTIFICATION CONTROLLER
     // =====================================================
@@ -758,7 +749,6 @@ onPressed: () async {
     await box.remove(
       'notificationsCount',
     );
->>>>>>> limhong
 
     await box.remove(
       'deletedNotificationIds',

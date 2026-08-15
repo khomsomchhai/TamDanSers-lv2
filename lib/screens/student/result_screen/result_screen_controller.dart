@@ -271,42 +271,11 @@ Future<void> getResult() async {
       'GET RESULT ERROR: $e',
     );
 
-<<<<<<< HEAD
-      await getRank();
-    } catch (e, stackTrace) {
-      debugPrint('GET RESULT ERROR: $e');
-      debugPrintStack(stackTrace: stackTrace);
-
-      result.clear();
-      rank.value = null;
-      yearlyRank.value = null;
-      selectedMonth.value = null;
-
-      final bool isAuthFailure = e is DioException && e.response?.statusCode == 401;
-      if (isAuthFailure) {
-        if (Get.currentRoute != AppRoutes.loginScreen) {
-          await AuthSessionService().handleUnauthorized();
-        }
-        return;
-      }
-
-      if (e is DioException && e.type == DioExceptionType.cancel) {
-        return;
-      }
-
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-=======
     debugPrintStack(
       stackTrace: stackTrace,
     );
   } finally {
     if (!_isClosed) {
->>>>>>> limhong
       isLoading.value = false;
     }
   }
